@@ -4,7 +4,8 @@ public enum ExceptionCode {
     UNEXPECTED_ERROR("Unexpected error. Please contact with admin."),
     USERNAME_ALREADY_TAKEN("This username already taken."),
 
-    INVALID_REQUEST("Invalid request.");
+    INVALID_REQUEST("Invalid request."),
+    SHELF_NOT_FOUND("Shelf not found.");
 
     private final String description;
 
