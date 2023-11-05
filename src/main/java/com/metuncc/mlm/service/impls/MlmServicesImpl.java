@@ -7,6 +7,7 @@ import com.metuncc.mlm.entity.Shelf;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
+import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
 import com.metuncc.mlm.service.MlmServices;
@@ -25,7 +26,7 @@ public class MlmServicesImpl implements MlmServices {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private ShelfRepository shelfRepository;
-
+    private RoomRepository roomRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     @Override
     public StatusDTO createUser(UserRequest userRequest) {

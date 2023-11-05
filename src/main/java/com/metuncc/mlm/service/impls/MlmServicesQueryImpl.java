@@ -1,10 +1,12 @@
 package com.metuncc.mlm.service.impls;
 
+import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.entity.Shelf;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
+import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
 import com.metuncc.mlm.service.MlmQueryServices;
@@ -21,7 +23,7 @@ public class MlmServicesQueryImpl implements MlmQueryServices {
 
     private final UserRepository userRepository;
     private ShelfRepository shelfRepository;
-
+    private RoomRepository roomRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -41,7 +43,9 @@ public class MlmServicesQueryImpl implements MlmQueryServices {
         return shelf.toDTO();
     }
     @Override
-    public List<ShelfDTO> getAllShelfs(){
-        return shelfRepository.findAll().stream().map(Shelf::toDTO).collect(Collectors.toList());
+    public ShelfDTOListResponse getAllShelfs(){
+        ShelfDTOListResponse response = new ShelfDTOListResponse();
+        response.setShelfDTOList(shelfRepository.findAll().stream().map(Shelf::toDTO).collect(Collectors.toList()));
+        return response;
     }
 }
