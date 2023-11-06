@@ -3,19 +3,24 @@ package com.metuncc.mlm.service.impls;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.Shelf;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
+import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
 import com.metuncc.mlm.service.MlmServices;
+import com.metuncc.mlm.utils.ImageUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.util.Objects;
 
 @Service
@@ -27,6 +32,7 @@ public class MlmServicesImpl implements MlmServices {
     private PasswordEncoder passwordEncoder;
     private ShelfRepository shelfRepository;
     private RoomRepository roomRepository;
+    private ImageRepository imageRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     @Override
     public StatusDTO createUser(UserRequest userRequest) {
@@ -63,6 +69,18 @@ public class MlmServicesImpl implements MlmServices {
         }
         shelf = shelf.fromRequest(request);
         shelfRepository.save(shelf);
+        return success;
+    }
+
+    @Override
+    public StatusDTO uploadImage(MultipartFile file) throws IOException {
+
+        Image img= new Image();
+        img.setImageData(ImageUtil.compressImage(file.getBytes()));
+        img.setName(file.getOriginalFilename());
+        img.setType(file.getContentType());
+
+        imageRepository.save(img);
         return success;
     }
 }

@@ -1,5 +1,6 @@
 package com.metuncc.mlm.datas;
 
+import com.metuncc.mlm.entity.Shelf;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.Role;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,5 +22,16 @@ public class DOSHelper {
         user.setDeleted(false);
         user.setDeletedDate(null);
         return user;
+    }
+
+    public Shelf shelf1(){
+        Shelf shelf = new Shelf();
+        shelf.setFloor("1");
+        shelf.setId(1L);
+        shelf.setCreatedDate(LocalDateTime.now());
+        shelf.setLastModifiedDate(LocalDateTime.now());
+        shelf.setDeleted(false);
+        shelf.setDeletedDate(null);
+        return shelf;
     }
 }
