@@ -80,7 +80,8 @@ public class MlmServicesImpl implements MlmServices {
         img.setName(file.getOriginalFilename());
         img.setType(file.getContentType());
 
-        imageRepository.save(img);
+        img = imageRepository.save(img);
+        StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
         return success;
     }
 }

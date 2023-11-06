@@ -7,8 +7,13 @@ import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value ="/api/admin", produces = "application/json;charset=UTF-8")
@@ -30,6 +35,10 @@ public class MLMAdminController {
     @PutMapping("/shelf/update")
     public ResponseEntity<ApiResponse<StatusDTO>> updateShelf(@RequestBody ShelfCreateRequest shelfCreateRequest){
         return responseService.createResponse(mlmServices.updateShelf(shelfCreateRequest));
+    }
+    @PostMapping(value="/uploadImage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<StatusDTO>> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
+        return responseService.createResponse(mlmServices.uploadImage(file));
     }
 
 

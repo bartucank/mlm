@@ -6,6 +6,7 @@ import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
+import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.exception.ExceptionCode;
@@ -46,4 +47,8 @@ public class MLMController {
         return responseService.createResponse(mlmQueryServices.getAllShelfs());
     }
 
+    @GetMapping("/getImageById")
+    public ResponseEntity<ApiResponse<ImageDTO>>  getImageByName(@RequestParam(name = "id")Long id){
+        return responseService.createResponse(mlmQueryServices.getImageById(id));
+    }
 }
