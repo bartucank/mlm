@@ -5,7 +5,9 @@ public enum ExceptionCode {
     USERNAME_ALREADY_TAKEN("This username already taken."),
 
     INVALID_REQUEST("Invalid request."),
-    SHELF_NOT_FOUND("Shelf not found.");
+    SHELF_NOT_FOUND("Shelf not found."),
+    ONLY_METU("Only metuians can register this application."),
+    PLEASE_VERIFY_ACCOUNT("Please verify your account via email.");
 
     private final String description;
 

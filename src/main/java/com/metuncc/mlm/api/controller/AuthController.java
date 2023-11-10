@@ -16,47 +16,35 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Objects;
 
 @RestController
 @RequestMapping(value ="/api/auth", produces = "application/json;charset=UTF-8")
 public class AuthController {
-    private AuthenticationManager authenticationManager;
-    private JwtTokenProvider jwtTokenProvider;
+
     private MlmServices mlmServices;
 
     private MlmQueryServices mlmQueryServices;
     private ResponseService responseService;
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MlmServices mlmServices, MlmQueryServices mlmQueryServices, ResponseService responseService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenProvider = jwtTokenProvider;
+    public AuthController(MlmServices mlmServices, MlmQueryServices mlmQueryServices, ResponseService responseService) {
         this.mlmServices = mlmServices;
         this.mlmQueryServices = mlmQueryServices;
         this.responseService = responseService;
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody UserRequest userRequest){
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                new UsernamePasswordAuthenticationToken(userRequest.getUsername(),
-                        userRequest.getPass());
-        Authentication authentication = authenticationManager
-                .authenticate(usernamePasswordAuthenticationToken);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token =  jwtTokenProvider.generateJwtToken(authentication);
-        LoginResponse loginResponse = new LoginResponse();
-        loginResponse.setJwt(token);
-        return new ResponseEntity<>(loginResponse, HttpStatus.OK);
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody UserRequest userRequest){
+        return responseService.createResponse(mlmServices.login(userRequest));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<StatusDTO>> register(@RequestBody UserRequest userRequest){
+    public ResponseEntity<ApiResponse<LoginResponse>> register(@RequestBody UserRequest userRequest){
         return responseService.createResponse(mlmServices.createUser(userRequest));
+    }
+    @PostMapping("/verify")
+    public ResponseEntity<ApiResponse<StatusDTO>> verify(@RequestParam String code){
+        return responseService.createResponse(mlmServices.verifyEmail(code));
     }
 }

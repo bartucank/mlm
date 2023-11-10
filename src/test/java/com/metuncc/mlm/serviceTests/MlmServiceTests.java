@@ -5,11 +5,13 @@ import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.datas.DOSHelper;
 import com.metuncc.mlm.datas.DTOSHelper;
 import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.Shelf;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
+import com.metuncc.mlm.security.JwtTokenProvider;
 import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.service.impls.MlmServicesImpl;
 import org.junit.jupiter.api.Test;
@@ -134,7 +136,9 @@ public class MlmServiceTests {
                 "image/jpeg",
                 resource.getInputStream()
         );
-
+        Image img = new Image();
+        img.setId(1L);
+        when(imageRepository.save(any())).thenReturn(img);
         StatusDTO result = service.uploadImage(multipartFile);
 
     }

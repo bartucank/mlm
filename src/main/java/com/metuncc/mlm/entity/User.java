@@ -21,6 +21,9 @@ public class User extends MLMBaseClass {
     private String username;
     private String password;
 
+    private Boolean verified;
+    private String email;
+
 
     public UserDTO toDTO() {
         UserDTO userDTO = new UserDTO();
@@ -35,6 +38,7 @@ public class User extends MLMBaseClass {
         setUsername(userRequest.getUsername());
         setFullName(userRequest.getNameSurname());
         setRole(Role.USER);
+        setEmail(userRequest.getEmail());
         return this;
     }
 }
