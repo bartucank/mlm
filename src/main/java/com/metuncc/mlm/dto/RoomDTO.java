@@ -1,14 +1,12 @@
 package com.metuncc.mlm.dto;
 
-import com.metuncc.mlm.entity.enums.Role;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class ShelfDTO extends MLMBaseClassDTO {
-
-    private String floor;
-
-
+public class RoomDTO extends MLMBaseClassDTO{
+    private String name;
+    private Long imageId;
+    private Long quata;
 }

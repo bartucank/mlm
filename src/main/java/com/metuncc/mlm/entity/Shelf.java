@@ -18,7 +18,7 @@ import javax.persistence.Table;
 @Data
 @Entity
 @Table(name = "shelf")
-public class Shelf extends MLMBaseClass {
+public class Shelf  extends MLMBaseClass{
 
     private String floor;
 

@@ -11,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.Table;
 
 @Data
+@EqualsAndHashCode(callSuper=true)
 public class UserDTO extends MLMBaseClassDTO {
 
     private Role role;
