@@ -23,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
@@ -49,9 +50,13 @@ public class MlmServicesImpl implements MlmServices {
     public LoginResponse createUser(UserRequest userRequest) {
         if(Objects.isNull(userRequest) ||
                 Objects.isNull(userRequest.getUsername()) ||
+                StringUtils.isEmpty(userRequest.getUsername()) ||
                 Objects.isNull(userRequest.getPass()) ||
+                StringUtils.isEmpty(userRequest.getPass()) ||
                 Objects.isNull(userRequest.getNameSurname()) ||
-                Objects.isNull(userRequest.getEmail())
+                StringUtils.isEmpty(userRequest.getNameSurname()) ||
+                Objects.isNull(userRequest.getEmail()) ||
+                StringUtils.isEmpty(userRequest.getEmail())
         ){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
@@ -145,6 +150,9 @@ public class MlmServicesImpl implements MlmServices {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
         User user = userRepository.getById(jwtUser.getId());
+        if(Objects.isNull(user)){
+            return StatusDTO.builder().statusCode("E").msg("Unauthorized person.").build();
+        }
         VerificationCode verificationCode = verificationCodeRepository.getByUser(user);
         if(verificationCode.getCode().equals(code)){
             verificationCode.setIsCompleted(true);
@@ -152,7 +160,8 @@ public class MlmServicesImpl implements MlmServices {
             user.setVerified(true);
             userRepository.save(user);
             return success;
+        }else{
+            return StatusDTO.builder().statusCode("E").msg("Wrong code.").build();
         }
-        return error;
     }
 }
