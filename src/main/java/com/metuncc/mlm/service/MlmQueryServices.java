@@ -1,8 +1,10 @@
 package com.metuncc.mlm.service;
 
 import com.metuncc.mlm.api.response.BookDTOListResponse;
+import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.dto.BookDTO;
+import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.UserDTO;
@@ -19,6 +21,8 @@ public interface MlmQueryServices {
     ShelfDTOListResponse getAllShelfs();
 
     ImageDTO getImageById(Long id);
+
+    UserDTOListResponse getUsersBySpecifications(FindUserRequest request);
 
     BookDTO getBookById(Long id);
 
