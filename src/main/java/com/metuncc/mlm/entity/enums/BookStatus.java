@@ -2,7 +2,7 @@ package com.metuncc.mlm.entity.enums;
 
 public enum BookStatus {
     AVAILABLE("Available"),
-    NOTAVAILABLE("Not Available")
+    NOT_AVAILABLE("Not Available")
 
     ;
 

@@ -7,8 +7,8 @@ public enum ExceptionCode {
     SHELF_NOT_FOUND("Shelf not found."),
     ONLY_METU("Only metuians can register this application."),
     PLEASE_VERIFY_ACCOUNT("Please verify your account via email."),
-    BOOK_NOT_FOUND("Book not found.");
-
+    BOOK_NOT_FOUND("Book not found."),
+    IMAGE_NOT_FOUND("Image not found.");
 
     private final String description;
 

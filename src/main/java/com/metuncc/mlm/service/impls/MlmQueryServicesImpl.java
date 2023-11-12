@@ -86,7 +86,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         }
         Book book = bookRepository.getById(id);
         if(Objects.isNull(book)){
-            throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
         }
         return book.toDTO();
     }

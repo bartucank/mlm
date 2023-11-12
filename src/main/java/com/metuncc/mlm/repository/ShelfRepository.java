@@ -10,5 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ShelfRepository extends JpaRepository<Shelf,Long> {
 
+    @Query("select s from Shelf s where s.id = :id")
+    Shelf getShelfById(@Param ("id") Long id);
 
 }
