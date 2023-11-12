@@ -1,5 +1,6 @@
 package com.metuncc.mlm.api.controller;
 
+import com.metuncc.mlm.api.request.BookRequest;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
@@ -48,5 +49,17 @@ public class MLMAdminController {
         return responseService.createResponse(mlmQueryServices.getUsersBySpecifications(request));
     }
 
+    @PostMapping("/book/create")
+    public ResponseEntity<ApiResponse<StatusDTO>> createBook(@RequestBody BookRequest request){
+        return responseService.createResponse(mlmServices.createBook(request));
+    }
 
+    @PutMapping("/book/update")
+    public ResponseEntity<ApiResponse<StatusDTO>> updateBook(@RequestBody BookRequest request){
+        return responseService.createResponse(mlmServices.updateBook(request));
+    }
+    @PutMapping("/book/delete")
+    public ResponseEntity<ApiResponse<StatusDTO>> deleteBook(@RequestParam("id") Long id){
+        return responseService.createResponse(mlmServices.deleteBook(id));
+    }
 }

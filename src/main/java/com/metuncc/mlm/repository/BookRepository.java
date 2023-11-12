@@ -1,16 +1,18 @@
 package com.metuncc.mlm.repository;
 
+import com.metuncc.mlm.entity.Book;
 import com.metuncc.mlm.entity.Shelf;
-import com.metuncc.mlm.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-@Repository
-public interface ShelfRepository extends JpaRepository<Shelf,Long> {
+import java.util.List;
 
-    @Query("select s from Shelf s where s.id = :id")
-    Shelf getShelfById(@Param ("id") Long id);
+@Repository
+public interface BookRepository extends JpaRepository<Book,Long> {
+    @Query("select b from Book b where b.shelfId.id=:shelfId")
+    List<Book> getBooksByShelfId(@Param("shelfId")Long shelfId);
+
 
 }

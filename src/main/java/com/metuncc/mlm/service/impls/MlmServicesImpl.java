@@ -1,13 +1,14 @@
 package com.metuncc.mlm.service.impls;
+import java.time.LocalDateTime;
 import java.util.Random;
+
+import com.metuncc.mlm.api.request.BookRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.Shelf;
-import com.metuncc.mlm.entity.User;
-import com.metuncc.mlm.entity.VerificationCode;
+import com.metuncc.mlm.entity.*;
+import com.metuncc.mlm.entity.enums.BookStatus;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -40,6 +41,7 @@ public class MlmServicesImpl implements MlmServices {
     private ShelfRepository shelfRepository;
     private RoomRepository roomRepository;
     private ImageRepository imageRepository;
+    private BookRepository bookRepository;
     private AuthenticationManager authenticationManager;
     private JwtTokenProvider jwtTokenProvider;
     private MailUtil mailUtil;
@@ -164,4 +166,54 @@ public class MlmServicesImpl implements MlmServices {
             return StatusDTO.builder().statusCode("E").msg("Wrong code.").build();
         }
     }
+
+    @Override
+    public StatusDTO createBook(BookRequest request){
+        if(Objects.isNull(request) || Objects.isNull(request.getName()) || Objects.isNull(request.getIsbn())
+                || Objects.isNull(request.getAuthor()) || Objects.isNull(request.getCategory())
+                || Objects.isNull(request.getShelfId()) || Objects.isNull(request.getImageId())){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Shelf shelf = shelfRepository.getShelfById(request.getShelfId());
+        if(Objects.isNull(shelf)){
+            throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+        }
+        Image image = imageRepository.getImageById(request.getImageId());
+        if(Objects.isNull(image)){
+            throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
+        }
+        Book book = new Book().fromRequest(request);
+        book.setStatus(BookStatus.AVAILABLE);
+        book.setShelfId(shelf);
+        book.setImageId(image);
+        bookRepository.save(book);
+        return success;
+    }
+
+    @Override
+    public StatusDTO updateBook(BookRequest request) {
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(request.getId());
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        book = book.fromRequest(request);
+        bookRepository.save(book);
+        return success;
+    }
+
+    @Override
+    public StatusDTO deleteBook(Long id) {
+        Book book = bookRepository.getById(id);
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        book.setDeleted(true);
+        book.setDeletedDate(LocalDateTime.now());
+        bookRepository.save(book);
+        return success;
+    }
+
 }

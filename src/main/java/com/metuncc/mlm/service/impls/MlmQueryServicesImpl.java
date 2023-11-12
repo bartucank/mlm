@@ -1,16 +1,20 @@
 package com.metuncc.mlm.service.impls;
 
+import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
+import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.Shelf;
+import com.metuncc.mlm.entity.Book;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
+import com.metuncc.mlm.repository.*;
 import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
@@ -33,6 +37,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private ShelfRepository shelfRepository;
     private RoomRepository roomRepository;
     private ImageRepository imageRepository;
+    private BookRepository bookRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -73,6 +78,26 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             return null;
         }
     }
+
+    @Override
+    public BookDTO getBookById(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(id);
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        return book.toDTO();
+    }
+
+    @Override
+    public BookDTOListResponse getBooksByShelfId(Long shelfId) {
+        BookDTOListResponse response = new BookDTOListResponse();
+        response.setBookDTOList(bookRepository.getBooksByShelfId(shelfId).stream().map(Book::toDTO).collect(Collectors.toList()));
+        return response;
+    }
+
 
     @Override
     public UserDTOListResponse getUsersBySpecifications(FindUserRequest request){
