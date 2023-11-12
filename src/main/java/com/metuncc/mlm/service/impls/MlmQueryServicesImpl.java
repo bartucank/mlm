@@ -7,6 +7,7 @@ import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
+import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.Shelf;
@@ -20,9 +21,12 @@ import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
 import com.metuncc.mlm.repository.specifications.UserSpecification;
+import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.utils.ImageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -116,5 +120,20 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         UserDTOListResponse response = new UserDTOListResponse();
         response.setUserDTOList(dtos);
         return response;
+    }
+
+    @Override
+    public UserDTO getUserDetails() {
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+            User user = userRepository.getById(jwtUser.getId());
+            if(Objects.nonNull(user)){
+                return user.toDTO();
+            }
+        }catch (Exception e){
+            throw new MLMException(ExceptionCode.SESSION_EXPERIED_PLEASE_LOGIN);
+        }
+        throw new MLMException(ExceptionCode.SESSION_EXPERIED_PLEASE_LOGIN);
     }
 }

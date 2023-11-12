@@ -15,9 +15,11 @@ import javax.persistence.Table;
 public class UserDTO extends MLMBaseClassDTO {
 
     private Role role;
+    private String roleStr;
     private String fullName;
     private String username;
     private String password;
-
+    private Boolean verified;
+    private String email;
 
 }

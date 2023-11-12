@@ -116,8 +116,8 @@ public class MlmServicesImpl implements MlmServices {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Shelf shelf = new Shelf().fromRequest(request);
-        shelfRepository.save(shelf);
-        return success;
+        shelf = shelfRepository.save(shelf);
+        return StatusDTO.builder().statusCode("S").msg(shelf.getId().toString()).build();
     }
 
     @Override
@@ -143,8 +143,7 @@ public class MlmServicesImpl implements MlmServices {
         img.setType(file.getContentType());
 
         img = imageRepository.save(img);
-        StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
-        return success;
+        return StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
     }
 
     @Override

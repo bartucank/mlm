@@ -11,6 +11,7 @@ import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.security.JwtTokenProvider;
@@ -52,6 +53,11 @@ public class MLMController {
     @GetMapping("/getImageById")
     public ResponseEntity<ApiResponse<ImageDTO>>  getImageByName(@RequestParam(name = "id")Long id){
         return responseService.createResponse(mlmQueryServices.getImageById(id));
+    }
+
+    @GetMapping("/getUserDetails")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserDetails(){
+        return responseService.createResponse(mlmQueryServices.getUserDetails());
     }
 
     @GetMapping("/book/getBookById")

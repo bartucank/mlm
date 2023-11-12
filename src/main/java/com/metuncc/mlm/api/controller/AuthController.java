@@ -5,6 +5,7 @@ import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.security.JwtTokenProvider;
@@ -47,4 +48,6 @@ public class AuthController {
     public ResponseEntity<ApiResponse<StatusDTO>> verify(@RequestParam String code){
         return responseService.createResponse(mlmServices.verifyEmail(code));
     }
+
+
 }
