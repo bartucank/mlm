@@ -14,6 +14,5 @@ public interface BookRepository extends JpaRepository<Book,Long> {
     @Query("select b from Book b where b.shelfId.id=:shelfId")
     List<Book> getBooksByShelfId(@Param("shelfId")Long shelfId);
 
-    List<Book> getBooksByShelfId(Shelf shelf);
 
 }

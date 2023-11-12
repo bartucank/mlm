@@ -26,5 +26,5 @@ public interface MlmQueryServices {
 
     BookDTO getBookById(Long id);
 
-    BookDTOListResponse getBooksByShelfId(Long );
+    BookDTOListResponse getBooksByShelfId(Long id);
 }

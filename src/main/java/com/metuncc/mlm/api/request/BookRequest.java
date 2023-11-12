@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 @Data
 public class BookRequest {
+    private Long id;
     private Long shelfId;
     private Long imageId;
     private String isbn;

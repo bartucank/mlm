@@ -1,13 +1,13 @@
 package com.metuncc.mlm.service.impls;
+import java.time.LocalDateTime;
 import java.util.Random;
+
+import com.metuncc.mlm.api.request.BookRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.Shelf;
-import com.metuncc.mlm.entity.User;
-import com.metuncc.mlm.entity.VerificationCode;
+import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -40,6 +40,7 @@ public class MlmServicesImpl implements MlmServices {
     private ShelfRepository shelfRepository;
     private RoomRepository roomRepository;
     private ImageRepository imageRepository;
+    private BookRepository bookRepository;
     private AuthenticationManager authenticationManager;
     private JwtTokenProvider jwtTokenProvider;
     private MailUtil mailUtil;
@@ -165,5 +166,40 @@ public class MlmServicesImpl implements MlmServices {
         }
     }
 
+    @Override
+    public StatusDTO createBook(BookRequest request){
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = new Book().fromRequest(request);
+        bookRepository.save(book);
+        return success;
+    }
+
+    @Override
+    public StatusDTO updateBook(BookRequest request) {
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(request.getId());
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        book = book.fromRequest(request);
+        bookRepository.save(book);
+        return success;
+    }
+
+    @Override
+    public StatusDTO deleteBook(Long id) {
+        Book book = bookRepository.getById(id);
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        book.setDeleted(true);
+        book.setDeletedDate(LocalDateTime.now());
+        bookRepository.save(book);
+        return success;
+    }
 
 }

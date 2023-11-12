@@ -2,6 +2,7 @@ package com.metuncc.mlm.api.controller;
 
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
@@ -58,7 +59,7 @@ public class MLMController {
         return responseService.createResponse(mlmQueryServices.getBookById(id));
     }
     @GetMapping("/book/getBooksByShelfId")
-    public ResponseEntity<ApiResponse<BookDTO>>  getBooksByShelfId(@RequestParam(name = "id")Long shelfId){
+    public ResponseEntity<ApiResponse<BookDTOListResponse>>  getBooksByShelfId(@RequestParam(name = "shelfId")Long shelfId){
         return responseService.createResponse(mlmQueryServices.getBooksByShelfId(shelfId));
     }
 

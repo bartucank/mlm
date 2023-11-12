@@ -92,11 +92,12 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
-    public BookDTOListResponse getBooksByShelfId() {
+    public BookDTOListResponse getBooksByShelfId(Long shelfId) {
         BookDTOListResponse response = new BookDTOListResponse();
-
+        response.setBookDTOList(bookRepository.getBooksByShelfId(shelfId).stream().map(Book::toDTO).collect(Collectors.toList()));
         return response;
     }
+
 
     @Override
     public UserDTOListResponse getUsersBySpecifications(FindUserRequest request){
