@@ -6,6 +6,7 @@ import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
+import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.StatusDTO;
@@ -51,4 +52,14 @@ public class MLMController {
     public ResponseEntity<ApiResponse<ImageDTO>>  getImageByName(@RequestParam(name = "id")Long id){
         return responseService.createResponse(mlmQueryServices.getImageById(id));
     }
+
+    @GetMapping("/book/getBookById")
+    public ResponseEntity<ApiResponse<BookDTO>>  getBookById(@RequestParam(name = "id")Long id){
+        return responseService.createResponse(mlmQueryServices.getBookById(id));
+    }
+    @GetMapping("/book/getBooksByShelfId")
+    public ResponseEntity<ApiResponse<BookDTO>>  getBooksByShelfId(@RequestParam(name = "id")Long shelfId){
+        return responseService.createResponse(mlmQueryServices.getBooksByShelfId(shelfId));
+    }
+
 }
