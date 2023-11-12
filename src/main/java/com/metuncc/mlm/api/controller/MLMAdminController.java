@@ -1,7 +1,9 @@
 package com.metuncc.mlm.api.controller;
 
+import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.StatusDTO;
@@ -39,6 +41,11 @@ public class MLMAdminController {
     @PostMapping(value="/uploadImage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<StatusDTO>> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
         return responseService.createResponse(mlmServices.uploadImage(file));
+    }
+
+    @PostMapping("/user/getUsersBySpecifications")
+    public ResponseEntity<ApiResponse<UserDTOListResponse>> getUsersBySpecifications(@RequestBody FindUserRequest request){
+        return responseService.createResponse(mlmQueryServices.getUsersBySpecifications(request));
     }
 
 
