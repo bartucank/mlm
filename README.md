@@ -1,4 +1,3 @@
-# MLM
-CNG 491 Senior Project - MLM
+# CNG 491 Senior Project - MLM
 
 
