@@ -5,6 +5,7 @@ import com.metuncc.mlm.datas.DTOSHelper;
 import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.exception.MLMException;
+import com.metuncc.mlm.repository.BookRepository;
 import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
@@ -39,6 +40,8 @@ public class MlmQueryServiceTests {
     private ShelfRepository shelfRepository;
     @Mock
     private ImageRepository imageRepository;
+    @Mock
+    private BookRepository bookRepository;
 
     @InjectMocks
     private MlmQueryServicesImpl service;
@@ -102,5 +105,23 @@ public class MlmQueryServiceTests {
 
         when(imageRepository.getImageById(any())).thenReturn(null);
         service.getImageById(1L);
+    }
+    @Test
+    public void getBookById_valid_case() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        service.getBookById(1L);
+    }
+    @Test
+    public void getBookById_invalid_case(){
+        MLMException thrown = assertThrows(MLMException.class, () -> {
+            service.getBookById(null);
+        });
+    }
+    @Test
+    public void getBookbyId_invalid_case2(){
+        MLMException thrown = assertThrows(MLMException.class, () -> {
+            when(bookRepository.getById(any())).thenReturn(null);
+            service.getBookById(1L);
+        });
     }
 }

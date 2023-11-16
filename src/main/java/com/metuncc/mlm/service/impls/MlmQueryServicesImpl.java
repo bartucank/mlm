@@ -1,5 +1,6 @@
 package com.metuncc.mlm.service.impls;
 
+import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
@@ -20,6 +21,7 @@ import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
+import com.metuncc.mlm.repository.specifications.BookSpecification;
 import com.metuncc.mlm.repository.specifications.UserSpecification;
 import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmQueryServices;
@@ -135,5 +137,29 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             throw new MLMException(ExceptionCode.SESSION_EXPERIED_PLEASE_LOGIN);
         }
         throw new MLMException(ExceptionCode.SESSION_EXPERIED_PLEASE_LOGIN);
+    }
+
+    @Override
+    public BookDTOListResponse getBooksBySpecification(FindBookRequest request) {
+        if(Objects.isNull(request)){
+            request = new FindBookRequest();
+        }
+        BookSpecification  bookSpecification = new BookSpecification(
+                request.getName(),
+                request.getAuthor(),
+                request.getPublisher(),
+                request.getDescription(),
+                request.getIsbn(),
+                request.getPublicationDate(),
+                request.getBarcode(),
+                request.getCategory(),
+                request.getStatus()
+        );
+        List<Book> books = bookRepository.findAll(bookSpecification);
+        List<BookDTO> bookDTOS =  books.stream().map(Book::toDTO).collect(Collectors.toList());
+        BookDTOListResponse response = new BookDTOListResponse();
+        response.setBookDTOList(bookDTOS);
+        return response;
+
     }
 }
