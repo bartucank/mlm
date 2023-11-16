@@ -1,5 +1,6 @@
 package com.metuncc.mlm.service;
 
+import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
@@ -29,4 +30,6 @@ public interface MlmQueryServices {
     BookDTOListResponse getBooksByShelfId(Long id);
 
     UserDTO getUserDetails();
+
+    BookDTOListResponse getBooksBySpecification(FindBookRequest request);
 }
