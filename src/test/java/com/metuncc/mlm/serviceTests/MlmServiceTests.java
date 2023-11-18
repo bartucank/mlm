@@ -11,9 +11,11 @@ import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
+import com.metuncc.mlm.repository.VerificationCodeRepository;
 import com.metuncc.mlm.security.JwtTokenProvider;
 import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.service.impls.MlmServicesImpl;
+import com.metuncc.mlm.utils.MailUtil;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -44,6 +46,10 @@ public class MlmServiceTests {
     @Mock
     private ImageRepository imageRepository;
 
+    @Mock
+    private MailUtil mailUtil;
+    @Mock
+    private VerificationCodeRepository verificationCodeRepository;
     @InjectMocks
     private MlmServicesImpl service;
 
@@ -62,6 +68,7 @@ public class MlmServiceTests {
         UserRequest userRequest = new UserRequest();
         userRequest.setUsername("username");
         userRequest.setPass("123");
+        userRequest.setEmail("a@metu.edu.tr");
         userRequest.setNameSurname("full name");
         MLMException thrown = assertThrows(MLMException.class, () -> {
             when(userRepository.findByUsername(any())).thenReturn(dosHelper.user1());
@@ -76,8 +83,10 @@ public class MlmServiceTests {
         userRequest.setUsername("username");
         userRequest.setPass("123");
         userRequest.setNameSurname("full name");
+        userRequest.setEmail("a@metu.edu.tr");
         when(userRepository.findByUsername(any())).thenReturn(null);
         when(passwordEncoder.encode(any())).thenReturn("1");
+        when(userRepository.save(any())).thenReturn(dosHelper.user1());
         assertNotNull(service.createUser(userRequest));
     }
 
@@ -92,6 +101,7 @@ public class MlmServiceTests {
 
     @Test
     public void createShelf_valid_case(){
+        when( shelfRepository.save(any())).thenReturn(dosHelper.shelf1());
         ShelfCreateRequest request = new ShelfCreateRequest();
         request.setFloor("1");
         assertNotNull(service.createShelf(request));

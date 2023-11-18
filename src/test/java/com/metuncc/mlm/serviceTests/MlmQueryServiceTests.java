@@ -49,7 +49,7 @@ public class MlmQueryServiceTests {
 
     @Test
     public void getOneUserByUserName(){
-        when(userRepository.findByUsername(any())).thenReturn(new User());
+        when(userRepository.findByUsername(any())).thenReturn(dosHelper.user1());
         service.getOneUserByUserName("asdf");
     }
 
