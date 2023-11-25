@@ -1,0 +1,22 @@
+@startuml
+actor "Registered User" as User
+participant "Book Collection Page" as Page
+participant "Book Details Page" as Details
+database "Books Database" as DB
+
+User -> Page: Visits Collection Page
+activate Page
+
+Page -> DB: Requests short information of books
+activate DB
+DB --> Page: Returns list of books
+deactivate DB
+User -> Page: Browses books from list
+Page -> Page: Displays list of books
+opt if user clicks any Book
+    activate Details
+    deactivate Page
+    Page -> Details:Redirect book details page
+    Details -> Details:Display details of selected book
+end
+@enduml

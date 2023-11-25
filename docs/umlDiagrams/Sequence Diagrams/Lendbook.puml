@@ -1,0 +1,40 @@
+@startuml
+actor "Librarian" as Librarian
+participant "HomePage" as Home
+participant "Book Page" as Page
+participant "Controller" as System
+database "Database" as BooksDB
+
+Librarian -> Home: Click on the Book page button
+activate Home
+Home -> Page: Requests list of books
+deactivate Home
+activate Page
+Page -> System: Request books list
+activate System
+
+System -> BooksDB: Retrieve books list
+activate BooksDB
+BooksDB --> System: List of books
+deactivate BooksDB
+System --> Page: Return list of books
+Page -> Page: Display list of books
+deactivate System
+deactivate Page
+
+
+Librarian -> Page: Selects book for lending
+activate Page
+Page -> System: Send the record of lending
+activate System
+
+System -> BooksDB: Creates lending record
+activate BooksDB
+BooksDB --> System: Lending record created
+deactivate BooksDB
+
+System --> Page: Confirm lending
+Page -> Page: Display the confirmation message
+deactivate Page
+deactivate System
+@enduml

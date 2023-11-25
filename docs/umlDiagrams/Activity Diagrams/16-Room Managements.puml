@@ -1,0 +1,59 @@
+@startuml
+start
+:User navigated to Room List Page ; 
+:"+" button displayed at the right bottom of the screen.;
+if (Room exists on database?) then (yes)
+    :Display all rooms on the page.;
+    if (User click any room?) then (yes)
+        :User navigated Librarian Room Detail Page;
+        if (\t\tFor Each timeslot;\nTimeslot is reserved by someone else?) then (yes)
+            :Display Timeslot in Red;
+        else (no)
+            :Display Timeslot in Green;
+        endif
+        :Display Delete button;
+        if (User select any timeslot?) then (yes)
+            if (Timeslot is red?) then (yes)
+                :Give reservation detail in popup;
+                :Display "Cancel" and "Confirmation" buttons;
+                if (User click cancel button?) then (yes)
+                    :Cancel reservation and show success message;
+                else (no)
+                    if(User click confirmation button?)then (yes)
+                        :Make reservation as confirmed;
+                        :Send email to the reservation's users;
+                    else (no)
+                        :Stay on the same page;
+                    endif
+                endif
+            else (no)
+                :Stay on the same page;
+            endif
+        else (no)
+            if (User clicks Delete button?) then (yes)
+                :Delete room and show success message;
+            else (no)
+                :Stay on the samepage;
+            endif
+        endif
+        
+    else (no)
+        :Stay on the same page;
+    endif
+else (no)
+    :Display blank page;
+endif
+if (User click "+" button?) then (yes)
+    :Open Add Room page;
+    if (User fills room name, room image, NFC_No, \ntime slots, and clicks submit button ?) then (yes)
+        :Save Room informations to the database;
+        :Show success message;
+        :User navigated room list page;
+    else (no)
+        :Stay on the same page;
+    endif
+else (no)
+    :Stay on the same page;
+endif
+stop
+@enduml

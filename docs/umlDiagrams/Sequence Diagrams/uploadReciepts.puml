@@ -1,0 +1,42 @@
+@startuml
+actor "Registered User" as User
+participant "CopyCard Page" as Home 
+participant "Upload Interface" as Upload
+participant "Receipts Controller" as Controller
+database "Database" as Storage
+
+User -> Home: Click on the CopyCard button
+activate Home
+Home -> Upload: Show option for required reciept
+deactivate Home
+activate Upload
+
+opt If user wants to do upload for the CopyCard
+    Upload -> Controller: Uploads receipt for CopyCard
+    activate Controller
+
+    Controller -> Storage: Stores receipt for CopyCard
+    activate Storage
+    Storage --> Controller: Confirm receipt stored
+    deactivate Storage
+
+    Controller --> Upload: Confirm upload success
+    deactivate Controller
+
+    Upload --> User: Display upload confirmation
+else
+    Upload -> Controller: Uploads receipt for book dept
+    activate Controller
+
+    Controller -> Storage: Stores receipt for book dept
+    activate Storage
+    Storage --> Controller: Confirm receipt stored
+    deactivate Storage
+
+    Controller --> Upload: Confirm upload success
+    deactivate Controller
+
+    Upload --> User: Display upload confirmation
+    deactivate Upload
+end
+@enduml

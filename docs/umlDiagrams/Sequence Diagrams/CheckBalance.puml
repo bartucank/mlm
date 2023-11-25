@@ -1,0 +1,24 @@
+@startuml CheckBalance
+actor User
+participant HomePage as HomePage
+participant Controller as Controller
+database Database
+
+User -> HomePage: Enter HomePage
+activate HomePage
+
+HomePage -> Controller: Request Balance Check
+activate Controller
+
+Controller -> Database: Retrieve Balance
+activate Database
+
+Database --> Controller: Return Balance
+deactivate Database
+
+Controller --> HomePage: Send Balance
+deactivate Controller
+HomePage -> HomePage: Display Balance
+
+deactivate HomePage
+@enduml

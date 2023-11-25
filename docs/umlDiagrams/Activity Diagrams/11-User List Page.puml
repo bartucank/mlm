@@ -1,0 +1,31 @@
+@startuml
+
+start
+:User navigated to User List page.;
+:Display 10 user from database by sorting by their ID.;
+if (User scroll down to the bottom of page?) then (yes)
+    :Display 10 more user from database.;
+else
+    :Stay on the same page;
+endif
+if (User clicks Filter button?) then (yes)
+    :Filter bottom sheet opened.;
+    if (User enter any informations which are "Name Surname",\n \t\t"Username" and "Email" and clicks\n\t\t "Filter" button on the bottom sheet?) then (yes)
+        :Get specific user list based on user's request;
+    else (no)
+        if (User click "Clear" button?) then (yes)
+            :Display user list which are displayed before filtering.;
+        else (no)
+            if (User click out of bottom sheet?) then (yes)
+                :Close bottom sheet;
+            else (no)
+                :Stay on bottom sheet;
+            endif
+        endif
+    endif
+else 
+    :Stay on the same page;
+                endif
+stop
+
+@enduml

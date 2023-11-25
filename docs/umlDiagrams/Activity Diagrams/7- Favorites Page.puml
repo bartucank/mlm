@@ -1,0 +1,19 @@
+@startuml
+
+start
+:User navigated to Favorites page;
+
+if (User has added any book to the favorite?) then (yes)
+  :Navigate User's favorites book;
+  if (User clicked any book?) then (yes)
+  :Navigate Book Detail Page;
+  else (no)
+    :Stay on the page;
+  endif
+else (no)
+ :Display blank page;
+endif
+
+stop
+
+@enduml

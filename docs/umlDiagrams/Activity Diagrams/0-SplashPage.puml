@@ -1,0 +1,16 @@
+@startuml
+
+start
+:User opens the Application;
+if (JWT is exists and alive?) then (yes)
+    if (User's role is LIB?) then (yes)
+        :User navigated to Librarian Home Page;
+    else (no)
+        :User navigated to User Home Page;
+    endif
+else
+    :User navigated to Onboarding page;
+endif
+
+stop
+@enduml

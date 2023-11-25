@@ -1,0 +1,76 @@
+@startuml
+start
+:User navigated to Boook List page .;
+:Display 10 Book from database by sorting by their created date.;
+if (User scroll down to the bottom of page?) then (yes)
+    :Display 10 more book from database.;
+else
+    :Stay on the same page;
+endif
+if (User clicks Filter button?) then (yes)
+    :Filter bottom sheet opened.;
+    if (User enter any informations which are "Name",\n \t"Author", "Publisher", "Description", "isbn",\n\t "publication date", "barcode", "category"\n\t and "status" clicks "Filter" button on\n\t the bottom sheet?) then (yes)
+        :Get specific book list based on user's request;
+    else (no)
+        if (User click "Clear" button?) then (yes)
+            :Display book list which are displayed before filtering.;
+        else (no)
+            if (User click out of bottom sheet?) then (yes)
+                :Close bottom sheet;
+            else (no)
+                :Stay on bottom sheet;
+            endif
+        endif
+    endif
+else 
+    if (User click "+"" button?) then (yes)
+        :User navigated Add Book page.;
+        if (User enters isbn and clicks get info button?) then (yes)
+            :Get book information based on ISBN number\nfrom external system via back-end api call;
+            :UI fill the form based on information which are returned from back-end;
+            if (User clicks submit button?) then (yes)
+                :UI send book informations to the back-end \nand back-end save book details to the database.;
+            else (no)
+                :Stay on the page;
+            endif
+        else (no)
+            if(User enters book details manually and clicks submit button?) then (yes)
+                :UI send book informations to the back-end \nand back-end save book details to the database.;
+                :Display success message and user navigated back to the Book List page.;
+            else
+                :Stay on the page;
+            endif
+        endif
+    else (no)
+        :Stay on the same page;
+    endif
+
+endif
+if (User click any book if exists?) then (yes)
+    :Display book detail on the Book Detail page;
+    :Display Update and Delete book;
+    if (User click delete button?) then (yes)
+        :Delete book and show success message;
+    else (no)
+        if (User clicks update button?) then (yes)
+            :User navigated update book screen;
+            :Display filled text ares based on book information;
+            if (User edits and clicks update button?) then (yes)
+                :Update book and show success message;
+            else (no)
+                if (Librarian clicks Lend button\n and select user from list?) then (yes)
+                    :Lent this book.;
+                else (no)
+                    :Stay on the same page;
+                endif
+            endif
+        else (no)
+            :Stay on the same page;
+        endif
+    endif
+else (no)
+    :Stay on the same page;
+endif
+stop
+
+@enduml

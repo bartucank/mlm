@@ -1,0 +1,27 @@
+@startuml
+actor  User as User
+participant "Homepage" as Home
+participant "User Detail Page" as Page
+participant "User Controller" as Controller
+database "User Database" as DB
+
+User -> Home: Is on Homepage
+activate Home
+deactivate Home
+
+User -> Page: Clicks 'Three Dot Icon'
+activate Page
+
+Page -> Controller: Triggers JSON request
+activate Controller
+
+Controller -> DB: Fetches User Details
+activate DB
+DB --> Controller: Returns User Details
+deactivate DB
+Controller --> Page: Returns User Detail Object
+deactivate Controller
+Page -> Page:Display User Detail On The Screen
+
+deactivate Page
+@enduml

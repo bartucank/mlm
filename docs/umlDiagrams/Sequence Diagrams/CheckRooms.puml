@@ -1,0 +1,66 @@
+@startuml
+actor "Registered User" as User
+participant "Homepage" as Home
+participant "Reservation Page" as Reservation
+participant "Room List" as List
+participant "Room Controller" as Controller
+database "Database" as DB
+
+User -> Home: Navigates to homepage
+activate Home
+
+Home -> Reservation: Clicks the “Room Reservation” button
+deactivate Home
+activate Reservation
+
+Reservation -> List: Requests list of rooms
+deactivate Reservation
+activate List
+List -> Controller: Request list of rooms
+activate Controller
+
+Controller -> DB: Retrieves rooms with pictures
+activate DB
+DB --> Controller: Returns list of rooms
+deactivate DB
+
+Controller --> List: Provides list of rooms and pictures
+deactivate Controller
+List -> List: Display room list
+
+opt If user selects any room
+    activate Reservation
+    User -> Reservation: Selects a room to see slots
+    List --> Reservation: Return selected room
+    deactivate List
+    Reservation -> Controller: Request queries for slots
+    activate Controller
+    Controller -> DB: Queries available slots for room
+    activate DB
+    DB --> Controller: Returns available slots
+    deactivate DB
+    Controller --> Reservation: Return available slots
+    deactivate Controller
+    Reservation --> Reservation: Shows available slots on the page
+else
+    Reservation -> Home: Return homepage
+    deactivate Reservation
+
+    opt If user wanna select time slot
+        User -> Reservation: Makes reservation for available slot
+        activate Reservation
+        Reservation -> Controller: Request for booking
+        activate Controller
+        Controller -> DB: Books selected slot
+        activate DB
+        DB --> Controller: Returns Confirmation for reservation
+        deactivate DB
+        Controller --> Reservation: Returns Confirmation message
+        deactivate Controller
+        Reservation --> User: Indicates successful booking
+    else
+        Reservation -> Home: Return homepage
+        deactivate Reservation
+    end
+end
+@enduml

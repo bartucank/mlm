@@ -1,0 +1,45 @@
+@startuml BlockUser
+actor Librarian
+participant HomePage as HomePage
+participant UserPage as UserPage
+participant Controller as Controller
+database Database
+
+Librarian-> HomePage: Enter HomePage
+activate HomePage
+
+HomePage -> UserPage: Enter UserPage
+deactivate HomePage
+activate UserPage
+
+UserPage -> UserPage: Enter the Details of the User to be Blocked in the Pop-up
+UserPage -> Controller: Request the List of Users with Given Details
+activate Controller
+
+Controller -> Database: Retrieve the List of Users with Given Details
+activate Database
+
+Database --> Controller: Return the List of Users
+deactivate Database
+
+Controller --> UserPage: Return the List of Users
+deactivate Controller
+UserPage -> UserPage: Display the List of Users
+
+Librarian -> UserPage: Click on One of the User
+UserPage -> Controller: Send UserID to Block
+activate Controller
+
+Controller -> Database: Send UserID to Block
+activate Database
+
+Database --> Controller: Return Deletion Confirmation
+deactivate Database
+
+Controller --> UserPage: Return Deletion Confirmation
+deactivate Controller
+
+UserPage -> UserPage: Display Deletion Confirmation
+deactivate UserPage
+
+@enduml

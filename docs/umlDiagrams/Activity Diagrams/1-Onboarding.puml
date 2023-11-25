@@ -1,7 +1,6 @@
 @startuml
-
 start
-:User opens the Application;
+:User navigated to Onboarding page;
 if (Register/Login clicked?) then (yes)
   if (Register selected?) then (yes)
     :Display Registration Form;
@@ -24,7 +23,11 @@ if (Register/Login clicked?) then (yes)
     :User enters credentials;
     if (Login button clicked?) then (yes)
       if (Account confirmed?) then (yes)
-        :Navigate to Home Page;
+        if (User's role is LIB?) then (yes)
+          :Navigate to the Libraian Homepage;
+        else (no)
+          :Navigate to the Home Page;
+        endif
       else (no)
         :Ask for Confirmation Code;
         if (Code entered correctly?) then (yes)

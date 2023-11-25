@@ -1,0 +1,30 @@
+@startuml SearchBook
+actor User
+participant HomePage as HomePage
+participant SearchPage as SearchPage
+participant Controller as Controller
+database Database
+
+User -> HomePage: Enter HomePage
+activate HomePage
+
+HomePage -> SearchPage: Navigate to SearchPage by Clicking on Search Icon
+deactivate HomePage
+activate SearchPage
+
+
+SearchPage -> Controller: Send Specification Form
+activate Controller
+
+Controller -> Database: Retrieve Search Results with the Specifications
+activate Database
+
+Database --> Controller: Return Search Results
+deactivate Database
+
+Controller --> SearchPage: Send Search Results
+deactivate Controller
+SearchPage -> SearchPage: Display Search Results
+
+deactivate SearchPage
+@enduml

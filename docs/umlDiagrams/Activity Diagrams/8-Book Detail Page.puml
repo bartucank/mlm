@@ -1,0 +1,29 @@
+@startuml
+
+start
+:User navigated to Book Detail page;
+:Details of book returned to the application from the back-end server.;
+:Book Details and components displayed;
+if(Book is available?) then (yes)
+  :Display "Available!";
+else
+  :Display "Not Available!" message
+  \tand "Enter Queue" button.;
+  if(User click that button? ) then(yes)
+    :Put user to the queue;
+    :Display Success page;
+    :Send email to the user about queue status;
+  else
+    :Stay on the page;
+  endif
+endif
+
+if (User clicked Hearth icon?) then (yes)
+  :Add book to the user's favorites list.;
+else (no)
+  :Stay on the page;
+endif
+
+stop
+
+@enduml

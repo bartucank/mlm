@@ -1,0 +1,46 @@
+@startuml
+actor "Librarian" as Librarian
+participant "Reservation Management Page" as System
+participant "Reservation Controller" as Controller
+participant "Email Service" as Email
+database "Database" as Database
+
+Librarian -> System: Requests list of reservations
+activate System
+
+System -> Controller: Requests reservations
+activate Controller
+
+Controller -> Database: Retrieves reservations
+activate Database
+Database --> Controller: List of reservations
+deactivate Database
+Controller --> System: Returns list of reservations
+deactivate Controller
+
+System --> System: Displays list of reservations
+deactivate System
+
+Librarian -> System: Chooses reservation to cancel
+activate System
+
+System -> Controller: Cancels reservation
+activate Controller
+Controller -> Database: Sends the necessary data
+activate Database
+Database --> Controller: Confirmation of cancellation
+deactivate Database
+Controller --> System: Confirmation of cancellation
+Controller --> Controller: Display cancellation message
+ 
+
+System -> Controller: Sends cancellation email to user
+activate Email
+Controller -> Email:Send the information through email
+deactivate Controller
+Email --> System: Email sent confirmation
+deactivate Email
+
+System --> Librarian: Confirms reservation cancelled and email sent
+deactivate System
+@enduml

@@ -1,0 +1,30 @@
+@startuml
+start
+
+:Open Confirmation Type Popup;
+if(User select NFC) then(yes)
+ if(User scan NFC card on the room?) then(yes)
+   if(Correct NFC Tag?) then(yes)
+    :Display success popup;
+    :Make room as a full;
+   else
+    :Display error popup;
+   endif
+ else
+   :Stay on the same popup;
+ endif
+else
+ :Open Camera;
+ if(User scan QR Code) then (yes)
+  if(Correct QR Code?) then(yes)
+    :Display success popup;
+    :Make room as a full;
+   else
+    :Display error popup;
+   endif
+ else
+   :Stay on the same popup;
+ endif
+endif
+end
+@enduml

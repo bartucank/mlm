@@ -1,0 +1,29 @@
+@startuml
+actor "Registered User" as User
+participant "Homepage" as Home
+participant "My Books Section" as MyBooks
+participant "Books Controller" as Controller
+database "Books Database" as DB
+
+User -> Home: Navigates to homepage
+activate Home
+User -> Home: Clicks the "My Books" button
+Home -> MyBooks: Redirect the “My Books Section”
+deactivate Home
+activate MyBooks
+
+
+MyBooks -> Controller: Requests borrowed books
+activate Controller
+
+Controller -> DB: Retrieves user's borrowed books
+activate DB
+DB --> Controller: Returns borrowed books list
+deactivate DB
+
+Controller --> MyBooks: Sends borrowed books data
+deactivate Controller
+
+MyBooks -> MyBooks: Displays borrowed books
+deactivate MyBooks
+@enduml

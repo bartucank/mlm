@@ -1,0 +1,11 @@
+@startuml
+
+start
+:User navigated to Software Detail page;
+:Details of software returned to the application from the back-end server.;
+:Software Details displayed;
+
+
+stop
+
+@enduml

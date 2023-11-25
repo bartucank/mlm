@@ -1,0 +1,45 @@
+@startuml
+actor "Librarian" as Librarian
+participant "HomePage" as Home
+participant "Simulation Page" as SimPage
+participant "Queue System" as QueueSys
+database "Database" as QueueDB
+participant "Statistics Module" as StatsMod
+
+
+
+Librarian -> Home: Click on the simulation page button
+activate Home
+Home -> SimPage: Enters simulation page
+deactivate Home
+activate SimPage
+
+SimPage -> QueueSys: Requests active queues
+activate QueueSys
+
+QueueSys -> QueueDB: Retrieves active queues
+activate QueueDB
+QueueDB --> QueueSys: List of active queues
+deactivate QueueDB
+
+QueueSys --> SimPage: Displays active queues
+deactivate QueueSys
+
+Librarian -> SimPage: Selects a queue
+activate SimPage
+
+SimPage -> StatsMod: Requests average time calculation for selected queue
+activate StatsMod
+
+StatsMod -> QueueDB: Checks for old queue records
+activate QueueDB
+QueueDB --> StatsMod: Returns old queue records
+deactivate QueueDB
+
+StatsMod -> StatsMod: Calculates average time
+StatsMod --> SimPage: Returns average time and predicted queue end
+deactivate StatsMod
+
+SimPage --> SimPage: Shows simulation results
+deactivate SimPage
+@enduml

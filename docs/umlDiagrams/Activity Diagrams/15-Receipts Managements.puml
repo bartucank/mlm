@@ -1,0 +1,21 @@
+@startuml
+start
+:User navigated to Receipts Management page ;
+if (Are there any receipt which are waiting approvement?) then (yes)
+    :Display receipts;
+    if (User clicks any receipt?) then (yes)
+        :Display receipt information, text field area for balance,\n and two button which are Approve and Reject;
+        if (User fills text area and clicks Approve or Reject Button?) then (yes)
+            :Update receipt status with releted status;
+            :Add input balance to the  User's balance;
+        else (no)
+            :Stay on the same page;
+        endif
+    else (no)
+        :Stay on the same page;
+    endif
+else (no)
+    :Display blank page;
+endif
+stop
+@enduml

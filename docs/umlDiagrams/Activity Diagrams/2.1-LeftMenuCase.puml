@@ -1,0 +1,30 @@
+@startuml
+start
+:Left menu opened.;
+:User's full name displayed on the beginning of the menu.;
+:Options which are "Book Collection", "Search book" and "Logout" displayed;
+if(User clicked anywhere?) then(yes)
+  if("Book Collection" clicked?) then (yes)
+    :Book Collection page opened.;
+  else
+    if("Search Book" clicked?) then (yes)
+      :Search Book page opened.;
+    else
+     if("Logout" clicked?) then (yes)
+       :JWT killed then sessiond ends.;
+       :Navigate to onboarding page;
+      else
+       if(Any point out of menu clicked?) then (yes)
+        :Menu closed;
+       else
+         :Point where on the menu but not on menu element clicked.
+         Stay on menu;
+       endif
+      endif
+    endif
+  endif
+else
+  :Stay on menu;
+endif
+stop
+@enduml

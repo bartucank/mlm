@@ -1,0 +1,20 @@
+@startuml
+
+start
+:User navigated to Search Book page;
+:Display Filtering Components;
+:Display random 10 book on the page;
+
+if (User clicked any book?) then (yes)
+  :Navigate Book Detail Page;
+else (no)
+  if(User scroll down to the end of the page?) then (yes)
+    :Load 10 more book;
+  else (no)
+    :Stay on the page;
+  endif
+endif
+
+stop
+
+@enduml

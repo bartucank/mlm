@@ -1,0 +1,60 @@
+@startuml AddBook
+actor Librarian
+participant HomePage as HomePage
+participant BookPage as BookPage
+participant AddBookPage as AddBookPage
+participant Controller as Controller
+database OpenLibrary
+database Database
+
+Librarian -> HomePage: Enter HomePage
+activate HomePage
+
+HomePage -> BookPage: Navigate to BookPage
+deactivate HomePage
+activate BookPage
+
+Librarian -> BookPage: Click on Add Book
+BookPage -> BookPage: Display Add Book Options Pop-up
+Librarian -> BookPage: Click on Add Book Option
+
+alt Get Details with ISBN
+    BookPage -> BookPage: Display ISBN Input Popup
+    Librarian -> BookPage: Enter ISBN
+    BookPage -> Controller: Request Book Information by ISBN
+    activate Controller
+
+    Controller -> OpenLibrary: Retrieve Book Information by ISBN
+    activate OpenLibrary
+
+    OpenLibrary --> Controller: Return Book Information
+    deactivate OpenLibrary
+    deactivate Controller
+    
+else Enter Information Manually
+    BookPage -> AddBookPage: Navigate to AddBookPage
+    deactivate BookPage
+    activate AddBookPage
+
+    Librarian -> AddBookPage: Fill in Book Information Form
+    AddBookPage -> Controller: Send Book Information
+    deactivate AddBookPage
+    activate Controller
+
+    
+end
+
+Controller -> Database: Add Book to Database
+activate Database
+
+Database --> Controller: Return Addition Confirmation
+deactivate Database
+
+
+Controller --> BookPage: Return Addition Confirmation
+deactivate Controller
+activate BookPage
+
+BookPage -> BookPage: Display Addition Confirmation
+deactivate BookPage
+@enduml

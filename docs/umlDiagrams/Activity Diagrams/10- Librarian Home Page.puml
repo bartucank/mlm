@@ -1,0 +1,65 @@
+@startuml
+
+start
+:User navigated Libraian Home Page;
+  :Get Total Book Count, Total User Count,\nTotal Room Count from back-end to display.;
+  :Display Homepage Components;
+
+if (Any Where clicked?) then (yes)
+    if ("Left Menu Icon" clicked?) then (yes)
+      :Left menu opened.;
+      :User's full name displayed on the beginning of the menu.;
+      :Options which are "User List", "Librarian List",
+       "Book List", "Software List", "Copy Card Managements", 
+       "Room Managements" and "Logout" displayed;
+        if(User clicked anywhere?) then(yes)
+            if("User List" clicked?) then (yes)
+                :User navigated to User List page.;
+            else
+                if("Librarian List" clicked?) then (yes)
+                    :User navigated to Librarian List page.;
+                    
+                else
+                    if("Book List" clicked?) then (yes)
+                        :User navigated to Boook List page .;
+                        
+                    else
+                        if ("Software List" clicked?) then (yes)
+                            :User navigated to Software List page ;
+                        else (no)
+                            if ("Receipts Managements" clicked?) then (yes)
+                                :User navigated to Receipts Management page ;
+                            else (no)
+                                if ("Room Managements"?) then (yes)
+                                    :User navigated to Room List Page ;  
+                                else (no)
+                                    if (Logout?) then (yes)
+                                        :JWT killed then sessiond ends.;
+                                        :Navigate to onboarding page;
+                                    else (no)
+                                        if(Any point out of menu clicked?) then (yes)
+                                            :Menu closed;
+                                        else
+                                            :Point where on the menu but not on menu element clicked.
+                                            :Stay on menu;
+                                        endif  
+                                    endif
+                                endif
+                            endif
+                        endif
+                    endif
+                endif
+            endif
+        else
+            :Stay on menu;
+        endif
+    else
+      :Blank area clicked. Stay on the page.;
+    endif
+else
+    :Stay on Homepage;
+endif
+
+stop
+
+@enduml

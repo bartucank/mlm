@@ -1,0 +1,89 @@
+@startuml CheckReservation
+actor User
+participant MobileDevice as MobileDevice
+participant HomePage as HomePage
+participant Controller as Controller
+participant RoomConfirmationPage as RoomConfirmationPage
+database Database
+
+User -> HomePage: Enter HomePage
+activate HomePage
+
+HomePage -> Controller: Check Room Reservation
+activate Controller
+
+Controller -> Database: Request Room Reservation Check
+activate Database
+
+Database --> Controller: Return Room Reservation Status
+deactivate Database
+
+alt "Room Reservation Exist"
+    Controller --> HomePage: Enable Room Confirmation Button
+    deactivate Controller
+
+    User -> HomePage: Click on Room Confirmation Button
+    HomePage -> HomePage: Display Confirmation Options Pop-up
+    
+    User -> HomePage: Choose Confirmation Option
+
+    alt "NFC Option"
+        HomePage -> HomePage: Display NFC Confirmation Pop-up
+        
+        User -> MobileDevice: Scan NFC
+        activate MobileDevice
+        MobileDevice -> Controller: Send NFC Tag Code
+        
+        deactivate MobileDevice
+        activate Controller
+
+        Controller -> Database: Send NFC Tag Code
+        activate Database
+
+        Database --> Controller: Return Confirmation
+        deactivate Database
+
+        Controller --> HomePage: Return Confirmation
+        deactivate Controller
+        HomePage -> HomePage: Display Success Message
+        
+    else "QR Code Option"
+        HomePage -> RoomConfirmationPage: Navigate to RoomConfirmationPage
+        deactivate HomePage
+        activate RoomConfirmationPage
+        
+        
+        RoomConfirmationPage -> RoomConfirmationPage: Display QR Code Scanner
+        
+        User -> MobileDevice: Scan QR
+        activate MobileDevice
+        
+        MobileDevice -> RoomConfirmationPage: Send QR Code
+        deactivate MobileDevice
+
+        RoomConfirmationPage -> Controller: Send QR Code 
+        deactivate RoomConfirmationPage
+        activate Controller
+
+        Controller -> Database: Send QR Code 
+        activate Database
+
+        Database --> Controller: Return Confirmation
+        deactivate Database
+
+        
+        Controller --> HomePage: Return Confirmation 
+        deactivate Controller
+        activate HomePage
+        
+        HomePage -> HomePage: Display Success Message
+    end
+else "Room Reservation Does Not Exist"
+    Controller --> HomePage: Return False to Display Room Confirmation Button
+    activate Controller
+    deactivate Controller
+end
+
+deactivate HomePage
+@enduml
+
