@@ -1,0 +1,152 @@
+@startuml
+
+skinparam monochrome true
+hide circle
+skinparam classAttributeIconSize 0
+
+class Image {
+  - id: Long
+  - base64: String
+  
+  + Image(id: Long, base64: String)
+}
+
+
+class User {
+  - id: Long
+  - username: String
+  - password: String
+  - nameSurname: String
+  - copyCard: CopyCard
+  - role: Enum
+  
+  + User(id: Long, role: Enum, username: String, password: String, nameSurname: String): User
+  + getCopyCard(): CopyCard
+  + setCopyCard(copyCard: CopyCard): void
+  + Register(role: Enum, username: String, password: String, nameSurname: String): User
+}
+
+class CopyCard {
+  - id: Long
+  - credit: BigDecimal
+  - NFC_no: String
+  
+  + CopyCard(id: Long, credit: BigDecimal, NFC_no: String): CopyCard
+  + AddBalance(id:Long, credit:BigDecimal): void
+  + decreaseBalance(id:Long, credit:BigDecimal): void
+}
+
+class Shelf {
+  - id: Long
+  - floor: String
+  - name: String
+  - books: List<Book>
+
+  + Shelf(id: Long, floor: String, name: String): Shelf
+  + getBooks(): List<Book>
+  + addBook(book: Book): void
+  + removeBook(book: Book): void
+}
+
+class Book {
+  - id: Long
+  - isbn: String
+  - name: String
+  - publisher: String
+  - desc: String
+  - author: String
+  - image: Image
+  
+  + Book(id: Long, isbn: String, name: String, publisher: String, desc: String, author: String): Book
+  + getImage(): Image
+  + setImage(image: Image): void
+  + getBookDetailByISBN(isbn:String): Book
+}
+
+class Room {
+  - id: Long
+  - name: String
+  - NFC_no: String
+  - verfCode: String
+  - image: Image
+  - roomSlots: List<RoomSlot>
+  
+  + Room(id: Long, name: String, NFC_no: String, verfCode: String): Room
+  + getImage(): Image
+  + setImage(image: Image): void
+  + getRoomSlots(): List<RoomSlot>
+  + addRoomSlot(roomSlot: RoomSlot): void
+  + removeRoomSlot(roomSlot: RoomSlot): void
+}
+
+class RoomSlot {
+  - id: Long
+  - startHour: String
+  - endHour: String
+  
+  + RoomSlot(id: Long, startHour: String, endHour: String)
+}
+
+class RoomReservation {
+  - id: Long
+  - date: LocalDate
+  - room: Room
+  - users: List<User>
+  
+  + RoomReservation(id: Long, date: LocalDate)
+  + getRoom(): Room
+  + setRoom(room: Room): void
+  + getUsers(): List<User>
+  + addUser(user: User): void
+  + removeUser(user: User): void
+}
+
+
+
+class BookQueue {
+  - id: Long
+  - date: LocalDate
+  - status: QueueStatus
+  - book: Book
+  - users: List<User>
+  
+  + BookQueue(id: Long, date: LocalDate): BookQueue
+  + getStatus(): QueueStatus
+  + setStatus(status: QueueStatus): void
+  + getBook(): Book
+  + setBook(book: Book): void
+  + getUsers(): List<User>
+  + addUser(user: User): void
+  + removeUser(user: User): void
+}
+
+
+class MLM {
+  - userList: List<User>
+  - shelfList: List<Shelf>
+  - queueList: List<BookQueue>
+  - roomList: List<Room>
+  - roomReservationList: List<RoomReservation>
+
+  + login(username:String, password:String): String
+
+}
+MLM *-down-> User: has users
+MLM *-down-> Shelf: has shelfs
+MLM *-down-> BookQueue: has book queues
+MLM *-down-> Room: has rooms
+MLM *-down-> RoomReservation: has reservations
+
+BookQueue "n" o-down-> "1" Book : for
+BookQueue "n" o-down-> "n" User : has
+
+
+RoomReservation "n" o-down-> "1" Room : on
+RoomReservation "n" o-down-> "n" User : has
+
+User "1" *-down-> "1" CopyCard : has
+Shelf "1" *-down-> "n" Book : has
+Book "1" *-down-> "1" Image : has 
+Room "1" *-down-> "n" RoomSlot : has
+Room "1" *-down-> "1" Image : has 
+@enduml

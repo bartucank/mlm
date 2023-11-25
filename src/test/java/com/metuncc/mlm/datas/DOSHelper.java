@@ -20,6 +20,7 @@ public class DOSHelper {
         user.setPassword("1234");
         user.setRole(Role.USER);
         user.setUsername("username");
+        user.setEmail("a@metu.edu.tr");
         user.setFullName("full name");
         user.setId(1L);
         user.setCreatedDate(LocalDateTime.now());

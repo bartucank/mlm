@@ -1,0 +1,48 @@
+@startuml
+
+start
+:User opens the Application;
+if (Register/Login clicked?) then (yes)
+  if (Register selected?) then (yes)
+    :Display Registration Form;
+    :User enters details;
+    if (Register button clicked?) then (yes)
+      :Send Confirmation Code to Email;
+      if (Code entered correctly?) then (yes)
+        :Set User's status to APPROVED;
+        :Complete Registration;
+        :Navigate to Home Page;
+      else (no)
+        :Display Wrong Code Message;
+        ->Code entered correctly?;
+      endif
+    else (no)
+      :Stay on the same page;
+    endif
+  else (no)
+    :Display Login Form;
+    :User enters credentials;
+    if (Login button clicked?) then (yes)
+      if (Account confirmed?) then (yes)
+        :Navigate to Home Page;
+      else (no)
+        :Ask for Confirmation Code;
+        if (Code entered correctly?) then (yes)
+          :Set User's status to APPROVED;
+          :Complete Registration;
+          :Navigate to Home Page;
+        else (no)
+          :Display Wrong Code Message;
+          ->Code entered correctly?;
+        endif
+      endif
+    else (no)
+      :Stay on the same page;
+    endif
+  endif
+else (no)
+  :Stay on Onboarding Page;
+endif
+stop
+
+@enduml

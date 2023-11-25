@@ -1,0 +1,44 @@
+@startuml
+
+start
+:User navigated to Copy Card page;
+:Display User's Copy Card;
+if (Receipt sent and approved?) then (yes)
+  :Display Approved Receipt Message;
+else (no)
+  :No Approved Receipt Message;
+endif
+:Display "Access Bank Accounts" button;
+:Display "Upload Receipt" button;
+:Display "Transaction History" button;
+
+if ("Access Bank Accounts" button clicked?) then (yes)
+  :Display Library's Bank Account Information Popup;
+else (no)
+  if ("Upload Receipt" button clicked?) then (yes)
+    :Open Camera;
+    if (User takes a photo?) then (yes)
+      :Display two button which are:
+      For Copy Card Deposit
+      For Library Debt;
+      if (User selects any of button?) then (yes)
+        :Send Document for Approval;
+      else (no)
+        :Stay on popup;
+      endif
+    else (no)
+      :Stay on Camera;
+    endif
+  else (no)
+    if ("Transaction History" button clicked?) then (yes)
+      :Navigate to Transaction History Page;
+      :Display User's Transaction History;
+    else (no)
+      :Stay on Copy Card Page;
+    endif
+  endif
+endif
+
+stop
+
+@enduml

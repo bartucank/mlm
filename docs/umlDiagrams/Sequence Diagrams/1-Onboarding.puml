@@ -1,0 +1,65 @@
+@startuml
+actor user as User
+participant OnboardingPage as OnboardingPage
+participant RegistrationPage as RegistrationPage
+participant LoginPage as LoginPage
+participant UserEntity as UserEntity
+participant Validation as Validation
+database Database
+
+activate OnboardingPage
+User -> OnboardingPage: Logging into the application\nOpening Onboarding page
+activate RegistrationPage
+
+OnboardingPage -> RegistrationPage: User clicks on REGISTER button
+RegistrationPage -> UserEntity: User fills out the user form
+activate UserEntity
+
+UserEntity -> Validation: Validating user information 
+activate Validation
+Validation -> Database: Checking if the user exists
+activate Database
+Database --> Validation: Checking user information
+deactivate Database
+
+Validation -> Validation : Checking Email format
+
+deactivate Validation
+
+alt Email format is correct
+    UserEntity --> Database: Sending Confirmation code
+    activate Database
+    Database --> UserEntity: Confirmation code is sent
+    deactivate Database
+    UserEntity --> RegistrationPage: Confirmation code is sent
+    RegistrationPage -> UserEntity: User enters the correct confirmation code
+    UserEntity -> Database: Updating user status with confirmed status.
+    activate Database
+    Database --> UserEntity: Success
+    deactivate Database
+    UserEntity --> RegistrationPage: Registration process is completed
+    RegistrationPage --> User: User is navigated to the main page
+else Email format is incorrect
+    UserEntity --> RegistrationPage: Error message is returned
+end
+deactivate UserEntity
+deactivate RegistrationPage
+
+OnboardingPage -> LoginPage: User clicks on login button\nUser enters user information
+deactivate OnboardingPage
+activate LoginPage
+LoginPage -> UserEntity: Sending page information to the backend
+activate UserEntity
+UserEntity -> Database: Checking user password
+activate Database
+Database --> UserEntity: Checking user information
+deactivate Database
+alt Information is correct
+    UserEntity --> LoginPage: Json Web Token is returned
+    LoginPage --> User: User is navigated to the main page
+else Information is incorrect
+    UserEntity --> LoginPage: Error message is returned
+end
+deactivate UserEntity
+deactivate LoginPage
+@enduml
