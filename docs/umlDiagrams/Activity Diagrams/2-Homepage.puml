@@ -1,0 +1,109 @@
+@startuml
+
+start
+:User navigated homepage;
+if (JWT still alive?) then (yes)
+  if(User has room reservation?) then(yes)
+   :Display Room Confirmation Button;
+  endif
+  :Display Homepage Components;
+  if (Any Button / Icon clicked?) then (yes)
+    if ("Left Menu Icon" clicked?) then (yes)
+      :Left menu opened.;
+      :User's full name displayed on the beginning of the menu.;
+      :Options which are "Book Collection", "Search book" and "Logout" displayed;
+      if(User clicked anywhere?) then(yes)
+        if("Book Collection" clicked?) then (yes)
+          :Book Collection page opened.;
+        else
+          if("Search Book" clicked?) then (yes)
+            :Search Book page opened.;
+          else
+           if("Logout" clicked?) then (yes)
+             :JWT killed then sessiond ends.;
+             :Navigate to onboarding page;
+            else
+             if(Any point out of menu clicked?) then (yes)
+              :Menu closed;
+             else
+               :Point where on the menu but not on menu element clicked.
+               Stay on menu;
+             endif
+            endif
+          endif
+        endif
+      else
+        :Stay on menu;
+      endif
+    else
+      if ("Copy Card" button clicked?) then (yes)
+        :Navigate to Copy Card page;
+      else
+        if ("My Books" button clicked?) then (yes)
+          :Navigate to My Books page;
+        else
+          if ("Room Reservation" button clicked?) then (yes)
+            :Navigate to Room Reservations page;
+          else
+            if("Room Confirmation" button clicked?) then (yes)
+             :Open Confirmation Type Popup;
+             if(User select NFC) then(yes)
+              if(User scan NFC card on the room?) then(yes)
+                if(Correct NFC Tag?) then(yes)
+                 :Display success popup;
+                 :Make room as a full;
+                else
+                 :Display error popup;
+                endif
+              else
+                :Stay on the same popup;
+              endif
+             else
+              :Open Camera;
+              if(User scan QR Code) then (yes)
+               if(Correct QR Code?) then(yes)
+                 :Display success popup;
+                 :Make room as a full;
+                else
+                 :Display error popup;
+                endif
+              else
+                :Stay on the same popup;
+              endif
+             endif
+            else
+             if ("Search Icon" clicked?) then (yes)
+               :Navigate to Search Book Page page;
+             else
+               if ("Heart Icon" clicked?) then (yes)
+                 :Navigate to Favorites page;
+               else
+                 if ("Three Dots Icon" clicked?) then (yes)
+                   :Navigate to My Account page;
+                 else
+                   if (Any book selected from the list?) then (yes)
+                     :Navigate to Book Detail page;
+                   else
+                     if (Any licensed software selected from the list?) then (yes)
+                       :Navigate to Software Detail page;
+                     else
+                       :Stay on Homepage;
+                     endif
+                   endif
+                 endif
+               endif
+             endif
+            endif
+           endif
+        endif
+      endif
+    endif
+  else
+    :Stay on Homepage;
+  endif
+else
+  :Session end. Return onboarding page.;
+endif
+stop
+
+@enduml

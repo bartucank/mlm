@@ -35,3 +35,8 @@ out/
 
 ### VS Code ###
 .vscode/
+out/
+.gradle/
+.idea/
+build
+src/main/resources/application.properties

@@ -1,0 +1,31 @@
+@startuml
+
+start
+:User navigated to Room Reservations page;
+:Display Library Rooms List;
+if (User selects a room?) then (yes)
+  :Navigate to Room Timeslots Page;
+  if (Timeslot is reserved by someone else?) then (yes)
+    :Display Timeslot in Red;
+  else (no)
+    :Display Timeslot in Green;
+  endif
+  :Display Timeslots for Selected Room;
+  if (User selects a timeslot?) then (yes)
+    :Navigate to Reservation Detail Page;
+    :Ask for other user's username;
+    if (Username/s entered?) then (yes)
+      :Reserve Room for users;
+    else (no)
+      :Stay on Timeslot Detail Page;
+    endif
+  else (no)
+    :Stay on Room Timeslots Page;
+  endif
+else (no)
+  :Stay on Room Reservations Page;
+endif
+
+stop
+
+@enduml

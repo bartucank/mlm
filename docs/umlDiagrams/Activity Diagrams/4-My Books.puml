@@ -1,0 +1,14 @@
+@startuml
+
+start
+:User navigated to My Books page;
+if (User has borrowed books?) then (yes)
+  :Display Borrowed Books List;
+  :Display Days Remaining for Each Book;
+else (no)
+  :Display Empty Page;
+endif
+
+stop
+
+@enduml
