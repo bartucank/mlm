@@ -16,6 +16,7 @@ import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.security.JwtTokenProvider;
+import com.metuncc.mlm.service.MlmBorrowServices;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
 import org.springframework.http.HttpStatus;
@@ -35,10 +36,13 @@ public class MLMController {
     private MlmServices mlmServices;
     private MlmQueryServices mlmQueryServices;
     private ResponseService responseService;
-    public MLMController( MlmServices mlmServices, MlmQueryServices mlmQueryServices, ResponseService responseService) {
+    private MlmBorrowServices mlmBorrowServices;
+    public MLMController( MlmServices mlmServices, MlmQueryServices mlmQueryServices, ResponseService responseService,
+    MlmBorrowServices mlmBorrowServices) {
         this.mlmServices = mlmServices;
         this.mlmQueryServices = mlmQueryServices;
         this.responseService = responseService;
+        this.mlmBorrowServices = mlmBorrowServices;
     }
 
 

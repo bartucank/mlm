@@ -160,6 +160,5 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(bookDTOS);
         return response;
-
     }
 }
