@@ -4,16 +4,11 @@ import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
-import com.metuncc.mlm.dto.BookDTO;
+import com.metuncc.mlm.api.request.HistoryRequest;
+import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
-import com.metuncc.mlm.dto.ImageDTO;
-import com.metuncc.mlm.dto.ShelfDTO;
-import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.dto.UserDTO;
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.Shelf;
-import com.metuncc.mlm.entity.Book;
-import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.api.response.BorrowHistoryDTOListResponse;
+import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -21,6 +16,7 @@ import com.metuncc.mlm.repository.ImageRepository;
 import com.metuncc.mlm.repository.RoomRepository;
 import com.metuncc.mlm.repository.ShelfRepository;
 import com.metuncc.mlm.repository.UserRepository;
+import com.metuncc.mlm.repository.specifications.BookBorrowHistorySpecification;
 import com.metuncc.mlm.repository.specifications.BookSpecification;
 import com.metuncc.mlm.repository.specifications.UserSpecification;
 import com.metuncc.mlm.security.JwtUserDetails;
@@ -44,6 +40,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private RoomRepository roomRepository;
     private ImageRepository imageRepository;
     private BookRepository bookRepository;
+    private BookHistoryRepository bookHistoryRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -104,7 +101,6 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return response;
     }
 
-
     @Override
     public UserDTOListResponse getUsersBySpecifications(FindUserRequest request){
         if(Objects.isNull(request)){
@@ -159,6 +155,34 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         List<BookDTO> bookDTOS =  books.stream().map(Book::toDTO).collect(Collectors.toList());
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(bookDTOS);
+        return response;
+    }
+
+    @Override
+    public BorrowHistoryDTO getBookHistoryById(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        BookHistory bookHistory = bookHistoryRepository.getById(id);
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.BOOKHISTORY_NOT_FOUND);
+        }
+        return bookHistory.toDTO();
+    }
+
+    @Override
+    public BorrowHistoryDTOListResponse getBookHistoryBySpecification(HistoryRequest request){
+        if(Objects.isNull(request)){
+            request = new HistoryRequest();
+        }
+        BookBorrowHistorySpecification bookBorrowHistorySpecification = new BookBorrowHistorySpecification(
+                request.getReturnDate(),
+                request.getStatus()
+        );
+        List<BookHistory> booksHistory = bookHistoryRepository.findAll(bookBorrowHistorySpecification);
+        List<BorrowHistoryDTO> dtos = booksHistory.stream().map(BookHistory::toDTO).collect(Collectors.toList());
+        BorrowHistoryDTOListResponse response = new BorrowHistoryDTOListResponse();
+        response.setBorrowHistoryDTOList(dtos);
         return response;
     }
 }

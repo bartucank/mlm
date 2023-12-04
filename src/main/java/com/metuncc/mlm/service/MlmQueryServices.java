@@ -4,11 +4,14 @@ import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
+import com.metuncc.mlm.api.request.HistoryRequest;
+import com.metuncc.mlm.api.response.BorrowHistoryDTOListResponse;
 import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.UserDTO;
+import com.metuncc.mlm.dto.BorrowHistoryDTO;
 import com.metuncc.mlm.entity.User;
 
 import java.util.List;
@@ -32,4 +35,11 @@ public interface MlmQueryServices {
     UserDTO getUserDetails();
 
     BookDTOListResponse getBooksBySpecification(FindBookRequest request);
+
+    BorrowHistoryDTO getBookHistoryById(Long id);
+
+    BorrowHistoryDTOListResponse getBookHistoryBySpecification(HistoryRequest request);
+
+
+
 }

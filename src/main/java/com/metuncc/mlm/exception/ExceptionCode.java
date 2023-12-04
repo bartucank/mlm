@@ -9,6 +9,7 @@ public enum ExceptionCode {
     PLEASE_VERIFY_ACCOUNT("Please verify your account via email."),
     SESSION_EXPERIED_PLEASE_LOGIN("Session experied. Please log in again."),
     BOOK_NOT_FOUND("Book not found."),
+    BOOKHISTORY_NOT_FOUND("Book history not found"),
     IMAGE_NOT_FOUND("Image not found.");
 
     private final String description;

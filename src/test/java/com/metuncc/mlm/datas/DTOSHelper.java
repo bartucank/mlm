@@ -1,13 +1,7 @@
 package com.metuncc.mlm.datas;
 
-import com.metuncc.mlm.dto.BookDTO;
-import com.metuncc.mlm.dto.ImageDTO;
-import com.metuncc.mlm.dto.ShelfDTO;
-import com.metuncc.mlm.dto.UserDTO;
-import com.metuncc.mlm.entity.Book;
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.Shelf;
-import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.dto.*;
+import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.entity.enums.BookStatus;
 import com.metuncc.mlm.entity.enums.Role;
@@ -74,5 +68,14 @@ public class DTOSHelper {
         book.setDeletedDate(null);
         return book.toDTO();
 
+    }
+    public BorrowHistoryDTO borrowHistoryDTO(){
+        BookHistory bookHistory = new BookHistory();
+        bookHistory.setUserId(new User());
+        bookHistory.setBookId(new Book());
+        bookHistory.setReturnDate(LocalDateTime.now());
+        bookHistory.setStatus(BookStatus.AVAILABLE);
+
+        return bookHistory.toDTO();
     }
 }

@@ -1,34 +1,17 @@
 package com.metuncc.mlm.api.controller;
 
 import com.metuncc.mlm.api.request.FindBookRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.HistoryRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
-import com.metuncc.mlm.api.response.LoginResponse;
+import com.metuncc.mlm.api.response.BorrowHistoryDTOListResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
-import com.metuncc.mlm.dto.BookDTO;
-import com.metuncc.mlm.dto.ImageDTO;
-import com.metuncc.mlm.dto.ShelfDTO;
-import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.dto.UserDTO;
-import com.metuncc.mlm.exception.ExceptionCode;
-import com.metuncc.mlm.exception.MLMException;
-import com.metuncc.mlm.security.JwtTokenProvider;
-import com.metuncc.mlm.service.MlmBorrowServices;
+import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value ="/api/user", produces = "application/json;charset=UTF-8")
@@ -36,13 +19,11 @@ public class MLMController {
     private MlmServices mlmServices;
     private MlmQueryServices mlmQueryServices;
     private ResponseService responseService;
-    private MlmBorrowServices mlmBorrowServices;
-    public MLMController( MlmServices mlmServices, MlmQueryServices mlmQueryServices, ResponseService responseService,
-    MlmBorrowServices mlmBorrowServices) {
+
+    public MLMController( MlmServices mlmServices, MlmQueryServices mlmQueryServices, ResponseService responseService) {
         this.mlmServices = mlmServices;
         this.mlmQueryServices = mlmQueryServices;
         this.responseService = responseService;
-        this.mlmBorrowServices = mlmBorrowServices;
     }
 
 
@@ -76,6 +57,16 @@ public class MLMController {
     @GetMapping("book/getBooksBySpecification")
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksBySpecification(@RequestBody FindBookRequest request){
         return responseService.createResponse(mlmQueryServices.getBooksBySpecification(request));
+    }
+
+    @GetMapping("/bookhistory/getBookHistoryById")
+    public ResponseEntity<ApiResponse<BorrowHistoryDTO>> getBookHistoryById(@RequestParam(name = "id")Long id){
+        return responseService.createResponse(mlmQueryServices.getBookHistoryById(id));
+    }
+
+    @GetMapping("/bookhistory/getBookHistoryBySpecification")
+    public ResponseEntity<ApiResponse<BorrowHistoryDTOListResponse>> getBookHistoryBySpecification(@RequestParam HistoryRequest request){
+        return responseService.createResponse(mlmQueryServices.getBookHistoryBySpecification(request));
     }
 
 }
