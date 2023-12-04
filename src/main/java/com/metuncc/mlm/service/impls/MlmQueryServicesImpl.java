@@ -3,17 +3,11 @@ package com.metuncc.mlm.service.impls;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
+import com.metuncc.mlm.api.response.RoomDTOListResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
-import com.metuncc.mlm.dto.BookDTO;
+import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
-import com.metuncc.mlm.dto.ImageDTO;
-import com.metuncc.mlm.dto.ShelfDTO;
-import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.dto.UserDTO;
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.Shelf;
-import com.metuncc.mlm.entity.Book;
-import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -161,5 +155,23 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         response.setBookDTOList(bookDTOS);
         return response;
 
+    }
+
+    @Override
+    public RoomDTO getRoomById(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Room room = roomRepository.getById(id);
+        if(Objects.isNull(room)){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+
+        return room.toDTO();
+    }
+
+    @Override
+    public RoomDTOListResponse getRooms(){
+        return new RoomDTOListResponse(roomRepository.findAll().stream().map(Room::toDTO).collect(Collectors.toList()));
     }
 }

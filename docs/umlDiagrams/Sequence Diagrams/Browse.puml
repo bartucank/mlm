@@ -2,17 +2,17 @@
 actor "Registered User" as User
 participant "Book Collection Page" as Page
 participant "Book Details Page" as Details
-database "Books Database" as DB
+database "Database" as DB
 
 User -> Page: Visits Collection Page
 activate Page
 
-Page -> DB: Requests short information of books
+Page -> DB: Get list of books
 activate DB
-DB --> Page: Returns list of books
+DB --> Page:  list of books
 deactivate DB
-User -> Page: Browses books from list
 Page -> Page: Displays list of books
+User -> Page: Browses books from list
 opt if user clicks any Book
     activate Details
     deactivate Page

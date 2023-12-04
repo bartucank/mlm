@@ -1,11 +1,13 @@
 package com.metuncc.mlm.service;
 
 import com.metuncc.mlm.api.request.BookRequest;
+import com.metuncc.mlm.api.request.CreateRoomRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -28,4 +30,13 @@ public interface MlmServices {
     StatusDTO updateBook(BookRequest request);
 
     StatusDTO deleteBook(Long id);
+
+    StatusDTO createRoom(CreateRoomRequest request);
+
+    StatusDTO deleteRoom(Long id);
+
+    StatusDTO createSlotsForRoom(Long roomId,
+                                 RoomSlotDays day,
+                                 int startHour,
+                                 int endHour);
 }

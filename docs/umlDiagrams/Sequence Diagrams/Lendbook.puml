@@ -7,7 +7,7 @@ database "Database" as BooksDB
 
 Librarian -> Home: Click on the Book page button
 activate Home
-Home -> Page: Requests list of books
+Home -> Page: Request list of books
 deactivate Home
 activate Page
 Page -> System: Request books list
@@ -17,23 +17,23 @@ System -> BooksDB: Retrieve books list
 activate BooksDB
 BooksDB --> System: List of books
 deactivate BooksDB
-System --> Page: Return list of books
+System --> Page:  list of books
 Page -> Page: Display list of books
 deactivate System
 deactivate Page
 
 
-Librarian -> Page: Selects book for lending
+Librarian -> Page: Select book for lending
 activate Page
 Page -> System: Send the record of lending
 activate System
 
-System -> BooksDB: Creates lending record
+System -> BooksDB: Create lending record
 activate BooksDB
-BooksDB --> System: Lending record created
+BooksDB --> System: Lend record created
 deactivate BooksDB
 
-System --> Page: Confirm lending
+System --> Page: Response of Confirm lending
 Page -> Page: Display the confirmation message
 deactivate Page
 deactivate System

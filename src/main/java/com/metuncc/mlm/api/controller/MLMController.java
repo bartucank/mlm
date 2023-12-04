@@ -55,6 +55,10 @@ public class MLMController {
     public ResponseEntity<ApiResponse<ImageDTO>>  getImageByName(@RequestParam(name = "id")Long id){
         return responseService.createResponse(mlmQueryServices.getImageById(id));
     }
+    @GetMapping("/getImageBase64ById")
+    public byte[]  getImageBase64ById(@RequestParam(name = "id")Long id){
+        return getImageByName(id).getBody().getData().getImageData();
+    }
 
     @GetMapping("/getUserDetails")
     public ResponseEntity<ApiResponse<UserDTO>> getUserDetails(){
@@ -69,7 +73,7 @@ public class MLMController {
     public ResponseEntity<ApiResponse<BookDTOListResponse>>  getBooksByShelfId(@RequestParam(name = "shelfId")Long shelfId){
         return responseService.createResponse(mlmQueryServices.getBooksByShelfId(shelfId));
     }
-    @GetMapping("book/getBooksBySpecification")
+    @PostMapping("/book/getBooksBySpecification")
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksBySpecification(@RequestBody FindBookRequest request){
         return responseService.createResponse(mlmQueryServices.getBooksBySpecification(request));
     }

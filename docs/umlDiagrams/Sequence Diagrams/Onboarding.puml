@@ -19,7 +19,7 @@ UserEntity -> Validation: Validating user information
 activate Validation
 Validation -> Database: Checking if the user exists
 activate Database
-Database --> Validation: Checking user information
+Database --> Validation:  user information
 deactivate Database
 
 Validation -> Validation : Checking Email format
@@ -27,9 +27,9 @@ Validation -> Validation : Checking Email format
 deactivate Validation
 
 alt Email format is correct
-    UserEntity --> Database: Sending Confirmation code
+    UserEntity --> Database:  Confirmation code
     activate Database
-    Database --> UserEntity: Confirmation code is sent
+    Database --> UserEntity: success
     deactivate Database
     UserEntity --> RegistrationPage: Confirmation code is sent
     RegistrationPage -> UserEntity: User enters the correct confirmation code
@@ -40,7 +40,7 @@ alt Email format is correct
     UserEntity --> RegistrationPage: Registration process is completed
     RegistrationPage --> User: User is navigated to the main page
 else Email format is incorrect
-    UserEntity --> RegistrationPage: Error message is returned
+    UserEntity --> RegistrationPage: Error message
 end
 deactivate UserEntity
 deactivate RegistrationPage
@@ -52,13 +52,13 @@ LoginPage -> UserEntity: Sending page information to the backend
 activate UserEntity
 UserEntity -> Database: Checking user password
 activate Database
-Database --> UserEntity: Checking user information
+Database --> UserEntity:  user information
 deactivate Database
 alt Information is correct
-    UserEntity --> LoginPage: Json Web Token is returned
+    UserEntity --> LoginPage: Json Web Token 
     LoginPage --> User: User is navigated to the main page
 else Information is incorrect
-    UserEntity --> LoginPage: Error message is returned
+    UserEntity --> LoginPage: Error message 
 end
 deactivate UserEntity
 deactivate LoginPage

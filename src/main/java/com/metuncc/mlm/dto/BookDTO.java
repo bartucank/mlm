@@ -15,14 +15,15 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper=true)
 public class BookDTO extends MLMBaseClassDTO {
 
-    private Shelf shelfId;
-    private Image imageId;
+    private Long shelfId;
+    private Long imageId;
     private String isbn;
     private String publisher;
     private String name;
     private String description;
     private String author;
     private LocalDate publicationDate;
+    private LocalDate publicationDateStr;
     private String edition;
     private String barcode;
     private BookCategory category;

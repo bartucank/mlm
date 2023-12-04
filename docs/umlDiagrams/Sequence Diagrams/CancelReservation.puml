@@ -15,10 +15,10 @@ Controller -> Database: Retrieves reservations
 activate Database
 Database --> Controller: List of reservations
 deactivate Database
-Controller --> System: Returns list of reservations
+Controller --> System:  list of reservations
 deactivate Controller
 
-System --> System: Displays list of reservations
+System -> System: Displays list of reservations
 deactivate System
 
 Librarian -> System: Chooses reservation to cancel
@@ -28,11 +28,11 @@ System -> Controller: Cancels reservation
 activate Controller
 Controller -> Database: Sends the necessary data
 activate Database
-Database --> Controller: Confirmation of cancellation
+Database --> Controller: Response of Confirmation
 deactivate Database
-Controller --> System: Confirmation of cancellation
-Controller --> Controller: Display cancellation message
- 
+Controller --> System: Response of Confirmation
+System -> System: Display cancellation message
+
 
 System -> Controller: Sends cancellation email to user
 activate Email
@@ -41,6 +41,6 @@ deactivate Controller
 Email --> System: Email sent confirmation
 deactivate Email
 
-System --> Librarian: Confirms reservation cancelled and email sent
+System --> Librarian:  reservation cancelled and email sent message
 deactivate System
 @enduml

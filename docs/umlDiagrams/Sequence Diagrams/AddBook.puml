@@ -27,7 +27,7 @@ alt Get Details with ISBN
     Controller -> OpenLibrary: Retrieve Book Information by ISBN
     activate OpenLibrary
 
-    OpenLibrary --> Controller: Return Book Information
+    OpenLibrary --> Controller:  Book Information
     deactivate OpenLibrary
     deactivate Controller
     
@@ -47,11 +47,11 @@ end
 Controller -> Database: Add Book to Database
 activate Database
 
-Database --> Controller: Return Addition Confirmation
+Database --> Controller: Response of Addition Confirmation
 deactivate Database
 
 
-Controller --> BookPage: Return Addition Confirmation
+Controller --> BookPage: Response of Addition Confirmation
 deactivate Controller
 activate BookPage
 

@@ -1,60 +1,46 @@
 @startuml
-
+skinparam Linetype ortho
+skinparam rankdir TB
 start
+
 :User navigated homepage;
 
-  if(User has room reservation?) then(yes)
-   :Display Room Confirmation Button;
-  endif
-  :Display Homepage Components;
-  if (Any Button / Icon clicked?) then (yes)
-    if ("Left Menu Icon" clicked?) then (yes)
-      :Left menu opened.;
-      
-    else
-      if ("Copy Card" button clicked?) then (yes)
-        :Navigate to Copy Card page;
-      else
-        if ("My Books" button clicked?) then (yes)
-          :Navigate to My Books page;
-        else
-          if ("Room Reservation" button clicked?) then (yes)
-            :Navigate to Room Reservations page;
-          else
-            if("Room Confirmation" button clicked?) then (yes)
-             :Open Confirmation Type Popup;
-            else
-             if ("Search Icon" clicked?) then (yes)
-               :Navigate to Search Book Page page;
-             else
-               if ("Heart Icon" clicked?) then (yes)
-                 :Navigate to Favorites page;
-               else
-                 if ("Three Dots Icon" clicked?) then (yes)
-                   :Navigate to My Account page;
-                   :Displayed user informations on the page;
-                 else
-                   if (Any book selected from the list?) then (yes)
-                     :Navigate to Book Detail page;
-                   else
-                     if (Any licensed software selected from the list?) then (yes)
-                       :Navigate to Software Detail page;
-                     else
-                       :Stay on Homepage;
-                     endif
-                   endif
-                 endif
-               endif
-             endif
-            endif
-           endif
-        endif
-      endif
-    endif
+if(User has room reservation?) then (yes)
+  :Display Room Confirmation Button;
+endif
+
+:Display Homepage Components;
+
+if (Any Button / Icon clicked?) then (yes)
+  if ("Left Menu Icon" clicked?) then (yes)
+    :Left menu opened.;
+  elseif ("Copy Card" button clicked?) then (yes)
+    :Navigate to Copy Card page;
+  elseif ("My Books" button clicked?) then (yes)
+    :Navigate to My Books page;
+  elseif ("Room Reservation" button clicked?) then (yes)
+    :Navigate to Room Reservations page;
+  elseif("Room Confirmation" button clicked?) then (yes)
+    :Open Confirmation Type Popup;
+  elseif ("Search Icon" clicked?) then (yes)
+    :Navigate to Search Book Page page;
+  elseif ("Heart Icon" clicked?) then (yes)
+    :Navigate to Favorites page;
+  elseif ("Three Dots Icon" clicked?) then (yes)
+    :Navigate to My Account page;
+    :Displayed user informations on the page;
   else
-    :Stay on Homepage;
+    if (Any book selected from the list?) then (yes)
+      :Navigate to Book Detail page;
+    elseif (Any licensed software selected from the list?) then (yes)
+      :Navigate to Software Detail page;
+    else
+      :Stay on Homepage;
+    endif
   endif
+else
+  :Stay on Homepage;
+endif
 
 stop
-
 @enduml

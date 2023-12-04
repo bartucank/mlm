@@ -22,7 +22,7 @@ activate QueueDB
 QueueDB --> QueueSys: List of active queues
 deactivate QueueDB
 
-QueueSys --> SimPage: Displays active queues
+QueueSys --> SimPage:  active queues
 deactivate QueueSys
 
 Librarian -> SimPage: Selects a queue
@@ -33,13 +33,13 @@ activate StatsMod
 
 StatsMod -> QueueDB: Checks for old queue records
 activate QueueDB
-QueueDB --> StatsMod: Returns old queue records
+QueueDB --> StatsMod:  old queue records
 deactivate QueueDB
 
 StatsMod -> StatsMod: Calculates average time
-StatsMod --> SimPage: Returns average time and predicted queue end
+StatsMod --> SimPage:  average time and predicted queue end
 deactivate StatsMod
 
-SimPage --> SimPage: Shows simulation results
+SimPage -> SimPage: Shows simulation results
 deactivate SimPage
 @enduml

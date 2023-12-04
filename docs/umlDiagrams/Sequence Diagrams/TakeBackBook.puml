@@ -7,35 +7,35 @@ database "Database" as LendingDB
 
 Librarian -> Home: Click on book page button
 activate Home
-Home -> Page: Requests list of borrowed books
+Home -> Page: Request list of borrowed books
 deactivate Home
 activate Page
 
-Page -> Controller: Gets borrowed books
+Page -> Controller: Get borrowed books
 activate Controller
 
-Controller -> LendingDB: Retrieves list of borrowed books
+Controller -> LendingDB: Retrieve list of borrowed books
 activate LendingDB
 LendingDB --> Controller: List of borrowed books
 deactivate LendingDB
 
-Controller --> Page: Shows list to Librarian
+Controller --> Page:  list 
 deactivate Controller
 
-Librarian -> Page: Chooses a book to take back
+Librarian -> Page: Choose a book to take back
 activate Page
 
-Page -> Controller: Sends book return request
+Page -> Controller: Send book return request
 activate Controller
 
-Controller -> LendingDB: Records book return
+Controller -> LendingDB: Record book return
 activate LendingDB
-LendingDB --> Controller: Confirmation of book return
+LendingDB --> Controller: Response of book return
 deactivate LendingDB
 
-Controller --> Page: Confirms book taken back
+Controller --> Page: Confirm book taken back
 deactivate Controller
 
-Page --> Page: Display confirmation
+Page -> Page: Display confirmation
 deactivate Page
 @enduml

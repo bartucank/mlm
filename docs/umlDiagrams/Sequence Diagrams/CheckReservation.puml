@@ -15,7 +15,7 @@ activate Controller
 Controller -> Database: Request Room Reservation Check
 activate Database
 
-Database --> Controller: Return Room Reservation Status
+Database --> Controller:  Room Reservation Status
 deactivate Database
 
 alt "Room Reservation Exist"
@@ -40,10 +40,10 @@ alt "Room Reservation Exist"
         Controller -> Database: Send NFC Tag Code
         activate Database
 
-        Database --> Controller: Return Confirmation
+        Database --> Controller: Response of Confirmation
         deactivate Database
 
-        Controller --> HomePage: Return Confirmation
+        Controller --> HomePage: Response of Confirmation
         deactivate Controller
         HomePage -> HomePage: Display Success Message
         
@@ -68,18 +68,18 @@ alt "Room Reservation Exist"
         Controller -> Database: Send QR Code 
         activate Database
 
-        Database --> Controller: Return Confirmation
+        Database --> Controller:  Confirmation
         deactivate Database
 
         
-        Controller --> HomePage: Return Confirmation 
+        Controller --> HomePage:  Confirmation 
         deactivate Controller
         activate HomePage
         
         HomePage -> HomePage: Display Success Message
     end
 else "Room Reservation Does Not Exist"
-    Controller --> HomePage: Return False to Display Room Confirmation Button
+    Controller --> HomePage:  False for Display Room Confirmation Button
     activate Controller
     deactivate Controller
 end
