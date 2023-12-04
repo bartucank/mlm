@@ -40,14 +40,16 @@ public class Book extends MLMBaseClass {
 
     public BookDTO toDTO() {
         BookDTO bookDTO = new BookDTO();
-        bookDTO.setShelfId(getShelfId());
-        bookDTO.setImageId(getImageId());
+        bookDTO.setId(getId());
+        bookDTO.setShelfId(getShelfId().getId());
+        bookDTO.setImageId(getImageId().getId());
         bookDTO.setIsbn(getIsbn());
         bookDTO.setPublisher(getPublisher());
         bookDTO.setName(getName());
         bookDTO.setDescription(getDescription());
         bookDTO.setAuthor(getAuthor());
         bookDTO.setPublicationDate(getPublicationDate());
+        bookDTO.setPublicationDateStr(getPublicationDate());
         bookDTO.setEdition(getEdition());
         bookDTO.setBarcode(getBarcode());
         bookDTO.setCategory(getCategory());

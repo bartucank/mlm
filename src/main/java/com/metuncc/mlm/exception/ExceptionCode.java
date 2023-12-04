@@ -9,7 +9,7 @@ public enum ExceptionCode {
     PLEASE_VERIFY_ACCOUNT("Please verify your account via email."),
     SESSION_EXPERIED_PLEASE_LOGIN("Session experied. Please log in again."),
     BOOK_NOT_FOUND("Book not found."),
-    IMAGE_NOT_FOUND("Image not found.");
+    IMAGE_NOT_FOUND("Image not found."), ROOM_NOT_FOUND("Room not found!"), START_HOUR_INVALID("Start hour should be between 0-23"), END_HOUR_INVALID("End hour should be between 0-23"), SLOT_ON_DAY_EXISTS("TimeSlot already exists. You have to delete or update.");
 
     private final String description;
 

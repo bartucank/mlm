@@ -15,12 +15,12 @@ opt If user wants to do upload for the CopyCard
     Upload -> Controller: Uploads receipt for CopyCard
     activate Controller
 
-    Controller -> Storage: Stores receipt for CopyCard
+    Controller -> Storage: Store receipt for CopyCard
     activate Storage
-    Storage --> Controller: Confirm receipt stored
+    Storage --> Controller: Response of receipt stored
     deactivate Storage
 
-    Controller --> Upload: Confirm upload success
+    Controller --> Upload:   success
     deactivate Controller
 
     Upload --> User: Display upload confirmation
@@ -28,15 +28,15 @@ else
     Upload -> Controller: Uploads receipt for book dept
     activate Controller
 
-    Controller -> Storage: Stores receipt for book dept
+    Controller -> Storage: Store receipt for book dept
     activate Storage
-    Storage --> Controller: Confirm receipt stored
+    Storage --> Controller: Response of receipt stored
     deactivate Storage
 
-    Controller --> Upload: Confirm upload success
+    Controller --> Upload:   success
     deactivate Controller
 
-    Upload --> User: Display upload confirmation
+    Upload --> User:   success
     deactivate Upload
 end
 @enduml

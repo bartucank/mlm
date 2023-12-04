@@ -19,10 +19,10 @@ activate Controller
 Controller -> Database: Retrieve Search Results with the Specifications
 activate Database
 
-Database --> Controller: Return Search Results
+Database --> Controller:  Search Results
 deactivate Database
 
-Controller --> SearchPage: Send Search Results
+Controller --> SearchPage:  Search Results
 deactivate Controller
 SearchPage -> SearchPage: Display Search Results
 

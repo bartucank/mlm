@@ -1,7 +1,7 @@
 @startuml SearchBookForLibrarian
 actor Librarian
 participant HomePage as HomePage
-participant SearchPage as SearchPage
+participant BookListPage as SearchPage
 participant DetailsPage as DetailsPage
 participant Controller as Controller
 database Database
@@ -9,7 +9,7 @@ database Database
 Librarian-> HomePage: Enter HomePage
 activate HomePage
 
-HomePage -> SearchPage: Navigate to SearchPage by Clicking on Search Icon
+HomePage -> SearchPage: Navigate to BookListPage from left menu
 deactivate HomePage
 activate SearchPage
 
@@ -19,10 +19,10 @@ activate Controller
 Controller -> Database: Retrieve Search Results with Specifications
 activate Database
 
-Database --> Controller: Return Search Results
+Database --> Controller:  Search Results
 deactivate Database
 
-Controller --> SearchPage: Send Search Results
+Controller --> SearchPage:  Search Results
 deactivate Controller
 SearchPage -> SearchPage: Display Search Results
 
@@ -34,10 +34,10 @@ opt Delete Book
     Controller -> Database: Send BookID to Delete Book
     activate Database
 
-    Database --> Controller: Return Deletion Confirmation
+    Database --> Controller: Response of Deletion Confirmation
     deactivate Database
 
-    Controller --> SearchPage: Return Deletion Confirmation
+    Controller --> SearchPage: Response of Deletion Confirmation
     deactivate Controller
     SearchPage -> SearchPage: Display Deletion Confirmation
 end
@@ -56,10 +56,10 @@ opt Update Book
     Controller -> Database: Update Book
     activate Database
 
-    Database --> Controller: Return Book Updated Successfully
+    Database --> Controller: Response of Book Updated Successfully
     deactivate Database
 
-    Controller --> SearchPage: Send Update Confirmation
+    Controller --> SearchPage:  Update Confirmation
     deactivate Controller
     SearchPage -> SearchPage: Display Update Confirmation
 end

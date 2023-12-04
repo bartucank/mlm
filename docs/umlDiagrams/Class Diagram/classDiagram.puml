@@ -11,7 +11,6 @@ class Image {
   + Image(id: Long, base64: String)
 }
 
-
 class User {
   - id: Long
   - username: String
@@ -81,67 +80,70 @@ class Room {
 
 class RoomSlot {
   - id: Long
-  - startHour: String
-  - endHour: String
+  - startHour: LocalTime
+  - endHour: LocalTime
+  - day:Enum
   
-  + RoomSlot(id: Long, startHour: String, endHour: String)
+  + RoomSlot(day:Enum,id: Long, startHour: String, endHour: String)
 }
 
 class RoomReservation {
   - id: Long
   - date: LocalDate
-  - room: Room
+  - roomslots: List<RoomSlot>
   - users: List<User>
   
   + RoomReservation(id: Long, date: LocalDate)
-  + getRoom(): Room
-  + setRoom(room: Room): void
+  + getRoomSlots(): List<RoomSlot>
+  + setRoomSlots(roomSlots: List<RoomSlot>): void
   + getUsers(): List<User>
   + addUser(user: User): void
   + removeUser(user: User): void
 }
 
-
-
-class BookQueue {
+class BookQueueRecord {
   - id: Long
-  - date: LocalDate
-  - status: QueueStatus
   - book: Book
-  - users: List<User>
+  - borrowHistoryList: List<BookBorrowHistory>
+  - status: QueueStatus
+  - completeDate: LocalDateTime
+  - createdDate: LocalDateTime
   
-  + BookQueue(id: Long, date: LocalDate): BookQueue
-  + getStatus(): QueueStatus
-  + setStatus(status: QueueStatus): void
-  + getBook(): Book
-  + setBook(book: Book): void
-  + getUsers(): List<User>
-  + addUser(user: User): void
-  + removeUser(user: User): void
+  + BookQueueRecord(id: Long, book: Book, borrowHistoryList: List<BookBorrowHistory>, status: QueueStatus, completeDate: LocalDateTime, createdDate: LocalDateTime)
 }
 
+class BookBorrowHistory {
+  - id: Long
+  - status: BorrowStatus
+  - bookQueueRecord: BookQueueRecord
+  - user: User
+  - returnDate: LocalDateTime
+  - createdDate: LocalDateTime
+  
+  + BookBorrowHistory(id: Long, status: BorrowStatus, bookQueueRecord: BookQueueRecord, user: User, returnDate: LocalDateTime, createdDate: LocalDateTime)
+}
 
 class MLM {
   - userList: List<User>
   - shelfList: List<Shelf>
-  - queueList: List<BookQueue>
+  - queueList: List<BookQueueRecord>
   - roomList: List<Room>
   - roomReservationList: List<RoomReservation>
-
+  - borrowList: List<BookBorrowHistory>
   + login(username:String, password:String): String
-
 }
-MLM *-down-> User: has users
-MLM *-down-> Shelf: has shelfs
-MLM *-down-> BookQueue: has book queues
-MLM *-down-> Room: has rooms
-MLM *-down-> RoomReservation: has reservations
 
-BookQueue "n" o-down-> "1" Book : for
-BookQueue "n" o-down-> "n" User : has
+MLM "1" *-down->"n" User: has users
+MLM "1" *-down->"n" Shelf: has shelfs
+MLM "1" *-down->"n" BookQueueRecord: has book queues
+MLM "1" *-down->"n" Room: has rooms
+MLM "1" *-down->"n" RoomReservation: has reservations
+MLM "1" *-down->"n" BookBorrowHistory: hasBorrowRecords
+BookQueueRecord "n" o-down-> "1" Book : for
+BookQueueRecord "n" o-down-> "n" User : has
+BookQueueRecord "n" o-down-> "n" BookBorrowHistory : has
 
-
-RoomReservation "n" o-down-> "1" Room : on
+RoomReservation "n" o-down-> "m" RoomSlot : on
 RoomReservation "n" o-down-> "n" User : has
 
 User "1" *-down-> "1" CopyCard : has
@@ -149,4 +151,5 @@ Shelf "1" *-down-> "n" Book : has
 Book "1" *-down-> "1" Image : has 
 Room "1" *-down-> "n" RoomSlot : has
 Room "1" *-down-> "1" Image : has 
+
 @enduml

@@ -8,5 +8,4 @@ import lombok.EqualsAndHashCode;
 public class RoomDTO extends MLMBaseClassDTO{
     private String name;
     private Long imageId;
-    private Long quata;
 }

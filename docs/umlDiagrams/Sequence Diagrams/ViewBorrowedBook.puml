@@ -2,28 +2,27 @@
 actor "Registered User" as User
 participant "Homepage" as Home
 participant "My Books Section" as MyBooks
-participant "Books Controller" as Controller
-database "Books Database" as DB
+participant " Controller" as Controller
+database " Database" as DB
 
-User -> Home: Navigates to homepage
 activate Home
-User -> Home: Clicks the "My Books" button
-Home -> MyBooks: Redirect the “My Books Section”
+User -> Home: Click the "My Books" button
+Home -> MyBooks: Navigate the “My Books” Page 
 deactivate Home
 activate MyBooks
 
 
-MyBooks -> Controller: Requests borrowed books
+MyBooks -> Controller: Request borrowed books
 activate Controller
 
-Controller -> DB: Retrieves user's borrowed books
+Controller -> DB: Retrieve user's borrowed books
 activate DB
-DB --> Controller: Returns borrowed books list
+DB --> Controller:  borrowed books list
 deactivate DB
 
-Controller --> MyBooks: Sends borrowed books data
+Controller --> MyBooks:  borrowed books data
 deactivate Controller
 
-MyBooks -> MyBooks: Displays borrowed books
+MyBooks -> MyBooks: Display borrowed books
 deactivate MyBooks
 @enduml

@@ -1,5 +1,6 @@
 package com.metuncc.mlm.entity;
 
+import com.metuncc.mlm.api.request.CreateRoomRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.dto.RoomDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
@@ -7,9 +8,8 @@ import com.metuncc.mlm.entity.base.MLMBaseClass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -18,15 +18,20 @@ import javax.persistence.Table;
 public class Room extends MLMBaseClass{
 
     private String name;
-    private Long imageId;
-    private Long quata;
+    private String NFC_no;
+    private String verfCode;
+    @OneToOne
+    private Image imageId;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "roomId")
+    private List<RoomSlot> roomSlotList;
+
 
     public RoomDTO toDTO(){
         RoomDTO dto = new RoomDTO();
         dto.setId(getId());
         dto.setName(getName());
-        dto.setQuata(getQuata());
-        dto.setImageId(getImageId());
+        dto.setImageId(getImageId().getId());
         return dto;
     }
 }

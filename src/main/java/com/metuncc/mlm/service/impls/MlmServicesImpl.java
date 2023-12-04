@@ -1,14 +1,18 @@
 package com.metuncc.mlm.service.impls;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.metuncc.mlm.api.request.BookRequest;
+import com.metuncc.mlm.api.request.CreateRoomRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.BookStatus;
+import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -24,12 +28,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -212,6 +218,83 @@ public class MlmServicesImpl implements MlmServices {
         book.setDeleted(true);
         book.setDeletedDate(LocalDateTime.now());
         bookRepository.save(book);
+        return success;
+    }
+
+    @Override
+    public StatusDTO createRoom(CreateRoomRequest request){
+        if(
+                Objects.isNull(request) ||
+                        Objects.isNull(request.getImageId()) ||
+                        Objects.isNull(request.getName())
+        ){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Image image = imageRepository.getImageById(request.getImageId());
+        if(Objects.isNull(image)){
+            throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
+        }
+        Room room = new Room();
+        room.setName(request.getName());
+        room.setImageId(image);
+        room.setRoomSlotList(new ArrayList<>());
+        roomRepository.save(room);
+        return success;
+    }
+
+    @Override
+    public StatusDTO deleteRoom(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Room room = roomRepository.getById(id);
+        if(Objects.isNull(room)){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+        room.setDeleted(true);
+        room.setDeletedDate(LocalDateTime.now());
+        roomRepository.save(room);
+        return success;
+    }
+
+    @Override
+    public StatusDTO createSlotsForRoom(Long roomId,
+                                        RoomSlotDays day,
+                                        int startHour,
+                                        int endHour) {
+        if (Objects.isNull(roomId) || Objects.isNull(day) || Objects.isNull(startHour) || Objects.isNull(endHour)) {
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if (startHour < 0) {
+            throw new MLMException(ExceptionCode.START_HOUR_INVALID);
+        }
+        if (endHour < 0) {
+            throw new MLMException(ExceptionCode.END_HOUR_INVALID);
+        }
+
+        Room room = roomRepository.getById(roomId);
+        if (Objects.isNull(room)) {
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+        if (Objects.isNull(room.getRoomSlotList())) {
+            room.setRoomSlotList(new ArrayList<>());
+        }
+        if(!CollectionUtils.isEmpty(room.getRoomSlotList())){
+            Boolean flag = room.getRoomSlotList().stream().filter(f->f.getDay().equals(day)).collect(Collectors.toList()).size() > 0;
+            if(flag){
+                throw new MLMException(ExceptionCode.SLOT_ON_DAY_EXISTS);
+            }
+        }
+        for (int i = startHour; i <= endHour; i++) {
+            LocalTime localTimeStart = LocalTime.of(i, 0, 0, 0);
+            LocalTime localTimeEnd = LocalTime.of(i, 59, 0, 0);
+            RoomSlot roomSlot = new RoomSlot();
+            roomSlot.setStartHour(localTimeStart);
+            roomSlot.setEndHour(localTimeEnd);
+            roomSlot.setDay(day);
+            room.getRoomSlotList().add(roomSlot);
+        }
+        roomRepository.save(room);
         return success;
     }
 

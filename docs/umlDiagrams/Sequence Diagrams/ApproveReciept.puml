@@ -16,10 +16,10 @@ activate Controller
 
 Controller -> DB: Queries unapproved receipts
 activate DB
-DB --> Controller: Returns list of unapproved receipts
+DB --> Controller:  list of unapproved receipts
 deactivate DB
 
-Controller --> Interface: Shows list to Librarian
+Controller --> Interface:  list to Librarian
 deactivate Controller
 
 Librarian -> Interface: Chooses receipt and enters balance to approve
@@ -30,12 +30,12 @@ activate Controller
 
 Controller -> DB: Updates receipt status to "Approved" and adds balance
 activate DB
-DB --> Controller: Confirms update
+DB --> Controller: Response of update confirmation
 deactivate DB
 
-Controller --> Interface: Indicates successful approval
+Controller --> Interface: Response of successful approval
 deactivate Controller
 
-Interface --> Page: Displays approval confirmation
+Interface --> Page:  approval confirmation
 deactivate Interface
 @enduml

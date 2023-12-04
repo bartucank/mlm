@@ -13,10 +13,10 @@ activate Controller
 Controller -> Database: Retrieve Balance
 activate Database
 
-Database --> Controller: Return Balance
+Database --> Controller:  Balance
 deactivate Database
 
-Controller --> HomePage: Send Balance
+Controller --> HomePage:  Balance
 deactivate Controller
 HomePage -> HomePage: Display Balance
 
