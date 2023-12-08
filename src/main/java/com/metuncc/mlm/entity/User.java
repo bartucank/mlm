@@ -24,6 +24,9 @@ public class User extends MLMBaseClass {
     private Boolean verified;
     private String email;
 
+    @OneToOne( cascade = CascadeType.ALL)
+    private CopyCard copyCard;
+
 
     public UserDTO toDTO() {
         UserDTO userDTO = new UserDTO();

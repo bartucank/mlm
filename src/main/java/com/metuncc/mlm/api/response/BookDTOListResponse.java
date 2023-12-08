@@ -6,6 +6,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class BookDTOListResponse {
+public class BookDTOListResponse extends  PageableResponse {
     private List<BookDTO> bookDTOList;
 }

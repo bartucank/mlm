@@ -19,7 +19,7 @@ public class RoomSlot extends MLMBaseClass{
     @Enumerated(value = EnumType.STRING)
     private RoomSlotDays day;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "room_id")
     private Room roomId;
 }

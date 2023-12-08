@@ -1,8 +1,10 @@
 package com.metuncc.mlm.service.impls;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 import com.metuncc.mlm.api.request.BookRequest;
 import com.metuncc.mlm.api.request.CreateRoomRequest;
@@ -12,6 +14,8 @@ import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.BookStatus;
+import com.metuncc.mlm.entity.enums.BorrowStatus;
+import com.metuncc.mlm.entity.enums.QueueStatus;
 import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
@@ -22,6 +26,7 @@ import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.utils.ImageUtil;
 import com.metuncc.mlm.utils.MailUtil;
 import lombok.AllArgsConstructor;
+import net.glxn.qrgen.QRCode;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -34,7 +39,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +56,10 @@ public class MlmServicesImpl implements MlmServices {
     private JwtTokenProvider jwtTokenProvider;
     private MailUtil mailUtil;
     private VerificationCodeRepository verificationCodeRepository;
+    private  BookBorrowHistoryRepository bookBorrowHistoryRepository;
+    private BookQueueRecordRepository bookQueueRecordRepository;
+    private CopyCardRepository copyCardRepository;
+    private RoomSlotRepository roomSlotRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
     @Override
@@ -85,6 +93,12 @@ public class MlmServicesImpl implements MlmServices {
         verificationCode.setCode(generateRandomCode(4));
         verificationCodeRepository.save(verificationCode);
         mailUtil.sendVerifyEmailEmail(user.getEmail(),verificationCode.getCode());
+        CopyCard copyCard = new CopyCard();
+        copyCard.setBalance(BigDecimal.ZERO);
+        copyCard.setNfcCode("");
+        copyCard.setOwner(user);
+        user.setCopyCard(copyCard);
+        userRepository.save(user);
         return login(userRequest);
     }
 
@@ -150,6 +164,16 @@ public class MlmServicesImpl implements MlmServices {
 
         img = imageRepository.save(img);
         return StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
+    }
+    public Image uploadImageReturnImage(MultipartFile file) throws IOException {
+
+        Image img= new Image();
+        img.setImageData(ImageUtil.compressImage(file.getBytes()));
+        img.setName(file.getOriginalFilename());
+        img.setType(file.getContentType());
+
+        img = imageRepository.save(img);
+        return img;
     }
 
     @Override
@@ -238,6 +262,39 @@ public class MlmServicesImpl implements MlmServices {
         room.setName(request.getName());
         room.setImageId(image);
         room.setRoomSlotList(new ArrayList<>());
+        room = roomRepository.save(room);
+        try{
+            String code = getUniqueVerfCodeForRoom();
+            ByteArrayOutputStream stream = QRCode
+                    .from(code)
+                    .withSize(250, 250)
+                    .stream();
+            ByteArrayInputStream bis = new ByteArrayInputStream(stream.toByteArray());
+            byte[] qrCodeImageData = stream.toByteArray();
+            Image img= new Image();
+            img.setImageData(ImageUtil.compressImage(qrCodeImageData));
+            img.setName("QR");
+            img.setType("png");
+            img = imageRepository.save(img);
+            room.setVerfCode(code);
+            room.setQrImage(img);
+        } catch (Exception e) {
+            //do nothing for now.
+        }
+        roomRepository.save(room);
+        return success;
+    }
+
+    @Override
+    public StatusDTO setNFCForRoom(Long roomId, String nfcNo){
+        if(Objects.isNull(roomId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Room room = roomRepository.getById(roomId);
+        if(Objects.isNull(room)){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+        room.setNFC_no(nfcNo);
         roomRepository.save(room);
         return success;
     }
@@ -298,4 +355,151 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Override
+    public StatusDTO borrowBook(Long bookId, Long userId){
+        if(Objects.isNull(bookId) ||Objects.isNull(userId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        User user = userRepository.getById(userId);
+        Book book = bookRepository.getById(bookId);
+        if(Objects.isNull(book) ||Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(book.getStatus().equals(BookStatus.NOT_AVAILABLE)){
+            //May be in queue?
+            BookQueueRecord bookQueueRecord = bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(book,QueueStatus.ACTIVE);
+            if(Objects.isNull(bookQueueRecord)){
+                throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+            }
+            BookBorrowHistory bookBorrowHistory = null;
+            if (!CollectionUtils.isEmpty(bookQueueRecord.getBookBorrowHistoryList())) {
+                bookBorrowHistory = bookQueueRecord.getBookBorrowHistoryList()
+                        .stream()
+                        .filter(c -> c.getUserId() != null && c.getUserId().getId().equals(userId))
+                        .findFirst()
+                        .orElse(null);
+            }
+            //not in queue;
+            if(Objects.isNull(bookBorrowHistory)){
+                throw new MLMException(ExceptionCode.BOOK_NOT_AVAILABLE);
+            }
+            //in queue; Check firstly, book is returned or on someone?
+             bookBorrowHistory = null;
+            if (!CollectionUtils.isEmpty(bookQueueRecord.getBookBorrowHistoryList())) {
+                bookBorrowHistory = bookQueueRecord.getBookBorrowHistoryList()
+                        .stream()
+                        .filter(c->c.getStatus().equals(BorrowStatus.WAITING_RETURN))
+                        .findFirst()
+                        .orElse(null);
+            }
+            if(Objects.nonNull(bookBorrowHistory)){
+                //On someone. not available!
+                throw new MLMException(ExceptionCode.BOOK_NOT_RETURNED_YET);
+            }
+            //first user of the list is this user or not?
+            List<BookBorrowHistory> bookBorrowHistoryList2 = bookQueueRecord.getBookBorrowHistoryList().stream().filter(c->c.getStatus().equals(BorrowStatus.WAITING_TAKE)).collect(Collectors.toList());
+            bookBorrowHistoryList2.sort(Comparator.comparing(BookBorrowHistory::getCreatedDate));
+            if(bookBorrowHistoryList2.get(0).getUserId().equals(userId)){
+                //Next person is not this user.
+                throw new MLMException(ExceptionCode.BOOK_RESERVED_FOR_SOMEONE);
+            }
+            //We can give book to user.
+
+            bookBorrowHistory = null;
+            bookBorrowHistory = bookQueueRecord.getBookBorrowHistoryList()
+                    .stream()
+                    .filter(c -> c.getUserId() != null && c.getUserId().getId().equals(userId))
+                    .findFirst()
+                    .orElse(null);
+            bookBorrowHistory.setStatus(BorrowStatus.WAITING_RETURN);
+            bookQueueRecord.updateBookBorrow(bookBorrowHistory);
+            bookQueueRecordRepository.save(bookQueueRecord);
+            return success;
+        }
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        BookQueueRecord bookQueueRecord = new BookQueueRecord();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        bookQueueRecord.setBookId(book);
+        bookQueueRecord.setStatus(QueueStatus.ACTIVE);
+        BookBorrowHistory bookBorrowHistory = new BookBorrowHistory();
+        bookBorrowHistory.setUserId(user);
+        bookBorrowHistory.setStatus(BorrowStatus.WAITING_RETURN);
+        bookBorrowHistory.setBookQueueRecord(bookQueueRecord);
+        bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory);
+        bookQueueRecordRepository.save(bookQueueRecord);
+        return success;
+    }
+
+    @Override
+    public StatusDTO takeBackBook(Long bookId, Long userId){
+        if(Objects.isNull(bookId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(bookId);
+        if(Objects.isNull(book) ){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        BookQueueRecord bookQueueRecord = bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(book,QueueStatus.ACTIVE);
+        if(Objects.isNull(bookQueueRecord)){
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+        BookBorrowHistory bookBorrowHistory = null;
+        if (!CollectionUtils.isEmpty(bookQueueRecord.getBookBorrowHistoryList())) {
+            bookBorrowHistory = bookQueueRecord.getBookBorrowHistoryList()
+                    .stream()
+                    .filter(c -> c.getUserId() != null && c.getUserId().getId().equals(userId))
+                    .findFirst()
+                    .orElse(null);
+        }else{
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+        if(Objects.isNull(bookBorrowHistory)){
+            throw new MLMException(ExceptionCode.THIS_USER_DID_NOT_TAKE_THIS_BOOK);
+        }
+        bookBorrowHistory.setStatus(BorrowStatus.RETURNED);
+        bookBorrowHistory.setReturnDate(LocalDateTime.now());
+        bookQueueRecord.updateBookBorrow(bookBorrowHistory);
+        List<BookBorrowHistory> restOfUsers = bookQueueRecord.getBookBorrowHistoryList().stream().filter(c->c.getStatus().equals(BorrowStatus.WAITING_TAKE)).collect(Collectors.toList());
+        if(restOfUsers.size() == 0){
+            //Queue completed!
+            bookQueueRecord.setCompleteDate(LocalDateTime.now());
+            bookQueueRecord.setStatus(QueueStatus.END);
+            bookQueueRecord.getBookId().setStatus(BookStatus.AVAILABLE);
+        }else{
+            //Next person.
+            //todo: send an email to next person.
+        }
+        return success;
+    }
+
+    @Override
+    public StatusDTO givePhysicalCopyCardToUser(String nfcCode, Long userId){
+        if(Objects.isNull(userId) ||Objects.isNull(nfcCode)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        User user = userRepository.getById(userId);
+        if(Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        user.getCopyCard().setNfcCode(nfcCode);
+        userRepository.save(user);
+        return success;
+    }
+
+    public String getUniqueVerfCodeForRoom(){
+        StringBuilder code = new StringBuilder();
+        Random random = new Random();
+        Boolean flag = true;
+        while(flag){
+            code = new StringBuilder();
+            for (int i = 0; i < 8; i++) {
+                int randomDigit = random.nextInt(10);
+                code.append(randomDigit);
+            }
+            if(Objects.isNull(roomRepository.getByVerfCode(code.toString()))){
+                flag = false;
+            }
+        }
+        return code.toString();
+    }
 }

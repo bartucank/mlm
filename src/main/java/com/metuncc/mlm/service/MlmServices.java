@@ -33,10 +33,20 @@ public interface MlmServices {
 
     StatusDTO createRoom(CreateRoomRequest request);
 
+    StatusDTO setNFCForRoom(Long roomId, String nfcNo);
+
     StatusDTO deleteRoom(Long id);
 
     StatusDTO createSlotsForRoom(Long roomId,
                                  RoomSlotDays day,
                                  int startHour,
                                  int endHour);
+
+    StatusDTO borrowBook(Long bookId, Long userId);
+
+
+
+    StatusDTO takeBackBook(Long bookId, Long userId);
+
+    StatusDTO givePhysicalCopyCardToUser(String nfcCode, Long userId);
 }

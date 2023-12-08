@@ -34,4 +34,6 @@ public interface MlmQueryServices {
     RoomDTO getRoomById(Long id);
 
     RoomDTOListResponse getRooms();
+
+    CopyCardDTO getCopyCardDetails();
 }

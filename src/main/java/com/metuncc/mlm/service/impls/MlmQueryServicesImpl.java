@@ -21,6 +21,9 @@ import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.utils.ImageUtil;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -38,6 +41,8 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private RoomRepository roomRepository;
     private ImageRepository imageRepository;
     private BookRepository bookRepository;
+    private CopyCardRepository copyCardRepository;
+    private RoomSlotRepository roomSlotRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -103,6 +108,8 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     public UserDTOListResponse getUsersBySpecifications(FindUserRequest request){
         if(Objects.isNull(request)){
             request = new FindUserRequest();
+            request.setSize(7);
+            request.setPage(0);
         }
         UserSpecification userSpecification = new UserSpecification(
                 request.getRole(),
@@ -111,10 +118,20 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 request.getVerified(),
                 request.getEmail()
         );
-        List<User> users = userRepository.findAll(userSpecification);
-        List<UserDTO> dtos = users.stream().map(User::toDTO).collect(Collectors.toList());
+        if(Objects.isNull(request.getSize()) ||Objects.isNull(request.getPage())){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<User> usersPage = userRepository.findAll(userSpecification, pageable);
+        List<UserDTO> dtos = usersPage.getContent().stream()
+                .map(User::toDTO)
+                .collect(Collectors.toList());
         UserDTOListResponse response = new UserDTOListResponse();
         response.setUserDTOList(dtos);
+        response.setTotalPage(usersPage.getTotalPages());
+        response.setTotalResult(usersPage.getTotalElements());
+        response.setSize(request.getSize());
+        response.setPage(request.getPage());
         return response;
     }
 
@@ -137,6 +154,8 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     public BookDTOListResponse getBooksBySpecification(FindBookRequest request) {
         if(Objects.isNull(request)){
             request = new FindBookRequest();
+            request.setPage(0);
+            request.setSize(7);
         }
         BookSpecification  bookSpecification = new BookSpecification(
                 request.getName(),
@@ -149,10 +168,17 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 request.getCategory(),
                 request.getStatus()
         );
-        List<Book> books = bookRepository.findAll(bookSpecification);
-        List<BookDTO> bookDTOS =  books.stream().map(Book::toDTO).collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Book> bookPage = bookRepository.findAll(bookSpecification, pageable);
+        List<BookDTO> bookDTOS = bookPage.getContent().stream()
+                .map(Book::toDTO)
+                .collect(Collectors.toList());
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(bookDTOS);
+        response.setTotalPage(bookPage.getTotalPages());
+        response.setTotalResult(bookPage.getTotalElements());
+        response.setSize(request.getSize());
+        response.setPage(request.getPage());
         return response;
 
     }
@@ -173,5 +199,13 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public RoomDTOListResponse getRooms(){
         return new RoomDTOListResponse(roomRepository.findAll().stream().map(Room::toDTO).collect(Collectors.toList()));
+    }
+
+    @Override
+    public CopyCardDTO getCopyCardDetails(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+
+        return copyCardRepository.getByUser(jwtUser.getId()).toDTO();
     }
 }

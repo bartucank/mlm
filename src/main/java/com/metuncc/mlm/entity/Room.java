@@ -14,16 +14,19 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Entity
-@Table(name = "room")
 public class Room extends MLMBaseClass{
 
     private String name;
     private String NFC_no;
     private String verfCode;
     @OneToOne
+    private Image qrImage;
+    @OneToOne
     private Image imageId;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "roomId")
+
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private List<RoomSlot> roomSlotList;
 
 

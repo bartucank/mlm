@@ -6,6 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class UserDTOListResponse {
+public class UserDTOListResponse  extends  PageableResponse{
     private List<UserDTO> userDTOList;
+
 }

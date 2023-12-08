@@ -62,4 +62,16 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<StatusDTO>> deleteBook(@RequestParam("id") Long id){
         return responseService.createResponse(mlmServices.deleteBook(id));
     }
+
+    @PostMapping("/book/borrow")
+    public ResponseEntity<ApiResponse<StatusDTO>> borrowBook(@RequestParam("bookId") Long bookId,
+                                                             @RequestParam("userId") Long userId){
+        return responseService.createResponse(mlmServices.borrowBook(bookId,userId));
+    }
+
+    @PostMapping("/book/takeBackBook")
+    public ResponseEntity<ApiResponse<StatusDTO>> takeBackBook(@RequestParam("bookId") Long bookId,
+                                                             @RequestParam("userId") Long userId){
+        return responseService.createResponse(mlmServices.takeBackBook(bookId,userId));
+    }
 }

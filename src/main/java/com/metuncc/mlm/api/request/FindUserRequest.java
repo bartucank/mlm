@@ -11,4 +11,7 @@ public class FindUserRequest {
     private Boolean verified;
     private String email;
 
+    private int page;
+    private int size;
+
 }

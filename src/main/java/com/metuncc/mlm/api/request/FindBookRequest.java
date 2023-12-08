@@ -20,4 +20,7 @@ public class FindBookRequest {
     private BookCategory category;
     private BookStatus status;
 
+    private int page;
+    private int size;
+
 }
