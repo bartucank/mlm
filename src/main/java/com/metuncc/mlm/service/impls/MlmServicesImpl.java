@@ -534,6 +534,9 @@ public class MlmServicesImpl implements MlmServices {
     }
     @Override
     public StatusDTO cancelReservation(Long roomReservationId){
+        if(Objects.isNull(roomReservationId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
         User user = userRepository.getById(jwtUser.getId());
