@@ -2,6 +2,7 @@ package com.metuncc.mlm.service.impls;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -13,10 +14,7 @@ import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
-import com.metuncc.mlm.entity.enums.BookStatus;
-import com.metuncc.mlm.entity.enums.BorrowStatus;
-import com.metuncc.mlm.entity.enums.QueueStatus;
-import com.metuncc.mlm.entity.enums.RoomSlotDays;
+import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -60,6 +58,8 @@ public class MlmServicesImpl implements MlmServices {
     private BookQueueRecordRepository bookQueueRecordRepository;
     private CopyCardRepository copyCardRepository;
     private RoomSlotRepository roomSlotRepository;
+    private RoomReservationRepository roomReservationRepository;
+
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
     @Override
@@ -501,5 +501,53 @@ public class MlmServicesImpl implements MlmServices {
             }
         }
         return code.toString();
+    }
+    @Override
+    public StatusDTO makeReservation (Long roomSlotId){
+        if(Objects.isNull(roomSlotId) ){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+
+        RoomSlot roomSlot = roomSlotRepository.getById(roomSlotId);
+        if(Objects.isNull(roomSlot)){
+            throw new MLMException(ExceptionCode.ROOMSLOT_NOT_FOUND);
+        }
+        if(!roomSlot.getAvailable()){
+            throw new MLMException(ExceptionCode.ROOMSLOT_NOT_AVAILABLE);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        if(roomReservationRepository.getRoomReservationByUserId(jwtUser.getId()).size()>=2){
+            throw new MLMException(ExceptionCode.MAX_RESERVATION_REACHED);
+        }
+
+        RoomReservation roomReservation = new RoomReservation();
+        roomReservation.setDate(LocalDate.now());
+        roomReservation.setUserId(jwtUser.getId());
+        roomReservation.setRoomSlot(roomSlot);
+        roomSlot.setAvailable(false);
+
+        roomSlotRepository.save(roomSlot);
+        roomReservationRepository.save(roomReservation);
+
+        return success;
+    }
+    @Override
+    public StatusDTO cancelReservation(Long roomReservationId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
+        if(Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.UNAUTHORIZED);
+        }
+        RoomReservation roomReservation = roomReservationRepository.getById(roomReservationId);
+        if(Objects.isNull(roomReservation)){
+            throw new MLMException(ExceptionCode.RESERVATION_NOT_FOUND);
+        }
+        if(user.getRole().equals(Role.LIB) || (roomReservation.getUserId().equals(user.getId()))){
+            roomReservationRepository.delete(roomReservation);
+            return success;
+        }
+        throw new MLMException(ExceptionCode.UNAUTHORIZED);
     }
 }
