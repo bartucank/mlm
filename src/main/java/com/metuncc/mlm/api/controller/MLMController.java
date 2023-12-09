@@ -77,5 +77,13 @@ public class MLMController {
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksBySpecification(@RequestBody FindBookRequest request){
         return responseService.createResponse(mlmQueryServices.getBooksBySpecification(request));
     }
+    @PostMapping("/user/makeReservation")
+    public ResponseEntity<ApiResponse<StatusDTO>> makeReservation(@RequestParam(name = "roomSlotId")Long roomSlotId){
+        return responseService.createResponse(mlmServices.makeReservation(roomSlotId));
+    }
+    @PostMapping("/user/cancelReservation")
+    public ResponseEntity<ApiResponse<StatusDTO>> cancelReservation(@RequestParam(name = "roomReservationId")Long roomReservationId){
+        return responseService.createResponse(mlmServices.cancelReservation(roomReservationId));
+    }
 
 }

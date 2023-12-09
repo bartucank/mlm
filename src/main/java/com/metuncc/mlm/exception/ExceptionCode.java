@@ -21,7 +21,15 @@ public enum ExceptionCode {
     BOOK_NOT_RETURNED_YET("Book not returned yet."),
     BOOK_RESERVED_FOR_SOMEONE("Book is reserved for another person. Please pe patient."),
 
-    USER_NOT_FOUND("User not found.");
+    USER_NOT_FOUND("User not found."),
+    ROOMSLOT_NOT_FOUND("Room slot not found."),
+    ROOMSLOT_NOT_AVAILABLE("Room slot is not available."),
+    MAX_RESERVATION_REACHED("Max reservations reached"),
+    RESERVATION_NOT_FOUND("Reservation not found"),
+    UNAUTHORIZED("Unauthorized.");
+
+
+
 
 
     private final String description;

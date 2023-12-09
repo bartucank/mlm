@@ -5,5 +5,7 @@ public enum RoomSlotDays {
     TUE,
     WED,
     THU,
-    FRI
+    FRI,
+    SAT,
+    SUN
 }

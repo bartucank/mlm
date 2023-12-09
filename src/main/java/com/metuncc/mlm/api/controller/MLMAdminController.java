@@ -74,4 +74,14 @@ public class MLMAdminController {
                                                              @RequestParam("userId") Long userId){
         return responseService.createResponse(mlmServices.takeBackBook(bookId,userId));
     }
+    @PostMapping("/user/generateQRcodeForRoom")
+    public ResponseEntity<ApiResponse<StatusDTO>> generateQRcodeForRoom(@RequestParam("roomId") Long roomId){
+        return responseService.createResponse(mlmServices.generateQRcodeForRoom(roomId));
+    }
+    @PostMapping("/user/readingNFC")
+    public ResponseEntity<ApiResponse<StatusDTO>> readingNFC(@RequestParam("NFC_no") String NFC_no,
+                                                             @RequestParam("roomId") Long roomId){
+        return responseService.createResponse(mlmServices.readingNFC(NFC_no,roomId));
+    }
+
 }
