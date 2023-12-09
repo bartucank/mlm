@@ -53,4 +53,8 @@ public interface MlmServices {
     StatusDTO makeReservation(Long roomSlotId);
 
     StatusDTO cancelReservation(Long roomReservationId);
+
+    StatusDTO generateQRcodeForRoom(Long roomId);
+
+    StatusDTO readingNFC(String NFC_no, Long roomId);
 }

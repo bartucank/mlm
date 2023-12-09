@@ -550,4 +550,47 @@ public class MlmServicesImpl implements MlmServices {
         }
         throw new MLMException(ExceptionCode.UNAUTHORIZED);
     }
+    @Override
+    public StatusDTO generateQRcodeForRoom(Long roomId){
+        if(Objects.isNull(roomId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Room room = roomRepository.getById(roomId);
+        if(Objects.isNull(room)){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+
+        Image img = room.getQrImage();
+        imageRepository.delete(img);
+
+        String code = getUniqueVerfCodeForRoom();
+        ByteArrayOutputStream stream = QRCode
+                .from(code)
+                .withSize(250, 250)
+                .stream();
+        ByteArrayInputStream bis = new ByteArrayInputStream(stream.toByteArray());
+        byte[] qrCodeImageData = stream.toByteArray();
+        img= new Image();
+        img.setImageData(ImageUtil.compressImage(qrCodeImageData));
+        img.setName("QR");
+        img.setType("png");
+        imageRepository.save(img);
+        room.setVerfCode(code);
+        room.setQrImage(img);
+        roomRepository.save(room);
+        return success;
+    }
+    @Override
+    public StatusDTO readingNFC(String NFC_no, Long roomId){
+        if(Objects.isNull(roomId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Room room = roomRepository.getById(roomId);
+        if(Objects.isNull(room)){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+        room.setNFC_no(NFC_no);
+        roomRepository.save(room);
+        return success;
+    }
 }
