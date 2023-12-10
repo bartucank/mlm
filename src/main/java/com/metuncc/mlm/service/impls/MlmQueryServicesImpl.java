@@ -51,18 +51,19 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
 
 
     @Override
-    public ShelfDTO getShelfById(Long id){
-        if(Objects.isNull(id)){
+    public ShelfDTO getShelfById(Long id) {
+        if (Objects.isNull(id)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Shelf shelf = shelfRepository.getById(id);
-        if(Objects.isNull(shelf)){
+        if (Objects.isNull(shelf)) {
             throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
         }
         return shelf.toDTO();
     }
+
     @Override
-    public ShelfDTOListResponse getAllShelfs(){
+    public ShelfDTOListResponse getAllShelfs() {
         ShelfDTOListResponse response = new ShelfDTOListResponse();
         response.setShelfDTOList(shelfRepository.findAll().stream().map(Shelf::toDTO).collect(Collectors.toList()));
         return response;
@@ -71,26 +72,26 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public ImageDTO getImageById(Long id) {
         Image dbImage = imageRepository.getImageById(id);
-        if(Objects.nonNull(dbImage)){
-            ImageDTO dto =  ImageDTO
+        if (Objects.nonNull(dbImage)) {
+            ImageDTO dto = ImageDTO
                     .builder()
                     .name(dbImage.getName())
                     .imageData(ImageUtil.decompressImage(dbImage.getImageData()))
                     .build();
             dto.setId(id);
             return dto;
-        }else{
+        } else {
             return null;
         }
     }
 
     @Override
-    public BookDTO getBookById(Long id){
-        if(Objects.isNull(id)){
+    public BookDTO getBookById(Long id) {
+        if (Objects.isNull(id)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Book book = bookRepository.getById(id);
-        if(Objects.isNull(book)){
+        if (Objects.isNull(book)) {
             throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
         }
         return book.toDTO();
@@ -105,8 +106,8 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
 
 
     @Override
-    public UserDTOListResponse getUsersBySpecifications(FindUserRequest request){
-        if(Objects.isNull(request)){
+    public UserDTOListResponse getUsersBySpecifications(FindUserRequest request) {
+        if (Objects.isNull(request)) {
             request = new FindUserRequest();
             request.setSize(7);
             request.setPage(0);
@@ -118,7 +119,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 request.getVerified(),
                 request.getEmail()
         );
-        if(Objects.isNull(request.getSize()) ||Objects.isNull(request.getPage())){
+        if (Objects.isNull(request.getSize()) || Objects.isNull(request.getPage())) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -137,14 +138,14 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
 
     @Override
     public UserDTO getUserDetails() {
-        try{
+        try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
             User user = userRepository.getById(jwtUser.getId());
-            if(Objects.nonNull(user)){
+            if (Objects.nonNull(user)) {
                 return user.toDTO();
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new MLMException(ExceptionCode.SESSION_EXPERIED_PLEASE_LOGIN);
         }
         throw new MLMException(ExceptionCode.SESSION_EXPERIED_PLEASE_LOGIN);
@@ -152,12 +153,12 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
 
     @Override
     public BookDTOListResponse getBooksBySpecification(FindBookRequest request) {
-        if(Objects.isNull(request)){
+        if (Objects.isNull(request)) {
             request = new FindBookRequest();
             request.setPage(0);
             request.setSize(7);
         }
-        BookSpecification  bookSpecification = new BookSpecification(
+        BookSpecification bookSpecification = new BookSpecification(
                 request.getName(),
                 request.getAuthor(),
                 request.getPublisher(),
@@ -184,12 +185,12 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
-    public RoomDTO getRoomById(Long id){
-        if(Objects.isNull(id)){
+    public RoomDTO getRoomById(Long id) {
+        if (Objects.isNull(id)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Room room = roomRepository.getById(id);
-        if(Objects.isNull(room)){
+        if (Objects.isNull(room)) {
             throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
         }
 
@@ -197,12 +198,12 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
-    public RoomDTOListResponse getRooms(){
+    public RoomDTOListResponse getRooms() {
         return new RoomDTOListResponse(roomRepository.findAll().stream().map(Room::toDTO).collect(Collectors.toList()));
     }
 
     @Override
-    public CopyCardDTO getCopyCardDetails(){
+    public CopyCardDTO getCopyCardDetails() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
 

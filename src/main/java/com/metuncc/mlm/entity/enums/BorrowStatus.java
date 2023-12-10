@@ -5,7 +5,8 @@ public enum BorrowStatus {
     WAITING_TAKE("Waiting to take"),
     WAITING_RETURN("Waiting to return"),
 
-    RETURNED("Book returned")
+    RETURNED("Book returned"),
+    DID_NOT_TAKEN("Did not taken.")
 
     ;
 

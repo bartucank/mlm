@@ -22,6 +22,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         User user = userRepository.findByUsername(username);
         return JwtUserDetails.create(user);
     }
+
     public UserDetails loadUserById(Long id) throws UsernameNotFoundException {
         User user = userRepository.getById(id);
         return JwtUserDetails.create(user);

@@ -37,10 +37,10 @@ public interface MlmServices {
 
     StatusDTO deleteRoom(Long id);
 
-    StatusDTO createSlotsForRoom(Long roomId,
-                                 RoomSlotDays day,
-                                 int startHour,
-                                 int endHour);
+
+    StatusDTO createSlots(RoomSlotDays day, String start, String end);
+
+    StatusDTO enqueue(Long bookId);
 
     StatusDTO borrowBook(Long bookId, Long userId);
 
@@ -57,4 +57,6 @@ public interface MlmServices {
     StatusDTO generateQRcodeForRoom(Long roomId);
 
     StatusDTO readingNFC(String NFC_no, Long roomId);
+
+    StatusDTO approveReservation(String nfcCode, String qrCode);
 }

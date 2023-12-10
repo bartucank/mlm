@@ -13,4 +13,5 @@ public class RoomReservationDTO extends MLMBaseClassDTO{
     private LocalDate date;
     private RoomSlot roomSlot;
     private Long userId;
+    private Boolean approved;
 }

@@ -16,8 +16,10 @@ import java.util.List;
 public class RoomReservation extends MLMBaseClass{
 
     private LocalDate date;
+    @OneToOne
     private RoomSlot roomSlot;
     private Long userId;
+    private Boolean approved;
 
     public RoomReservationDTO toDTO(){
         RoomReservationDTO dto = new RoomReservationDTO();
@@ -25,6 +27,7 @@ public class RoomReservation extends MLMBaseClass{
         dto.setDate(getDate());
         dto.setRoomSlot(getRoomSlot());
         dto.setUserId(getUserId());
+        dto.setApproved(getApproved());
         return dto;
     }
 }

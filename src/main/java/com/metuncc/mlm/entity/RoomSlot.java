@@ -23,7 +23,7 @@ public class RoomSlot extends MLMBaseClass{
 
     @ManyToOne
     @JoinColumn(name = "room_id")
-    private Room roomId;
+    private Room room;
 
     public RoomSlotDTO toDto(){
         RoomSlotDTO dto = new RoomSlotDTO();

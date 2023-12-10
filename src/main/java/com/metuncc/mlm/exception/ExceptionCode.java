@@ -26,7 +26,9 @@ public enum ExceptionCode {
     ROOMSLOT_NOT_AVAILABLE("Room slot is not available."),
     MAX_RESERVATION_REACHED("Max reservations reached"),
     RESERVATION_NOT_FOUND("Reservation not found"),
-    UNAUTHORIZED("Unauthorized.");
+    UNAUTHORIZED("Unauthorized."),
+    INVALID_CONFIRMATION("Could not confirmed. Please check your room!"),
+    ALREADY_IN_QUEUE("You are already in queue.");
 
 
 

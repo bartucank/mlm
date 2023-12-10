@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Properties;
 
@@ -41,6 +42,7 @@ public class MailUtil {
             " <table cellpadding=\"0\" cellspacing=\"0\" class=\"es-footer\" align=\"center\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;table-layout:fixed !important;width:100%;background-color:transparent;background-repeat:repeat;background-position:center top\"><tr><td align=\"center\" style=\"padding:0;Margin:0\"><table class=\"es-footer-body\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px;background-color:transparent;width:640px\" role=\"none\"><tr><td align=\"left\" style=\"Margin:0;padding-top:20px;padding-bottom:20px;padding-left:20px;padding-right:20px\"><table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"none\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px\"><tr>\n" +
             "<td align=\"left\" style=\"padding:0;Margin:0;width:560px\"><table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" role=\"presentation\" style=\"mso-table-lspace:0pt;mso-table-rspace:0pt;border-collapse:collapse;border-spacing:0px\"><tr><td align=\"center\" style=\"padding:0;Margin:0;padding-bottom:35px\"><p style=\"Margin:0;-webkit-text-size-adjust:none;-ms-text-size-adjust:none;mso-line-height-rule:exactly;font-family:arial, 'helvetica neue', helvetica, sans-serif;line-height:18px;color:#333333;font-size:12px\">Middle East Technical University, Northern Cyprus Campus, 99738 Kalkanli, Guzelyurt, Mersin 10, Turkey</p> </td></tr></table></td></tr></table></td></tr></table></td></tr></table></td></tr></table></div></body></html>";
 
+    private final String defaultEmailTemplate = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\"><html dir=\"ltr\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\"><head> <meta charset=\"UTF-8\"> <meta content=\"width=device-width, initial-scale=1\" name=\"viewport\"> <meta name=\"x-apple-disable-message-reformatting\"> <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\"> <meta content=\"telephone=no\" name=\"format-detection\"> <title></title> <!--[if (mso 16)]> <style type=\"text/css\"> a {text-decoration: none;} </style> <![endif]--> <!--[if gte mso 9]><style>sup { font-size: 100% !important; }</style><![endif]--> <!--[if gte mso 9]><xml> <o:OfficeDocumentSettings> <o:AllowPNG></o:AllowPNG> <o:PixelsPerInch>96</o:PixelsPerInch> </o:OfficeDocumentSettings></xml><![endif]--></head><body> <div dir=\"ltr\" class=\"es-wrapper-color\"> <!--[if gte mso 9]><v:background xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"t\"><v:fill type=\"tile\" color=\"#f7f7f7\"></v:fill></v:background><![endif]--> <table class=\"es-wrapper\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"> <tbody> <tr> <td class=\"esd-email-paddings\" valign=\"top\"> <table cellpadding=\"0\" cellspacing=\"0\" class=\"esd-header-popover es-header\" align=\"center\"> <tbody> <tr> <td class=\"esd-stripe\" align=\"center\"> <table class=\"es-header-body\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: transparent;\"> <tbody> <tr> <td class=\"esd-structure\" align=\"left\" style=\"background-color: #d2232a;\" bgcolor=\"#d2232a\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> <tbody> <tr> <td width=\"600\" class=\"es-m-p0r esd-container-frame\" valign=\"top\" align=\"center\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-radius: 1px; border-collapse: separate;\"> <tbody> <tr> <td align=\"center\" class=\"esd-block-image\" style=\"font-size: 0px;\"><a target=\"_blank\" href=\"https://ncc.metu.edu.tr/tr\"><img src=\"https://www.metu.edu.tr/system/files/logo_orj/3/3.2.png\" alt=\"MLM\" style=\"display: block;\" title=\"MLM\" height=\"130\"></a></td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table class=\"es-content\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\"> <tbody> <tr> <td class=\"esd-stripe\" align=\"center\"> <table class=\"es-content-body\" style=\"border-left:1px solid #d2232a;border-right:1px solid #d2232a;background-color: #ffffff;\" width=\"600\" cellspacing=\"0\" cellpadding=\"0\" bgcolor=\"#2b2829\" align=\"center\"> <tbody> <tr> <td class=\"esd-structure es-p30t es-p20r es-p20l\" align=\"left\" bgcolor=\"#ffffff\" style=\"background-color: #ffffff;\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> <tbody> <tr> <td width=\"558\" align=\"left\" class=\"esd-container-frame\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> </table> </td> </tr> <tr> <td class=\"es-m-p0r esd-container-frame\" width=\"558\" valign=\"top\" align=\"center\"> <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"> <tbody> <tr> <td align=\"center\" class=\"esd-block-text es-p30t es-p5b es-m-txt-c\"> <h1> {TITLE} </h1> </td> </tr> <tr> <td class=\"esd-block-text es-p10t es-p20b es-p40r es-p40l\"> <h3 style=\"margin-top:-10px;padding-left:50px;padding-right:50px;\">Hello Hocam,</h3> <p style=\"margin-top:-10px;padding-left:50px;padding-right:50px;\"> <br> {CONTENT} <br><br> </p> <h3 style=\"margin-top:-10px;padding-left:50px;padding-right:50px;\">Best regards,<br>MLM Team.</h3> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table cellpadding=\"0\" cellspacing=\"0\" class=\"es-footer\" align=\"center\"> <tbody> <tr> <td class=\"esd-stripe\" align=\"center\"> <table class=\"es-footer-body\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: transparent;\"> <tbody> <tr> <td class=\"esd-structure es-p25t es-p25b es-p20r es-p20l\" align=\"left\" style=\"border-radius: 0px 0px 10px 10px; background-color: #d2232a;\" bgcolor=\"#d2232a\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> <tbody> <tr> <td width=\"560\" class=\"esd-container-frame\" align=\"left\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> <tbody> <tr> <td align=\"left\" class=\"esd-block-text\"> <p><br></p> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> <table cellpadding=\"0\" cellspacing=\"0\" class=\"es-content esd-footer-popover\" align=\"center\"> <tbody> <tr> <td class=\"esd-stripe\" align=\"center\"> <table class=\"es-content-body\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"background-color: transparent;\" bgcolor=\"#2b2829\"> <tbody> <tr> <td class=\"esd-structure es-p20\" align=\"left\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> <tbody> <tr> <td width=\"560\" class=\"esd-container-frame\" align=\"center\" valign=\"top\"> <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"> <tbody> <tr> <td align=\"center\" class=\"esd-block-text es-infoblock\"> <p style=\"color: #999999;\">Middle East Technical University, Northern Cyprus Campus, 99738 Kalkanli, Guzelyurt, Mersin 10, Turkey</p> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </td> </tr> </tbody> </table> </div></body></html>";
     public void sendVerifyEmailEmail(String to,String code) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -56,21 +58,40 @@ public class MailUtil {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(from));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            message.setSubject("Please verify your account.");
-            String htmlContent = verifyEmailTemplate;
-            htmlContent = htmlContent.replace("{CODE}",code);
+            message.setSubject("Please verify your account \uD83D\uDE4C ");
+            String htmlContent = defaultEmailTemplate;
+            htmlContent = htmlContent.replace("{TITLE}","Confirm Your Email");
+            String content = "You have received this e-mail to confirm your membership. Please enter the verification code below into the application. <br> <center>"+code+"</center>";
+            htmlContent = htmlContent.replace("{CONTENT}",content);
             message.setContent(htmlContent, "text/html");
             Transport.send(message);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
-
-
-        //        SimpleMailMessage message = new SimpleMailMessage();
-//        message.setTo(to);
-//        message.setSubject(subject);
-//        message.setText(body);
-//
-//        mailSender.send(message);
+    }
+    public void sendCustomEmail(String to,String subject, String content, String title) {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", smtp);
+        props.put("mail.smtp.port", port);
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject(StringUtils.hasText(subject)?subject:"Hello hocam!");
+            String htmlContent = defaultEmailTemplate;
+            htmlContent = htmlContent.replace("{TITLE}", StringUtils.hasText(title)?title:"");
+            htmlContent = htmlContent.replace("{CONTENT}", StringUtils.hasText(content)?content:"");
+            message.setContent(htmlContent, "text/html");
+            Transport.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 }
