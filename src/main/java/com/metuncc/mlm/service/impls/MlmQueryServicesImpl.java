@@ -1,12 +1,9 @@
 package com.metuncc.mlm.service.impls;
 
 import com.metuncc.mlm.api.request.FindBookRequest;
-import com.metuncc.mlm.api.response.BookDTOListResponse;
+import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
-import com.metuncc.mlm.api.response.RoomDTOListResponse;
-import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.dto.*;
-import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
@@ -28,7 +25,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -43,6 +43,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private BookRepository bookRepository;
     private CopyCardRepository copyCardRepository;
     private RoomSlotRepository roomSlotRepository;
+    private ReceiptHistoryRepository receiptHistoryRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -208,5 +209,38 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
 
         return copyCardRepository.getByUser(jwtUser.getId()).toDTO();
+    }
+    @Override
+    public ReceiptHistoryDTOListResponse getReceiptsOfUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+
+        ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
+        response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(jwtUser.getId()).stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
+        return response;
+    }
+    @Override
+    public ReceiptHistoryDTOListResponse getReceipts(){
+        ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
+        response.setReceiptHistoryDTOList(receiptHistoryRepository.findAll().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
+        return response;
+    }
+    @Override
+    public ReceiptHistoryDTOListResponse getReceiptsByUser(Long id){
+        ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
+        response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(id).stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
+        return response;
+    }
+    @Override
+    public ReceiptHistoryDTOHashMapResponse getReceiptsHashMap(){
+        ReceiptHistoryDTOHashMapResponse response = new ReceiptHistoryDTOHashMapResponse();
+        HashMap<Long, List<ReceiptHistoryDTO>> receiptHistoryHashMap = new HashMap<>();
+        List<ReceiptHistoryDTO> allReceipts = receiptHistoryRepository.findAll().stream().map(ReceiptHistory::toDTO).toList();
+        for (ReceiptHistoryDTO receipt : allReceipts) {
+            Long userId = receipt.getUserId();
+            receiptHistoryHashMap.computeIfAbsent(userId, k -> new ArrayList<>()).add(receipt);
+        }
+        response.setReceiptHistoryHashMap(receiptHistoryHashMap);
+        return response;
     }
 }

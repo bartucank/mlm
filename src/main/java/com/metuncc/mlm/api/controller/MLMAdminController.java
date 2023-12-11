@@ -1,9 +1,8 @@
 package com.metuncc.mlm.api.controller;
 
-import com.metuncc.mlm.api.request.BookRequest;
-import com.metuncc.mlm.api.request.FindUserRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.*;
+import com.metuncc.mlm.api.response.ReceiptHistoryDTOHashMapResponse;
+import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
@@ -82,6 +81,22 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<StatusDTO>> readingNFC(@RequestParam("NFC_no") String NFC_no,
                                                              @RequestParam("roomId") Long roomId){
         return responseService.createResponse(mlmServices.readingNFC(NFC_no,roomId));
+    }
+    @PostMapping("/user/createReceipt")
+    public ResponseEntity<ApiResponse<StatusDTO>> createReceipt(@RequestBody ReceiptRequest request){
+        return responseService.createResponse((mlmServices.createReceiptHistory(request)));
+    }
+    @PostMapping("/user/getReceipts")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceipts(){
+        return responseService.createResponse((mlmQueryServices.getReceipts()));
+    }
+    @GetMapping("/user/getReceiptByUser")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByUser(@RequestParam("userId") Long userId){
+        return responseService.createResponse(mlmQueryServices.getReceiptsByUser(userId));
+    }
+    @GetMapping("/user/getReceiptsHashMap")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOHashMapResponse>> getReceiptsHashMap(){
+        return responseService.createResponse(mlmQueryServices.getReceiptsHashMap());
     }
 
 }

@@ -1,9 +1,6 @@
 package com.metuncc.mlm.service;
 
-import com.metuncc.mlm.api.request.BookRequest;
-import com.metuncc.mlm.api.request.CreateRoomRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.User;
@@ -59,4 +56,6 @@ public interface MlmServices {
     StatusDTO readingNFC(String NFC_no, Long roomId);
 
     StatusDTO approveReservation(String nfcCode, String qrCode);
+
+    StatusDTO createReceiptHistory(ReceiptRequest receiptRequest);
 }

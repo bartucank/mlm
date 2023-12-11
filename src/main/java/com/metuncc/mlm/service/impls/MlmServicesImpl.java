@@ -9,11 +9,9 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.metuncc.mlm.api.request.BookRequest;
-import com.metuncc.mlm.api.request.CreateRoomRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.LoginResponse;
+import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
@@ -62,6 +60,7 @@ public class MlmServicesImpl implements MlmServices {
     private RoomSlotRepository roomSlotRepository;
     private RoomReservationRepository roomReservationRepository;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
+    private ReceiptHistoryRepository receiptHistoryRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
@@ -685,5 +684,27 @@ public class MlmServicesImpl implements MlmServices {
         }
 
         throw new MLMException(ExceptionCode.RESERVATION_NOT_FOUND);
+    }
+    @Override
+    public StatusDTO createReceiptHistory(ReceiptRequest receiptRequest){
+        if (Objects.isNull(receiptRequest) || Objects.isNull(receiptRequest.getUserId()) || Objects.isNull(receiptRequest.getImageId())) {
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        User user = userRepository.getById(receiptRequest.getUserId());
+        if (Objects.isNull(user)) {
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        Image image = imageRepository.getImageById(receiptRequest.getImageId());
+        if (Objects.isNull(image)) {
+            throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
+        }
+
+        ReceiptHistory receiptHistory = new ReceiptHistory();
+        receiptHistory.setUser(user);
+        receiptHistory.setImg(image);
+        receiptHistory.setApproved(false);
+        receiptHistory.setBalance(new BigDecimal(0));
+        receiptHistoryRepository.save(receiptHistory);
+        return success;
     }
 }

@@ -1,10 +1,12 @@
 package com.metuncc.mlm.api.controller;
 
 import com.metuncc.mlm.api.request.FindBookRequest;
+import com.metuncc.mlm.api.request.ReceiptRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.response.LoginResponse;
+import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
@@ -85,5 +87,8 @@ public class MLMController {
     public ResponseEntity<ApiResponse<StatusDTO>> cancelReservation(@RequestParam(name = "roomReservationId")Long roomReservationId){
         return responseService.createResponse(mlmServices.cancelReservation(roomReservationId));
     }
-
+    @GetMapping("user/getReceiptsofUser")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsOfUser(){
+        return responseService.createResponse(mlmQueryServices.getReceiptsOfUser());
+    }
 }
