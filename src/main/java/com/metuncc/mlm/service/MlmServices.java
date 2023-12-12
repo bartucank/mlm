@@ -57,5 +57,5 @@ public interface MlmServices {
 
     StatusDTO approveReservation(String nfcCode, String qrCode);
 
-    StatusDTO createReceiptHistory(ReceiptRequest receiptRequest);
+    StatusDTO createReceiptHistory(Long imageId);
 }

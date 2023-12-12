@@ -686,15 +686,17 @@ public class MlmServicesImpl implements MlmServices {
         throw new MLMException(ExceptionCode.RESERVATION_NOT_FOUND);
     }
     @Override
-    public StatusDTO createReceiptHistory(ReceiptRequest receiptRequest){
-        if (Objects.isNull(receiptRequest) || Objects.isNull(receiptRequest.getUserId()) || Objects.isNull(receiptRequest.getImageId())) {
+    public StatusDTO createReceiptHistory(Long imageId){
+        if (Objects.isNull(imageId)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
-        User user = userRepository.getById(receiptRequest.getUserId());
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
         if (Objects.isNull(user)) {
             throw new MLMException(ExceptionCode.USER_NOT_FOUND);
         }
-        Image image = imageRepository.getImageById(receiptRequest.getImageId());
+        Image image = imageRepository.getImageById(imageId);
         if (Objects.isNull(image)) {
             throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
         }

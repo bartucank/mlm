@@ -1,11 +1,7 @@
 package com.metuncc.mlm.api.controller;
 
 import com.metuncc.mlm.api.request.FindBookRequest;
-import com.metuncc.mlm.api.request.ReceiptRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
-import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
@@ -15,21 +11,10 @@ import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.dto.UserDTO;
-import com.metuncc.mlm.exception.ExceptionCode;
-import com.metuncc.mlm.exception.MLMException;
-import com.metuncc.mlm.security.JwtTokenProvider;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value ="/api/user", produces = "application/json;charset=UTF-8")
@@ -79,16 +64,20 @@ public class MLMController {
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksBySpecification(@RequestBody FindBookRequest request){
         return responseService.createResponse(mlmQueryServices.getBooksBySpecification(request));
     }
-    @PostMapping("/user/makeReservation")
+    @PostMapping("/makeReservation")
     public ResponseEntity<ApiResponse<StatusDTO>> makeReservation(@RequestParam(name = "roomSlotId")Long roomSlotId){
         return responseService.createResponse(mlmServices.makeReservation(roomSlotId));
     }
-    @PostMapping("/user/cancelReservation")
+    @PostMapping("/cancelReservation")
     public ResponseEntity<ApiResponse<StatusDTO>> cancelReservation(@RequestParam(name = "roomReservationId")Long roomReservationId){
         return responseService.createResponse(mlmServices.cancelReservation(roomReservationId));
     }
-    @GetMapping("user/getReceiptsofUser")
+    @GetMapping("/getReceiptsofUser")
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsOfUser(){
         return responseService.createResponse(mlmQueryServices.getReceiptsOfUser());
+    }
+    @PostMapping("/createReceipt")
+    public ResponseEntity<ApiResponse<StatusDTO>> createReceipt(@RequestParam (name = "imageId") Long imageId){
+        return responseService.createResponse((mlmServices.createReceiptHistory(imageId)));
     }
 }

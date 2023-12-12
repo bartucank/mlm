@@ -73,28 +73,25 @@ public class MLMAdminController {
                                                              @RequestParam("userId") Long userId){
         return responseService.createResponse(mlmServices.takeBackBook(bookId,userId));
     }
-    @PostMapping("/user/generateQRcodeForRoom")
+    @PostMapping("/generateQRcodeForRoom")
     public ResponseEntity<ApiResponse<StatusDTO>> generateQRcodeForRoom(@RequestParam("roomId") Long roomId){
         return responseService.createResponse(mlmServices.generateQRcodeForRoom(roomId));
     }
-    @PostMapping("/user/readingNFC")
+    @PostMapping("/readingNFC")
     public ResponseEntity<ApiResponse<StatusDTO>> readingNFC(@RequestParam("NFC_no") String NFC_no,
                                                              @RequestParam("roomId") Long roomId){
         return responseService.createResponse(mlmServices.readingNFC(NFC_no,roomId));
     }
-    @PostMapping("/user/createReceipt")
-    public ResponseEntity<ApiResponse<StatusDTO>> createReceipt(@RequestBody ReceiptRequest request){
-        return responseService.createResponse((mlmServices.createReceiptHistory(request)));
-    }
-    @PostMapping("/user/getReceipts")
+
+    @GetMapping("/getReceipts")
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceipts(){
         return responseService.createResponse((mlmQueryServices.getReceipts()));
     }
-    @GetMapping("/user/getReceiptByUser")
-    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByUser(@RequestParam("userId") Long userId){
-        return responseService.createResponse(mlmQueryServices.getReceiptsByUser(userId));
+    @GetMapping("/getReceiptByUser")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByUser(@RequestParam("userId") Long id){
+        return responseService.createResponse(mlmQueryServices.getReceiptsByUser(id));
     }
-    @GetMapping("/user/getReceiptsHashMap")
+    @GetMapping("/getReceiptsHashMap")
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOHashMapResponse>> getReceiptsHashMap(){
         return responseService.createResponse(mlmQueryServices.getReceiptsHashMap());
     }
