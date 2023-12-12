@@ -13,8 +13,12 @@ import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value ="/api/user", produces = "application/json;charset=UTF-8")
@@ -79,5 +83,9 @@ public class MLMController {
     @PostMapping("/createReceipt")
     public ResponseEntity<ApiResponse<StatusDTO>> createReceipt(@RequestParam (name = "imageId") Long imageId){
         return responseService.createResponse((mlmServices.createReceiptHistory(imageId)));
+    }
+    @PostMapping(value="/uploadImage",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<StatusDTO>> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
+        return responseService.createResponse(mlmServices.uploadImage(file));
     }
 }
