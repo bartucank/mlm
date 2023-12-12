@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping(value ="/api/admin", produces = "application/json;charset=UTF-8")
@@ -95,5 +96,9 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOHashMapResponse>> getReceiptsHashMap(){
         return responseService.createResponse(mlmQueryServices.getReceiptsHashMap());
     }
-
+    @PutMapping("/approveReceipt")
+    public ResponseEntity<ApiResponse<StatusDTO>> approveReceipt(@RequestParam("receiptId") Long id,
+                                                                 @RequestParam("balance")BigDecimal balance){
+        return responseService.createResponse(mlmServices.approveReceipt(id, balance));
+    }
 }

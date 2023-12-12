@@ -28,7 +28,9 @@ public enum ExceptionCode {
     RESERVATION_NOT_FOUND("Reservation not found"),
     UNAUTHORIZED("Unauthorized."),
     INVALID_CONFIRMATION("Could not confirmed. Please check your room!"),
-    ALREADY_IN_QUEUE("You are already in queue.");
+    ALREADY_IN_QUEUE("You are already in queue."),
+    RECEIPT_NOT_FOUND("Receipt not found."),
+    COPYCARD_NOT_FOUND("Copy card not found.");
 
 
 

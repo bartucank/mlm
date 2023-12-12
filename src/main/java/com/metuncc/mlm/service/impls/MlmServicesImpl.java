@@ -11,7 +11,6 @@ import java.util.*;
 
 import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.LoginResponse;
-import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
@@ -707,6 +706,31 @@ public class MlmServicesImpl implements MlmServices {
         receiptHistory.setApproved(false);
         receiptHistory.setBalance(new BigDecimal(0));
         receiptHistoryRepository.save(receiptHistory);
+        return success;
+    }
+    @Override
+    public StatusDTO approveReceipt(Long id, BigDecimal balance){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        ReceiptHistory receiptHistory = receiptHistoryRepository.getById(id);
+        if(Objects.isNull(receiptHistory)){
+            throw new MLMException(ExceptionCode.RECEIPT_NOT_FOUND);
+        }
+        receiptHistory.setBalance(balance);
+        receiptHistory.setApproved(true);
+        User user = userRepository.getById(receiptHistory.getUser().getId());
+        if(Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        CopyCard copyCard = copyCardRepository.getByUser(user.getId());
+        if(Objects.isNull(copyCard)){
+            throw new MLMException(ExceptionCode.COPYCARD_NOT_FOUND);
+        }
+        copyCard.setBalance((copyCard.getBalance().add(balance)));
+        copyCardRepository.save(copyCard);
+        receiptHistoryRepository.save(receiptHistory);
+
         return success;
     }
 }

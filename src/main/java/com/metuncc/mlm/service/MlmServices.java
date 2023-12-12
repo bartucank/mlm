@@ -8,6 +8,7 @@ import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 public interface MlmServices {
     LoginResponse createUser(UserRequest userRequest);
@@ -58,4 +59,6 @@ public interface MlmServices {
     StatusDTO approveReservation(String nfcCode, String qrCode);
 
     StatusDTO createReceiptHistory(Long imageId);
+
+    StatusDTO approveReceipt(Long id, BigDecimal balance);
 }
