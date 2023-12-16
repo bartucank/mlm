@@ -1,9 +1,8 @@
 package com.metuncc.mlm.api.controller;
 
-import com.metuncc.mlm.api.request.BookRequest;
-import com.metuncc.mlm.api.request.FindUserRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.*;
+import com.metuncc.mlm.api.response.ReceiptHistoryDTOHashMapResponse;
+import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping(value ="/api/admin", produces = "application/json;charset=UTF-8")
@@ -75,11 +75,11 @@ public class MLMAdminController {
                                                              @RequestParam("userId") Long userId){
         return responseService.createResponse(mlmServices.takeBackBook(bookId,userId));
     }
-    @PostMapping("/user/generateQRcodeForRoom")
+    @PostMapping("/generateQRcodeForRoom")
     public ResponseEntity<ApiResponse<StatusDTO>> generateQRcodeForRoom(@RequestParam("roomId") Long roomId){
         return responseService.createResponse(mlmServices.generateQRcodeForRoom(roomId));
     }
-    @PostMapping("/user/readingNFC")
+    @PostMapping("/readingNFC")
     public ResponseEntity<ApiResponse<StatusDTO>> readingNFC(@RequestParam("NFC_no") String NFC_no,
                                                              @RequestParam("roomId") Long roomId){
         return responseService.createResponse(mlmServices.readingNFC(NFC_no,roomId));
@@ -90,4 +90,21 @@ public class MLMAdminController {
     }
 
 
+    @GetMapping("/getReceipts")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceipts(){
+        return responseService.createResponse((mlmQueryServices.getReceipts()));
+    }
+    @GetMapping("/getReceiptByUser")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByUser(@RequestParam("userId") Long id){
+        return responseService.createResponse(mlmQueryServices.getReceiptsByUser(id));
+    }
+    @GetMapping("/getReceiptsHashMap")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOHashMapResponse>> getReceiptsHashMap(){
+        return responseService.createResponse(mlmQueryServices.getReceiptsHashMap());
+    }
+    @PutMapping("/approveReceipt")
+    public ResponseEntity<ApiResponse<StatusDTO>> approveReceipt(@RequestParam("receiptId") Long id,
+                                                                 @RequestParam("balance")BigDecimal balance){
+        return responseService.createResponse(mlmServices.approveReceipt(id, balance));
+    }
 }

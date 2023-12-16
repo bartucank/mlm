@@ -9,10 +9,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import com.metuncc.mlm.api.request.BookRequest;
-import com.metuncc.mlm.api.request.CreateRoomRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
@@ -63,6 +60,7 @@ public class MlmServicesImpl implements MlmServices {
     private RoomSlotRepository roomSlotRepository;
     private RoomReservationRepository roomReservationRepository;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
+    private ReceiptHistoryRepository receiptHistoryRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
@@ -686,5 +684,54 @@ public class MlmServicesImpl implements MlmServices {
         }
 
         throw new MLMException(ExceptionCode.RESERVATION_NOT_FOUND);
+    }
+    @Override
+    public StatusDTO createReceiptHistory(Long imageId){
+        if (Objects.isNull(imageId)) {
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
+        if (Objects.isNull(user)) {
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        Image image = imageRepository.getImageById(imageId);
+        if (Objects.isNull(image)) {
+            throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
+        }
+
+        ReceiptHistory receiptHistory = new ReceiptHistory();
+        receiptHistory.setUser(user);
+        receiptHistory.setImg(image);
+        receiptHistory.setApproved(false);
+        receiptHistory.setBalance(new BigDecimal(0));
+        receiptHistoryRepository.save(receiptHistory);
+        return success;
+    }
+    @Override
+    public StatusDTO approveReceipt(Long id, BigDecimal balance){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        ReceiptHistory receiptHistory = receiptHistoryRepository.getById(id);
+        if(Objects.isNull(receiptHistory)){
+            throw new MLMException(ExceptionCode.RECEIPT_NOT_FOUND);
+        }
+        receiptHistory.setBalance(balance);
+        receiptHistory.setApproved(true);
+        User user = userRepository.getById(receiptHistory.getUser().getId());
+        if(Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        CopyCard copyCard = copyCardRepository.getByUser(user.getId());
+        if(Objects.isNull(copyCard)){
+            throw new MLMException(ExceptionCode.COPYCARD_NOT_FOUND);
+        }
+        copyCard.setBalance((copyCard.getBalance().add(balance)));
+        copyCardRepository.save(copyCard);
+        receiptHistoryRepository.save(receiptHistory);
+
+        return success;
     }
 }
