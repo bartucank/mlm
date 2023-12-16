@@ -1,5 +1,7 @@
 package com.metuncc.mlm.service.impls;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.request.FindUserRequest;
@@ -8,6 +10,7 @@ import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.entity.*;
+import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -28,6 +31,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -208,5 +216,95 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
 
         return copyCardRepository.getByUser(jwtUser.getId()).toDTO();
+    }
+    @Override
+    public OpenLibraryBookDetails getBookDetailsFromExternalWithISBN(String isbn){
+
+        return getByISBN(isbn);
+    }
+    public  OpenLibraryBookDetails getByISBN(String isbn){
+
+        String endpoint = "https://openlibrary.org/isbn/"+isbn+".json";
+        OpenLibraryBookDetails  dto = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String newUrl = response.headers().map().get("location").get(0);
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(newUrl))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+         response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String body = response.body();
+        if(Objects.nonNull(body)){
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                dto = objectMapper.readValue(body, OpenLibraryBookDetails.class);
+                try{
+                    for (OpenLibraryBookAuthor author : dto.getAuthors()) {
+                        if(Objects.nonNull(author.getKey())){
+                            author.setKey(getByRef(author.getKey()));
+                        }
+                    }
+                }catch (Exception e){
+                    //Ignore.
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
+        return dto;
+    }
+
+
+    public  String getByRef(String ref){
+        String endpoint = "https://openlibrary.org"+ref+".json";
+        OpenLibraryBookAuthorDetail dto = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String body = response.body();
+        if(Objects.nonNull(body)){
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                dto = objectMapper.readValue(body, OpenLibraryBookAuthorDetail.class);
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+        }
+        return dto.getName();
+    }
+
+    @Override
+    public List<BookCategoryEnumDTO> getAllBookCategories(){
+        List<BookCategoryEnumDTO> dtoList = new ArrayList<>();
+
+        for (BookCategory category : BookCategory.values()) {
+            BookCategoryEnumDTO dto = new BookCategoryEnumDTO();
+            dto.setStr(category.toString());
+            dto.setEnumValue(category.name());
+            dtoList.add(dto);
+        }
+        return dtoList;
     }
 }

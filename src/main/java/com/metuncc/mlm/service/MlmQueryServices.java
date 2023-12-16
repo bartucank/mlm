@@ -36,4 +36,8 @@ public interface MlmQueryServices {
     RoomDTOListResponse getRooms();
 
     CopyCardDTO getCopyCardDetails();
+
+    OpenLibraryBookDetails getBookDetailsFromExternalWithISBN(String isbn);
+
+    List<BookCategoryEnumDTO> getAllBookCategories();
 }

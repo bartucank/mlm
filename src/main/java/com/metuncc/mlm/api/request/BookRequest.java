@@ -11,16 +11,16 @@ import java.time.LocalDate;
 @Data
 public class BookRequest {
     private Long id;
-    private Long shelfId;
+    private Long shelfId; //Combobox
     private Long imageId;
-    private String isbn;
-    private String publisher;
-    private String name;
-    private String description;
-    private String author;
-    private LocalDate publicationDate;
-    private String edition;
-    private String barcode;
-    private BookCategory category;
+    private String isbn; //ok
+    private String publisher;//ok
+    private String name;//ok
+    private String description;//ok
+    private String author;//ok
+    private LocalDate publicationDate;//ok
+    private String edition; //ignore
+    private String barcode; //ignore
+    private BookCategory category; //Combobox
     private BookStatus status;
 }

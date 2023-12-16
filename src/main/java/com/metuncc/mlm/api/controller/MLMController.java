@@ -3,16 +3,13 @@ package com.metuncc.mlm.api.controller;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.response.BookCategoryEnumDTOListResponse;
 import com.metuncc.mlm.api.response.BookDTOListResponse;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.response.ShelfDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
-import com.metuncc.mlm.dto.BookDTO;
-import com.metuncc.mlm.dto.ImageDTO;
-import com.metuncc.mlm.dto.ShelfDTO;
-import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.dto.UserDTO;
+import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.security.JwtTokenProvider;
@@ -77,13 +74,20 @@ public class MLMController {
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksBySpecification(@RequestBody FindBookRequest request){
         return responseService.createResponse(mlmQueryServices.getBooksBySpecification(request));
     }
-    @PostMapping("/user/makeReservation")
+    @PostMapping("/makeReservation")
     public ResponseEntity<ApiResponse<StatusDTO>> makeReservation(@RequestParam(name = "roomSlotId")Long roomSlotId){
         return responseService.createResponse(mlmServices.makeReservation(roomSlotId));
     }
-    @PostMapping("/user/cancelReservation")
+    @PostMapping("/cancelReservation")
     public ResponseEntity<ApiResponse<StatusDTO>> cancelReservation(@RequestParam(name = "roomReservationId")Long roomReservationId){
         return responseService.createResponse(mlmServices.cancelReservation(roomReservationId));
+    }
+
+    @GetMapping("/book/getAllCategories")
+    public ResponseEntity<ApiResponse<BookCategoryEnumDTOListResponse>>  getAllBookCategories(){
+        BookCategoryEnumDTOListResponse response = new BookCategoryEnumDTOListResponse();
+        response.setList(mlmQueryServices.getAllBookCategories());
+        return responseService.createResponse(response);
     }
 
 }

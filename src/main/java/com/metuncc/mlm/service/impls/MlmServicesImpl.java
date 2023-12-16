@@ -25,6 +25,7 @@ import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.utils.ImageUtil;
 import com.metuncc.mlm.utils.MailUtil;
+import com.metuncc.mlm.utils.OpenLibraryUtil;
 import lombok.AllArgsConstructor;
 import net.glxn.qrgen.QRCode;
 import org.springframework.security.authentication.AuthenticationManager;

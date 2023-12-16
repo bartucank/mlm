@@ -7,6 +7,7 @@ import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
+import com.metuncc.mlm.dto.OpenLibraryBookDetails;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
@@ -83,5 +84,10 @@ public class MLMAdminController {
                                                              @RequestParam("roomId") Long roomId){
         return responseService.createResponse(mlmServices.readingNFC(NFC_no,roomId));
     }
+    @GetMapping("/book/getByISBN")
+    public ResponseEntity<ApiResponse<OpenLibraryBookDetails>> getBookDetailsFromExternalWithISBN(@RequestParam("isbn")String isbn){
+        return responseService.createResponse(mlmQueryServices.getBookDetailsFromExternalWithISBN(isbn));
+    }
+
 
 }
