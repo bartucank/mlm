@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import java.math.BigDecimal;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -21,5 +22,8 @@ public class UserDTO extends MLMBaseClassDTO {
     private String password;
     private Boolean verified;
     private String email;
+    private BigDecimal debt;
+
+    private CopyCardDTO copyCardDTO;
 
 }

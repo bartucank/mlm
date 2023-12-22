@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -27,6 +28,8 @@ public class User extends MLMBaseClass {
     @OneToOne( cascade = CascadeType.ALL)
     private CopyCard copyCard;
 
+    private BigDecimal debt;
+
 
     public UserDTO toDTO() {
         UserDTO userDTO = new UserDTO();
@@ -37,6 +40,8 @@ public class User extends MLMBaseClass {
         userDTO.setUsername(getUsername());
         userDTO.setFullName(getFullName());
         userDTO.setVerified(getVerified());
+        userDTO.setCopyCardDTO(getCopyCard().toDTO());
+        userDTO.setDebt(getDebt());
         return userDTO;
     }
 
