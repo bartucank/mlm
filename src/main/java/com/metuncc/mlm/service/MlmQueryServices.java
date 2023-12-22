@@ -6,6 +6,7 @@ import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.entity.User;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface MlmQueryServices {
@@ -45,4 +46,16 @@ public interface MlmQueryServices {
     OpenLibraryBookDetails getBookDetailsFromExternalWithISBN(String isbn);
 
     List<BookCategoryEnumDTO> getAllBookCategories();
+
+    Integer totalUserCount();
+
+    Integer totalBookCount();
+
+    Integer availableBookCount();
+
+    Integer unavailableBookCount();
+
+    BigDecimal sumOfBalance();
+
+
 }
