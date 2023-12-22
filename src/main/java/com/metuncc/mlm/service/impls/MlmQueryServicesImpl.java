@@ -9,6 +9,7 @@ import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.entity.enums.BookStatus;
+import com.metuncc.mlm.entity.enums.QueueStatus;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -29,7 +30,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.URI;
@@ -53,6 +53,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private CopyCardRepository copyCardRepository;
     private RoomSlotRepository roomSlotRepository;
     private ReceiptHistoryRepository receiptHistoryRepository;
+    private BookQueueRecordRepository bookQueueRecordRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -343,28 +344,16 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return response;
     }
     @Override
-    public Integer totalUserCount(){
-        Integer count = userRepository.totalUserCount();
-        return count;
-    }
-    @Override
-    public Integer totalBookCount(){
-        Integer count = bookRepository.totalBookCount();
-        return count;
-    }
-    @Override
-    public Integer availableBookCount(){
-        Integer count = bookRepository.bookCountByAvailability(BookStatus.AVAILABLE);
-        return count;
-    }
-    @Override
-    public Integer unavailableBookCount(){
-        Integer count = bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE);
-        return count;
-    }
-    @Override
-    public BigDecimal sumOfBalance(){
-        BigDecimal sum = copyCardRepository.sumOfBalance();
-        return sum;
+    public StatisticsDTO getStatistics(){
+        StatisticsDTO statisticsDTO = new StatisticsDTO();
+        statisticsDTO.setTotalUserCount(userRepository.totalUserCount());
+        statisticsDTO.setTotalBookCount(bookRepository.totalBookCount());
+        statisticsDTO.setAvailableBookCount(bookRepository.bookCountByAvailability(BookStatus.AVAILABLE));
+        statisticsDTO.setUnavailableBookCount(bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE));
+        statisticsDTO.setSumOfBalance(copyCardRepository.totalBalance());
+        statisticsDTO.setSumOfDebt(userRepository.totalDebt());
+        statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
+
+        return statisticsDTO;
     }
 }

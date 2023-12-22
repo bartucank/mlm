@@ -7,6 +7,7 @@ import com.metuncc.mlm.api.response.UserDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.OpenLibraryBookDetails;
+import com.metuncc.mlm.dto.StatisticsDTO;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
@@ -106,5 +107,9 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<StatusDTO>> approveReceipt(@RequestParam("receiptId") Long id,
                                                                  @RequestParam("balance")BigDecimal balance){
         return responseService.createResponse(mlmServices.approveReceipt(id, balance));
+    }
+    @GetMapping("/getStatistics")
+    public ResponseEntity<ApiResponse<StatisticsDTO>> getStatistics(){
+        return responseService.createResponse(mlmQueryServices.getStatistics());
     }
 }

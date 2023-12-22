@@ -18,6 +18,6 @@ public interface CopyCardRepository extends JpaRepository<CopyCard,Long>, JpaSpe
     CopyCard getByUser(@Param("id")Long id);
 
     @Query("select sum(c.balance) from CopyCard c")
-    BigDecimal sumOfBalance();
+    BigDecimal totalBalance();
 
 }

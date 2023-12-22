@@ -47,15 +47,6 @@ public interface MlmQueryServices {
 
     List<BookCategoryEnumDTO> getAllBookCategories();
 
-    Integer totalUserCount();
 
-    Integer totalBookCount();
-
-    Integer availableBookCount();
-
-    Integer unavailableBookCount();
-
-    BigDecimal sumOfBalance();
-
-
+    StatisticsDTO getStatistics();
 }

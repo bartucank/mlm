@@ -104,32 +104,6 @@ public class MLMController {
         return responseService.createResponse(response);
     }
 
-    @GetMapping("/totalUserCount")
-    public ResponseEntity<ApiResponse<Integer>> totalUserCount(){
-        Integer totalUserCount = mlmQueryServices.totalUserCount();
-        return responseService.createResponse(totalUserCount);
-    }
 
-    @GetMapping("/totalBookCount")
-    public ResponseEntity<ApiResponse<Integer>> totalBookCount(){
-        Integer totalBookCount = mlmQueryServices.totalBookCount();
-        return responseService.createResponse(totalBookCount);
-    }
-
-    @GetMapping("/availableBookCount")
-    public ResponseEntity<ApiResponse<Integer>> availableBookCount(){
-        Integer availableBookCount = mlmQueryServices.availableBookCount();
-        return responseService.createResponse(availableBookCount);
-    }
-    @GetMapping("/unavailableBookCount")
-    public ResponseEntity<ApiResponse<Integer>> unavailableBookCount(){
-        Integer unavailableBookCount = mlmQueryServices.unavailableBookCount();
-        return responseService.createResponse(unavailableBookCount);
-    }
-    @GetMapping("/sumOfBalance")
-    public ResponseEntity<ApiResponse<BigDecimal>> sumOfBalance(){
-        BigDecimal sumOfBalance = mlmQueryServices.sumOfBalance();
-        return responseService.createResponse(sumOfBalance);
-    }
 
 }
