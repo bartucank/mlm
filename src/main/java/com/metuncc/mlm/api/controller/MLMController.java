@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping(value ="/api/user", produces = "application/json;charset=UTF-8")
@@ -102,5 +103,7 @@ public class MLMController {
         response.setList(mlmQueryServices.getAllBookCategories());
         return responseService.createResponse(response);
     }
+
+
 
 }

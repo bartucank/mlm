@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -15,4 +16,8 @@ public interface CopyCardRepository extends JpaRepository<CopyCard,Long>, JpaSpe
 
     @Query("select c from CopyCard c where c.owner.id=:id")
     CopyCard getByUser(@Param("id")Long id);
+
+    @Query("select sum(c.balance) from CopyCard c")
+    BigDecimal totalBalance();
+
 }
