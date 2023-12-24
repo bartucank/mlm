@@ -4,6 +4,7 @@ import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.ReceiptHistoryDTOHashMapResponse;
 import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
 import com.metuncc.mlm.api.response.UserDTOListResponse;
+import com.metuncc.mlm.api.response.UserNamesDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.OpenLibraryBookDetails;
@@ -111,5 +112,9 @@ public class MLMAdminController {
     @GetMapping("/getStatistics")
     public ResponseEntity<ApiResponse<StatisticsDTO>> getStatistics(){
         return responseService.createResponse(mlmQueryServices.getStatistics());
+    }
+    @GetMapping("/getUsersForBorrowPage")
+    public ResponseEntity<ApiResponse<UserNamesDTOListResponse>> getUsersForBorrowPage(){
+        return responseService.createResponse(mlmQueryServices.getAllUsers());
     }
 }

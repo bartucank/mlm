@@ -25,7 +25,7 @@ public class User extends MLMBaseClass {
     private Boolean verified;
     private String email;
 
-    @OneToOne( cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     private CopyCard copyCard;
 
     private BigDecimal debt;
@@ -51,5 +51,9 @@ public class User extends MLMBaseClass {
         setRole(Role.USER);
         setEmail(userRequest.getEmail());
         return this;
+    }
+    @Override
+    public String toString(){
+        return "";
     }
 }

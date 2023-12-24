@@ -1,6 +1,7 @@
 package com.metuncc.mlm.repository;
 
 import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.entity.enums.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -27,4 +28,7 @@ public interface UserRepository extends JpaRepository<User,Long> , JpaSpecificat
 
     @Query ("select sum(u.debt) from User u")
     BigDecimal totalDebt();
+
+    @Query("select c from User c where c.role=:role")
+    List<User> findAllByRoles(@Param("role") Role role);
 }

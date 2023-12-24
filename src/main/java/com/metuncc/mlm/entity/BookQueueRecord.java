@@ -44,4 +44,9 @@ public class BookQueueRecord extends MLMBaseClass {
         }
     }
 
+    @Override
+    public String toString(){
+        return "";
+    }
+
 }

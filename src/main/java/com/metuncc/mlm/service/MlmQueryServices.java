@@ -49,4 +49,6 @@ public interface MlmQueryServices {
 
 
     StatisticsDTO getStatistics();
+
+    UserNamesDTOListResponse getAllUsers();
 }

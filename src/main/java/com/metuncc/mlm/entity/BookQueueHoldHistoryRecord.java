@@ -21,5 +21,8 @@ public class BookQueueHoldHistoryRecord extends MLMBaseClass {
    private Long userId;
 
    private LocalDateTime endDate;
-
+   @Override
+   public String toString(){
+      return "";
+   }
 }

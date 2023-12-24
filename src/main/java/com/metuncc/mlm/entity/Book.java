@@ -76,4 +76,18 @@ public class Book extends MLMBaseClass {
 
         return this;
     }
+    public Book fromRequestUpdate(BookRequest bookRequest) {
+
+
+        setPublisher(bookRequest.getPublisher());
+        setName(bookRequest.getName());
+        setDescription(bookRequest.getDescription());
+        setAuthor(bookRequest.getAuthor());
+        setPublicationDate(bookRequest.getPublicationDate());
+        setEdition(bookRequest.getEdition());
+        setBarcode(bookRequest.getBarcode());
+        setCategory(bookRequest.getCategory());
+
+        return this;
+    }
 }

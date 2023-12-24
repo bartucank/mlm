@@ -10,6 +10,7 @@ import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.entity.enums.BookStatus;
 import com.metuncc.mlm.entity.enums.QueueStatus;
+import com.metuncc.mlm.entity.enums.Role;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -355,5 +356,20 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
 
         return statisticsDTO;
+    }
+
+    @Override
+    public UserNamesDTOListResponse getAllUsers(){
+        List<UserNamesDTO> dtos = new ArrayList<>();
+        List<User> users = userRepository.findAllByRoles(Role.USER);
+        for (User user : users) {
+            UserNamesDTO dto = new UserNamesDTO();
+            dto.setDisplayName(user.getFullName()+" - "+user.getUsername());
+            dto.setId(user.getId());
+            dtos.add(dto);
+        }
+        UserNamesDTOListResponse response = new UserNamesDTOListResponse();
+        response.setDtoList(dtos);
+        return response;
     }
 }

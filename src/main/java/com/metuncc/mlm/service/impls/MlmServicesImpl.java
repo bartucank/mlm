@@ -232,7 +232,7 @@ public class MlmServicesImpl implements MlmServices {
         if (Objects.isNull(book)) {
             throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
         }
-        book = book.fromRequest(request);
+        book = book.fromRequestUpdate(request);
         bookRepository.save(book);
         return success;
     }
@@ -439,6 +439,9 @@ public class MlmServicesImpl implements MlmServices {
                         .orElse(null);
             }
             if (Objects.nonNull(bookBorrowHistory)) {
+                if(bookBorrowHistory.getUserId().getId().equals(userId)){
+                    throw new MLMException(ExceptionCode.BOOK_ALREADY_ON_USER);
+                }
                 //On someone. not available!
                 throw new MLMException(ExceptionCode.BOOK_NOT_RETURNED_YET);
             }

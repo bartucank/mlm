@@ -30,4 +30,8 @@ public class CopyCard extends MLMBaseClass {
         dto.setOwnerId(getOwner().getId());
         return dto;
     }
+    @Override
+    public String toString(){
+        return "";
+    }
 }

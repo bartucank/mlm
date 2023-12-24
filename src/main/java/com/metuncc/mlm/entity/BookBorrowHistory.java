@@ -28,5 +28,8 @@ public class BookBorrowHistory extends MLMBaseClass {
     private LocalDateTime returnDate;
 
 
-
+    @Override
+    public String toString(){
+        return "";
+    }
 }

@@ -19,6 +19,7 @@ public enum ExceptionCode {
 
 
     BOOK_NOT_RETURNED_YET("Book not returned yet."),
+    BOOK_ALREADY_ON_USER("This user already borrowed this book."),
     BOOK_RESERVED_FOR_SOMEONE("Book is reserved for another person. Please pe patient."),
 
     USER_NOT_FOUND("User not found."),
