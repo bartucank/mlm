@@ -7,7 +7,15 @@ plugins {
 
 group = 'com.metuncc'
 archivesBaseName = 'mlm'
-version = '1.0.0'
+version = '1.1.0'
+
+def customJarName = "app.jar"
+def jarPath = "build/libs/${customJarName}"
+
+jar {
+	archiveFileName = customJarName
+}
+
 java {
 	sourceCompatibility = '17'
 }
@@ -58,22 +66,3 @@ tasks.named('test') {
 
 
 
-publishing {
-	repositories {
-		maven {
-			name = "GitHubPackages"
-			url = "https://maven.pkg.github.com/bartucank/mlm"
-			credentials {
-				username = System.getenv("GITHUB_ACTOR")
-				password = System.getenv("GITHUB_TOKEN")
-			}
-		}
-	}
-
-
-	publications {
-		maven(MavenPublication) {
-			from components.java
-		}
-	}
-}
