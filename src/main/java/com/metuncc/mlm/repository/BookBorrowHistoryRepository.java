@@ -4,6 +4,8 @@ import com.metuncc.mlm.entity.Book;
 import com.metuncc.mlm.entity.BookBorrowHistory;
 import com.metuncc.mlm.entity.BookQueueRecord;
 import com.metuncc.mlm.entity.enums.BorrowStatus;
+import com.metuncc.mlm.entity.ReceiptHistory;
+import com.metuncc.mlm.entity.enums.BorrowStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -13,9 +15,14 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import java.util.List;
+
 @Repository
 public interface BookBorrowHistoryRepository extends JpaRepository<BookBorrowHistory,Long>, JpaSpecificationExecutor<Book> {
 
+    @Query("select b from BookBorrowHistory  b where b.userId.id=:id and b.status=:status")
+    List<BookBorrowHistory> getByUserIdandStatus(@Param("id") Long id,
+                                                 @Param("status")BorrowStatus status);
 
     @Query("select b from BookBorrowHistory b where b.createdDate<=:localDateTime and b.status=:borrowStatus")
     List<BookBorrowHistory> getBookBorrowHistoriesByStatusAndDate(@Param("localDateTime") LocalDateTime localDateTime,
