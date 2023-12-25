@@ -15,11 +15,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,6 +32,13 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
 
     @Value("${default.end.hour}")
     private String endHour;
+
+    @Value("${default.borrow.day:10}")
+    private Long day;
+    @Value("${default.borrow.late.debt:2}")
+    private Long lateDebt;
+
+
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
@@ -117,6 +126,7 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
 
     //Every day, at 23.45
     @Scheduled(cron = "0 45 23 * * ?")
+    @Override
     public void dequeueForBooks(){
         LocalDateTime localDateTime = LocalDateTime.now();
         List<BookQueueHoldHistoryRecord> bookQueueHoldHistoryRecords= bookQueueHoldHistoryRecordRepository.getBookQueueHoldHistoryRecordByEndDate(localDateTime);
@@ -142,6 +152,26 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
                     "The Book is Available!");
         }
         bookQueueHoldHistoryRecordRepository.deleteAll(bookQueueHoldHistoryRecords);
+    }
+    //Every day, at 23.45
+    @Scheduled(cron = "0 45 23 * * ?")
+    @Override
+    public void increaseDebt(){
+        System.out.println("Çalıştı!");
+        LocalDateTime localDateTime = LocalDateTime.now().minusDays(day+1);
+        List<BookBorrowHistory> bookBorrowHistoryList = bookBorrowHistoryRepository.getBookBorrowHistoriesByStatusAndDate(localDateTime,BorrowStatus.WAITING_RETURN);
+        for (BookBorrowHistory bookBorrowHistory : bookBorrowHistoryList) {
+            if(Objects.isNull(bookBorrowHistory.getUserId().getDebt())){
+                bookBorrowHistory.getUserId().setDebt(BigDecimal.valueOf(lateDebt));
+            }else{
+                bookBorrowHistory.getUserId().setDebt(bookBorrowHistory.getUserId().getDebt().add(BigDecimal.valueOf(lateDebt)));
+            }
+            userRepository.save(bookBorrowHistory.getUserId());
+            mailUtil.sendCustomEmail(bookBorrowHistory.getUserId().getEmail(),
+                    "Reminder for "+bookBorrowHistory.getBookQueueRecord().getBookId().getName(),
+                    "We saw that you did not return "+bookBorrowHistory.getBookQueueRecord().getBookId().getName()+". You must return the book to the library to avoid penalties.",
+                    "Remainder");
+        }
     }
 }
 

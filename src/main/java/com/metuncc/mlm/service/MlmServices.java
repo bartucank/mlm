@@ -44,7 +44,7 @@ public interface MlmServices {
 
 
 
-    StatusDTO takeBackBook(Long bookId, Long userId);
+    StatusDTO takeBackBook(Long bookId);
 
     StatusDTO givePhysicalCopyCardToUser(String nfcCode, Long userId);
 

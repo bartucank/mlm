@@ -389,7 +389,7 @@ public class MlmServicesImpl implements MlmServices {
                     .findFirst()
                     .orElse(null);
         }
-        //not in queue;
+        //already in queue;
         if (Objects.nonNull(bookBorrowHistory)) {
             throw new MLMException(ExceptionCode.ALREADY_IN_QUEUE);
         }
@@ -480,7 +480,7 @@ public class MlmServicesImpl implements MlmServices {
     }
 
     @Override
-    public StatusDTO takeBackBook(Long bookId, Long userId) {
+    public StatusDTO takeBackBook(Long bookId) {
         if (Objects.isNull(bookId)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
@@ -496,7 +496,7 @@ public class MlmServicesImpl implements MlmServices {
         if (!CollectionUtils.isEmpty(bookQueueRecord.getBookBorrowHistoryList())) {
             bookBorrowHistory = bookQueueRecord.getBookBorrowHistoryList()
                     .stream()
-                    .filter(c -> c.getUserId() != null && c.getUserId().getId().equals(userId))
+                    .filter(c -> c.getUserId() != null && c.getStatus().equals(BorrowStatus.WAITING_RETURN))
                     .findFirst()
                     .orElse(null);
         } else {

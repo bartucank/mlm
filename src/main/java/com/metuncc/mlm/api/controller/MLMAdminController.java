@@ -73,9 +73,8 @@ public class MLMAdminController {
     }
 
     @PostMapping("/book/takeBackBook")
-    public ResponseEntity<ApiResponse<StatusDTO>> takeBackBook(@RequestParam("bookId") Long bookId,
-                                                             @RequestParam("userId") Long userId){
-        return responseService.createResponse(mlmServices.takeBackBook(bookId,userId));
+    public ResponseEntity<ApiResponse<StatusDTO>> takeBackBook(@RequestParam("bookId") Long bookId){
+        return responseService.createResponse(mlmServices.takeBackBook(bookId));
     }
     @PostMapping("/generateQRcodeForRoom")
     public ResponseEntity<ApiResponse<StatusDTO>> generateQRcodeForRoom(@RequestParam("roomId") Long roomId){
