@@ -3,10 +3,7 @@ package com.metuncc.mlm.api.controller;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
-import com.metuncc.mlm.api.response.BookCategoryEnumDTOListResponse;
-import com.metuncc.mlm.api.response.BookDTOListResponse;
-import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
-import com.metuncc.mlm.api.response.ShelfDTOListResponse;
+import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.*;
@@ -104,6 +101,9 @@ public class MLMController {
         return responseService.createResponse(response);
     }
 
-
+    @GetMapping("/myBooks")
+    public ResponseEntity<ApiResponse<MyBooksDTOListResponse>> getMyBooks(){
+        return responseService.createResponse(mlmQueryServices.getMyBooks());
+    }
 
 }

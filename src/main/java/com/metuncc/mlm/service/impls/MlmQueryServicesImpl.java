@@ -7,10 +7,7 @@ import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.entity.*;
-import com.metuncc.mlm.entity.enums.BookCategory;
-import com.metuncc.mlm.entity.enums.BookStatus;
-import com.metuncc.mlm.entity.enums.QueueStatus;
-import com.metuncc.mlm.entity.enums.Role;
+import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -31,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.net.URI;
@@ -41,6 +39,9 @@ import java.util.List;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static java.lang.Math.abs;
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @Service
 @AllArgsConstructor
@@ -55,6 +56,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private RoomSlotRepository roomSlotRepository;
     private ReceiptHistoryRepository receiptHistoryRepository;
     private BookQueueRecordRepository bookQueueRecordRepository;
+    private BookBorrowHistoryRepository bookBorrowHistoryRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -370,6 +372,28 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         }
         UserNamesDTOListResponse response = new UserNamesDTOListResponse();
         response.setDtoList(dtos);
+        return response;
+    }
+    @Override
+    public MyBooksDTOListResponse getMyBooks(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        List<MyBooksDTO> dtos = new ArrayList<>();
+        List<BookBorrowHistory> borrows = bookBorrowHistoryRepository.getByUserIdandStatus(jwtUser.getId(), BorrowStatus.WAITING_RETURN);
+        for (int i = 0; i< borrows.size(); i++){
+            MyBooksDTO dto = new MyBooksDTO();
+            dto.setBook(borrows.get(i).getBookQueueRecord().getBookId().toDTO());
+            dto.setDays(abs(15-DAYS.between(borrows.get(i).getCreatedDate(), LocalDateTime.now())));
+            if(15-DAYS.between(borrows.get(i).getCreatedDate(), LocalDateTime.now())<0){
+                dto.setIsLate(true);
+            }
+            else{
+                dto.setIsLate(false);
+            }
+            dtos.add(dto);
+        }
+        MyBooksDTOListResponse response = new MyBooksDTOListResponse();
+        response.setMyBooksDTOList(dtos);
         return response;
     }
 }
