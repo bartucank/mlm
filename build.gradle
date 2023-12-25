@@ -2,11 +2,12 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '2.5.2'
 	id 'io.spring.dependency-management' version '1.1.0'
+	id 'maven-publish'
 }
 
 group = 'com.metuncc'
-version = '1.0.0-SNAPSHOT'
-
+archivesBaseName = 'mlm'
+version = '1.0.0'
 java {
 	sourceCompatibility = '17'
 }
@@ -53,4 +54,26 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+
+
+publishing {
+	repositories {
+		maven {
+			name = "GitHubPackages"
+			url = "https://maven.pkg.github.com/bartucank/mlm"
+			credentials {
+				username = System.getenv("GITHUB_ACTOR")
+				password = System.getenv("GITHUB_TOKEN")
+			}
+		}
+	}
+
+
+	publications {
+		maven(MavenPublication) {
+			from components.java
+		}
+	}
 }
