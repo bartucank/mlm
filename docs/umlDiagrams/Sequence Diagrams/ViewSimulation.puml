@@ -1,6 +1,5 @@
 @startuml
 actor "Librarian" as Librarian
-participant "HomePage" as Home
 participant "Simulation Page" as SimPage
 participant "Queue System" as QueueSys
 database "Database" as QueueDB
@@ -8,10 +7,8 @@ participant "Statistics Module" as StatsMod
 
 
 
-Librarian -> Home: Click on the simulation page button
-activate Home
-Home -> SimPage: Enters simulation page
-deactivate Home
+Librarian -> SimPage: Enters simulation page
+
 activate SimPage
 
 SimPage -> QueueSys: Requests active queues

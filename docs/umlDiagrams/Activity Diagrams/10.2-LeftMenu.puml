@@ -1,17 +1,7 @@
 @startuml
 
 start
-:User navigated Libraian Home Page;
-  :Get Total Book Count, Total User Count,\nTotal Room Count from back-end to display.;
-  :Display Homepage Components;
-
-if (Any Where clicked?) then (yes)
-    if ("Left Menu Icon" clicked?) then (yes)
-      :Left menu opened.;
-      :User's full name displayed on the beginning of the menu.;
-      :Options which are "User List", "Librarian List",
-       "Book List", "Software List", "Copy Card Managements", 
-       "Room Managements" and "Logout" displayed;
+:Left Menu Opened.;
         if(User clicked anywhere?) then(yes)
             if("User List" clicked?) then (yes)
                 :User navigated to User List page.;
@@ -53,13 +43,6 @@ if (Any Where clicked?) then (yes)
         else
             :Stay on menu;
         endif
-    else
-      :Blank area clicked. Stay on the page.;
-    endif
-else
-    :Stay on Homepage;
-endif
-
 stop
 
 @enduml

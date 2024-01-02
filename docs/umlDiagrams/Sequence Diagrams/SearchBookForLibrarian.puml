@@ -1,16 +1,11 @@
 @startuml SearchBookForLibrarian
 actor Librarian
-participant HomePage as HomePage
 participant BookListPage as SearchPage
 participant DetailsPage as DetailsPage
 participant Controller as Controller
 database Database
 
-Librarian-> HomePage: Enter HomePage
-activate HomePage
-
-HomePage -> SearchPage: Navigate to BookListPage from left menu
-deactivate HomePage
+Librarian -> SearchPage: Navigate to BookListPage from left menu
 activate SearchPage
 
 SearchPage -> Controller: Send Specification Form

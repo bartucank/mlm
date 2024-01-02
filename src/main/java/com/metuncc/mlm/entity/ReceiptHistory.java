@@ -23,6 +23,7 @@ public class ReceiptHistory extends MLMBaseClass {
 
     public ReceiptHistoryDTO toDTO(){
         ReceiptHistoryDTO receiptHistoryDTO = new ReceiptHistoryDTO();
+        receiptHistoryDTO.setId(getId());
         receiptHistoryDTO.setUserId(getUser().getId());
         receiptHistoryDTO.setImgId(getImg().getId());
         receiptHistoryDTO.setApproved(getApproved());

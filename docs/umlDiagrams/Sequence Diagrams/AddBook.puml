@@ -1,17 +1,14 @@
 @startuml AddBook
 actor Librarian
-participant HomePage as HomePage
 participant BookPage as BookPage
 participant AddBookPage as AddBookPage
 participant Controller as Controller
 database OpenLibrary
 database Database
 
-Librarian -> HomePage: Enter HomePage
-activate HomePage
 
-HomePage -> BookPage: Navigate to BookPage
-deactivate HomePage
+Librarian -> BookPage: Navigate to BookPage
+
 activate BookPage
 
 Librarian -> BookPage: Click on Add Book

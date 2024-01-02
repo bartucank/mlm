@@ -446,12 +446,19 @@ public class MlmServicesImpl implements MlmServices {
                 throw new MLMException(ExceptionCode.BOOK_NOT_RETURNED_YET);
             }
             //first user of the list is this user or not?
-            List<BookBorrowHistory> bookBorrowHistoryList2 = bookQueueRecord.getBookBorrowHistoryList().stream().filter(c -> c.getStatus().equals(BorrowStatus.WAITING_TAKE)).collect(Collectors.toList());
-            bookBorrowHistoryList2.sort(Comparator.comparing(BookBorrowHistory::getCreatedDate));
-            if (bookBorrowHistoryList2.get(0).getUserId().equals(userId)) {
+//            List<BookBorrowHistory> bookBorrowHistoryList2 = bookQueueRecord.getBookBorrowHistoryList().stream().filter(c -> c.getStatus().equals(BorrowStatus.WAITING_TAKE)).collect(Collectors.toList());
+//            bookBorrowHistoryList2.sort(Comparator.comparing(BookBorrowHistory::getCreatedDate));
+//            if (bookBorrowHistoryList2.get(0).getUserId().equals(userId)) {
+            BookQueueHoldHistoryRecord bookQueueHoldHistoryRecord = bookQueueHoldHistoryRecordRepository.getBookQueueHoldHistoryByBookQueue(bookQueueRecord);
+            if (Objects.isNull(bookQueueHoldHistoryRecord)) {
+                throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+            }
+            if(!bookQueueHoldHistoryRecord.getUserId().equals(userId)){
                 //Next person is not this user.
                 throw new MLMException(ExceptionCode.BOOK_RESERVED_FOR_SOMEONE);
+
             }
+
             //We can give book to user.
 
             bookBorrowHistory = null;
@@ -461,8 +468,11 @@ public class MlmServicesImpl implements MlmServices {
                     .findFirst()
                     .orElse(null);
             bookBorrowHistory.setStatus(BorrowStatus.WAITING_RETURN);
+            bookBorrowHistory.setTakeDate(LocalDateTime.now());
+
             bookQueueRecord.updateBookBorrow(bookBorrowHistory);
             bookQueueRecordRepository.save(bookQueueRecord);
+            bookQueueHoldHistoryRecordRepository.delete(bookQueueHoldHistoryRecord);
             return success;
         }
         book.setStatus(BookStatus.NOT_AVAILABLE);
@@ -473,6 +483,7 @@ public class MlmServicesImpl implements MlmServices {
         BookBorrowHistory bookBorrowHistory = new BookBorrowHistory();
         bookBorrowHistory.setUserId(user);
         bookBorrowHistory.setStatus(BorrowStatus.WAITING_RETURN);
+        bookBorrowHistory.setTakeDate(LocalDateTime.now());
         bookBorrowHistory.setBookQueueRecord(bookQueueRecord);
         bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory);
         bookQueueRecordRepository.save(bookQueueRecord);
@@ -731,10 +742,43 @@ public class MlmServicesImpl implements MlmServices {
         if(Objects.isNull(copyCard)){
             throw new MLMException(ExceptionCode.COPYCARD_NOT_FOUND);
         }
-        copyCard.setBalance((copyCard.getBalance().add(balance)));
+        boolean debtFlag = false;
+        if(Objects.nonNull(user.getDebt()) && user.getDebt().compareTo(BigDecimal.ZERO)> 0){
+            //User has debt.
+            if(balance.compareTo(user.getDebt()) > 0){
+                balance = balance.subtract(user.getDebt());
+                copyCard.setBalance((copyCard.getBalance().add(balance)));
+            }else if(balance.compareTo(user.getDebt()) <= 0){
+                user.setDebt(user.getDebt().subtract(balance));
+            }
+            debtFlag = true;
+        }else{
+            copyCard.setBalance((copyCard.getBalance().add(balance)));
+        }
+        userRepository.save(user);
         copyCardRepository.save(copyCard);
         receiptHistoryRepository.save(receiptHistory);
-
+        StringBuilder content = new StringBuilder();
+        content.append("The receipt you uploaded on ");
+        content.append(receiptHistory.getCreatedDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
+        content.append(" has been approved. <br><br>");
+        if(debtFlag){
+            content.append("Since you previously owed money to the library, the debt was paid with the money you sent. After the transactions, your debt balance became ");
+            content.append(user.getDebt().toString());
+            content.append(" TL+7 and your copy card balance became ");
+            content.append(copyCard.getBalance().toString());
+            content.append(" TL.");
+        }else{
+            content.append("After the transactions, your copy card balance became ");
+            content.append(copyCard.getBalance().toString());
+            content.append(" TL.");
+        }
+        mailUtil.sendCustomEmail(
+                user.getEmail(),
+                "Receipt approved! \uD83D\uDCB8",
+                content.toString(),
+                null
+        );
         return success;
     }
 }

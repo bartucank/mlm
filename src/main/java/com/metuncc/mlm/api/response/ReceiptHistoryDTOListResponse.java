@@ -7,6 +7,6 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ReceiptHistoryDTOListResponse extends  PageableResponse {
+public class ReceiptHistoryDTOListResponse  {
     private List<ReceiptHistoryDTO> receiptHistoryDTOList;
 }

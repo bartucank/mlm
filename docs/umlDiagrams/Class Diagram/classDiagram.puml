@@ -145,7 +145,7 @@ BookQueueRecord "n" o-down-> "n" BookBorrowHistory : has
 
 RoomReservation "n" o-down-> "m" RoomSlot : on
 RoomReservation "n" o-down-> "n" User : has
-
+BookBorrowHistory "n" o-down-> "1" User : has
 User "1" *-down-> "1" CopyCard : has
 Shelf "1" *-down-> "n" Book : has
 Book "1" *-down-> "1" Image : has 

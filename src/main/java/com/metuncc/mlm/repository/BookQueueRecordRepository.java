@@ -17,6 +17,9 @@ public interface BookQueueRecordRepository extends JpaRepository<BookQueueRecord
     @Query("select b from BookQueueRecord b where b.bookId=:book  and b.status=:status")
     BookQueueRecord getBookQueueRecordByBookIdAndDeletedAndStatus(@Param("book")Book book,@Param("status") QueueStatus status);
 
+    @Query("select b from BookQueueRecord b where b.bookId=:book  order by b.id DESC")
+    List<BookQueueRecord> getBookQueueRecordByBookId(@Param("book")Book book);
+
     @Query("select count(b) from BookQueueRecord b where b.status=:status")
     Integer getBookQueueRecordByStatus(@Param("status") QueueStatus status);
 

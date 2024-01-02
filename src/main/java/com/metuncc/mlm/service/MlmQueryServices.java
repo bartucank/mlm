@@ -53,4 +53,8 @@ public interface MlmQueryServices {
     UserNamesDTOListResponse getAllUsers();
 
     MyBooksDTOListResponse getMyBooks();
+
+    StatusDTO getQueueStatusBasedOnBook(Long bookId);
+
+    QueueDetailDTO getQueueStatusBasedOnBookForLibrarian(Long bookId);
 }
