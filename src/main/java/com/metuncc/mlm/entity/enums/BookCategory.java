@@ -16,7 +16,7 @@ public enum BookCategory {
     PHYSICS("Physics"),
     COMPUTERSCIENCE("Computer Science"),
     FINANCE("Finance"),
-    BUSINESS("BUsiness"),
+    BUSINESS("Business"),
     ECONOMICS("Economics"),
     HISTORY("History"),
     BIOGRAPHY("Biography"),
