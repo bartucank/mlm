@@ -57,7 +57,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private BookQueueRecordRepository bookQueueRecordRepository;
     private BookBorrowHistoryRepository bookBorrowHistoryRepository;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
-
+    private StatisticsRepository statisticsRepository;
     @Override
     public UserDTO getOneUserByUserName(String username) {
         return userRepository.findByUsername(username).toDTO();
@@ -357,6 +357,11 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         statisticsDTO.setSumOfDebt(userRepository.totalDebt());
         statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
 
+        LocalDateTime today = LocalDateTime.now();
+        statisticsDTO.setDay(today.getDayOfWeek());
+        statisticsDTO.setDayDesc(today.getDayOfWeek().name());
+        statisticsDTO.setDayInt(today.getDayOfWeek().getValue());
+        statisticsDTO.setId(999L);
         return statisticsDTO;
     }
 
@@ -493,5 +498,33 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             queueDetailDTO.setHoldFlag(queueDetailDTO.getStatus().equals(QueueStatus.ACTIVE) && !waitToReturnFlag);
         queueDetailDTO.setStartDate(bookQueueRecord.getCreatedDate().format(formatter));
         return queueDetailDTO;
+    }
+
+
+    @Override
+    public List<StatisticsDTO> getStatisticsForChart(){
+        StatisticsDTO statisticsDTO = new StatisticsDTO();
+        statisticsDTO.setTotalUserCount(userRepository.totalUserCount());
+        statisticsDTO.setTotalBookCount(bookRepository.totalBookCount());
+        statisticsDTO.setAvailableBookCount(bookRepository.bookCountByAvailability(BookStatus.AVAILABLE));
+        statisticsDTO.setUnavailableBookCount(bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE));
+        statisticsDTO.setSumOfBalance(copyCardRepository.totalBalance());
+        statisticsDTO.setSumOfDebt(userRepository.totalDebt());
+        statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
+        statisticsDTO.setId(9999L);
+        LocalDateTime today = LocalDateTime.now();
+        statisticsDTO.setDay(today.getDayOfWeek());
+        statisticsDTO.setDayDesc(today.getDayOfWeek().name());
+        statisticsDTO.setDayInt(today.getDayOfWeek().getValue());
+        List<Statistics> statistics = statisticsRepository.findAll();
+        Collections.sort(statistics, Comparator.comparingLong(Statistics::getId));
+        List<StatisticsDTO> statisticsDTOS  = statistics.stream().filter(c->!c.getDay().equals(today.getDayOfWeek())).collect(Collectors.toList()).stream().map(Statistics::toDTO).collect(Collectors.toList());
+        statisticsDTOS.add(statisticsDTO);
+        Collections.sort(statisticsDTOS, Comparator.comparingLong(StatisticsDTO::getId));
+        List<StatisticsDTO> sortedStatistics = statisticsDTOS.stream()
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+        return sortedStatistics;
+
     }
 }

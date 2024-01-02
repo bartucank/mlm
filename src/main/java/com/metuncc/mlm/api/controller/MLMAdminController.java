@@ -1,10 +1,7 @@
 package com.metuncc.mlm.api.controller;
 
 import com.metuncc.mlm.api.request.*;
-import com.metuncc.mlm.api.response.ReceiptHistoryDTOHashMapResponse;
-import com.metuncc.mlm.api.response.ReceiptHistoryDTOListResponse;
-import com.metuncc.mlm.api.response.UserDTOListResponse;
-import com.metuncc.mlm.api.response.UserNamesDTOListResponse;
+import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.OpenLibraryBookDetails;
@@ -121,5 +118,11 @@ public class MLMAdminController {
     @GetMapping(value="/getQueueStatusBasedOnBookForLibrarian")
     public ResponseEntity<ApiResponse<QueueDetailDTO>> getQueueStatusBasedOnBookForLibrarian(@RequestParam("id") Long id) {
         return responseService.createResponse(mlmQueryServices.getQueueStatusBasedOnBookForLibrarian(id));
+    }
+    @GetMapping("/getStatisticsForChart")
+    public ResponseEntity<ApiResponse<StatisticsDTOListResponse>> getStatisticsForChart(){
+        StatisticsDTOListResponse response = new StatisticsDTOListResponse();
+        response.setStatisticsDTOList(mlmQueryServices.getStatisticsForChart());
+        return responseService.createResponse(response);
     }
 }

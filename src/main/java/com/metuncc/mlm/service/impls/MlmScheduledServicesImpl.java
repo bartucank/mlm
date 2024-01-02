@@ -1,7 +1,9 @@
 package com.metuncc.mlm.service.impls;
 
 import com.metuncc.mlm.entity.*;
+import com.metuncc.mlm.entity.enums.BookStatus;
 import com.metuncc.mlm.entity.enums.BorrowStatus;
+import com.metuncc.mlm.entity.enums.QueueStatus;
 import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import com.metuncc.mlm.repository.*;
 import com.metuncc.mlm.security.JwtTokenProvider;
@@ -16,9 +18,11 @@ import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -57,8 +61,9 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
     private RoomReservationRepository roomReservationRepository;
     private MlmServicesImpl mlmServices;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
+    private StatisticsRepository statisticsRepository;
 
-    public MlmScheduledServicesImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, MlmServicesImpl mlmServices, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository) {
+    public MlmScheduledServicesImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, MlmServicesImpl mlmServices, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, StatisticsRepository statisticsRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.shelfRepository = shelfRepository;
@@ -76,6 +81,7 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
         this.roomReservationRepository = roomReservationRepository;
         this.mlmServices = mlmServices;
         this.bookQueueHoldHistoryRecordRepository = bookQueueHoldHistoryRecordRepository;
+        this.statisticsRepository = statisticsRepository;
     }
 
     //Every hour with minute 15.
@@ -171,6 +177,30 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
                     "Reminder for "+bookBorrowHistory.getBookQueueRecord().getBookId().getName(),
                     "We saw that you did not return "+bookBorrowHistory.getBookQueueRecord().getBookId().getName()+". You must return the book to the library to avoid penalties.",
                     "Remainder");
+        }
+    }
+    //Every day, at 23.45
+    @Scheduled(cron = "0 40 04 * * ?")
+    @Override
+    public void logStatistics(){
+        System.out.println("okkkk");
+        LocalDateTime localDateTime = LocalDateTime.now();
+        DayOfWeek now = localDateTime.getDayOfWeek();
+        List<Statistics> statistics = statisticsRepository.findAll();
+        Statistics today = new Statistics();
+        today.setTotalUserCount(userRepository.totalUserCount());
+        today.setTotalBookCount(bookRepository.totalBookCount());
+        today.setAvailableBookCount(bookRepository.bookCountByAvailability(BookStatus.AVAILABLE));
+        today.setUnavailableBookCount(bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE));
+        today.setSumOfBalance(copyCardRepository.totalBalance());
+        today.setSumOfDebt(userRepository.totalDebt());
+        today.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
+        today.setDay(now);
+        today = statisticsRepository.save(today);
+        statistics.add(today);
+        if(statistics.size()>7){
+            Collections.sort(statistics, Comparator.comparingLong(Statistics::getId));
+            statisticsRepository.delete(statistics.get(0));
         }
     }
 }

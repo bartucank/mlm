@@ -16,4 +16,8 @@ public interface MlmScheduledServices {
     //Every day, at 23.45
     @Scheduled(cron = "0 45 23 * * ?")
     void increaseDebt();
+
+    //Every day, at 23.45
+    @Scheduled(cron = "0 40 04 * * ?")
+    void logStatistics();
 }
