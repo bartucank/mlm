@@ -105,5 +105,12 @@ public class MLMController {
     public ResponseEntity<ApiResponse<MyBooksDTOListResponse>> getMyBooks(){
         return responseService.createResponse(mlmQueryServices.getMyBooks());
     }
-
+    @GetMapping(value="/getQueueStatusBasedOnBook")
+    public ResponseEntity<ApiResponse<StatusDTO>> getQueueStatusBasedOnBook(@RequestParam("id") Long id) {
+        return responseService.createResponse(mlmQueryServices.getQueueStatusBasedOnBook(id));
+    }
+    @PostMapping(value="/enqueue")
+    public ResponseEntity<ApiResponse<StatusDTO>> enqueue(@RequestParam("id") Long id) {
+        return responseService.createResponse(mlmServices.enqueue(id));
+    }
 }

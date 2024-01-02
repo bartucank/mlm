@@ -1,6 +1,7 @@
 package com.metuncc.mlm.entity;
 
 
+import com.metuncc.mlm.dto.BookQueueHoldHistoryRecordDTO;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
 import com.metuncc.mlm.entity.enums.QueueStatus;
 import lombok.Data;

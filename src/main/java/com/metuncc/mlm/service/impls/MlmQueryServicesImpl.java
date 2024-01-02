@@ -27,17 +27,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
 
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.abs;
@@ -57,6 +56,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private ReceiptHistoryRepository receiptHistoryRepository;
     private BookQueueRecordRepository bookQueueRecordRepository;
     private BookBorrowHistoryRepository bookBorrowHistoryRepository;
+    private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
 
     @Override
     public UserDTO getOneUserByUserName(String username) {
@@ -395,5 +395,103 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         MyBooksDTOListResponse response = new MyBooksDTOListResponse();
         response.setMyBooksDTOList(dtos);
         return response;
+    }
+
+    @Override
+    public StatusDTO getQueueStatusBasedOnBook(Long bookId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
+        if (Objects.isNull(bookId)) {
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(bookId);
+        if (Objects.isNull(book)) {
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        if(book.getStatus().equals(BookStatus.AVAILABLE)){
+           return  StatusDTO.builder().statusCode("S").msg("This book is available now! You can borrow from librarian!").build();
+        }
+        BookQueueRecord bookQueueRecord = bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(book,QueueStatus.ACTIVE);
+        if(Objects.isNull(bookQueueRecord)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+
+        List<BookBorrowHistory> bookBorrowHistoriesForUser = bookQueueRecord.getBookBorrowHistoryList().stream().filter(c->c.getUserId().getId().equals(user.getId())).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(bookBorrowHistoriesForUser)){
+            BookBorrowHistory bookBorrowHistory = bookBorrowHistoriesForUser.get(0);
+            if(bookBorrowHistory.getStatus().equals(BorrowStatus.DID_NOT_TAKEN)){
+                return  StatusDTO.builder().statusCode("DID_NOT_TAKEN").msg("You missed your turn :( You must wait for the current queue to end before you can queue again.").build();
+            }
+            if(bookBorrowHistory.getStatus().equals(BorrowStatus.WAITING_RETURN)){
+                return  StatusDTO.builder().statusCode("WAITING_RETURN").msg("You already have the book. If you think there is a mistake, you can consult the librarian.").build();
+            }
+            if(bookBorrowHistory.getStatus().equals(BorrowStatus.RETURNED)){
+                return  StatusDTO.builder().statusCode("RETURNED").msg("You already returned this book! If you think there is a mistake, you can consult the librarian.").build();
+            }
+        }
+
+        List<BookBorrowHistory> bookBorrowHistoryList = bookQueueRecord.getBookBorrowHistoryList().stream().filter(c->c.getStatus().equals(BorrowStatus.WAITING_TAKE)).collect(Collectors.toList());
+        Collections.sort(bookBorrowHistoryList, Comparator.comparingLong(BookBorrowHistory::getId));
+        List<BookBorrowHistory> listofuser = bookBorrowHistoryList.stream().filter(c->c.getUserId().getId().equals(user.getId())).collect(Collectors.toList());
+        if(listofuser.size()>0){
+            int foundIndex = -1;
+            for (int i = 0; i < bookBorrowHistoryList.size(); i++) {
+                if (Objects.equals(bookBorrowHistoryList.get(i).getId(), listofuser.get(0).getId())) {
+                    foundIndex = i;
+                    break;
+                }
+            }
+            foundIndex++;
+            return  StatusDTO.builder().statusCode("ALREADY_QUEUE").msg("You are already in queue :) There are "+ foundIndex +" people before you. We will inform you when your turn comes.").build();
+        }else{
+            return  StatusDTO.builder().statusCode("S").msg("This book is not available but don't worry, you can enter queue. When it's your turn, we'll reserve the book for you.").build();
+
+        }
+    }
+    @Override
+    public QueueDetailDTO getQueueStatusBasedOnBookForLibrarian(Long bookId){
+        Book book = bookRepository.getById(bookId);
+        if (Objects.isNull(book)) {
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        List<BookQueueRecord> bookQueueRecordList = bookQueueRecordRepository.getBookQueueRecordByBookId(book);
+        if(CollectionUtils.isEmpty(bookQueueRecordList)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        BookQueueRecord bookQueueRecord = bookQueueRecordList.get(0);
+        QueueDetailDTO queueDetailDTO = new QueueDetailDTO();
+        queueDetailDTO.setBookDTO(bookQueueRecord.getBookId().toDTO());
+        queueDetailDTO.setStatus(bookQueueRecord.getStatus());
+        queueDetailDTO.setStatusDesc(bookQueueRecord.getStatus().toString());
+        queueDetailDTO.setMembers(new ArrayList<>());
+        List<BookBorrowHistory> bookBorrowHistoryList = bookQueueRecord.getBookBorrowHistoryList();
+        Collections.sort(bookBorrowHistoryList, Comparator.comparingLong(BookBorrowHistory::getId));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        Boolean waitToReturnFlag = false;
+        for (BookBorrowHistory bookBorrowHistory : bookBorrowHistoryList) {
+            QueueMembersDTO dto = new QueueMembersDTO();
+            dto.setUserDTO(bookBorrowHistory.getUserId().toDTO());
+            dto.setEnterDate(bookBorrowHistory.getCreatedDate().format(formatter));
+            dto.setTakeDate(Objects.nonNull(bookBorrowHistory.getTakeDate())?bookBorrowHistory.getTakeDate().format(formatter):"--");
+            dto.setReturnDate(Objects.nonNull(bookBorrowHistory.getReturnDate())?bookBorrowHistory.getReturnDate().format(formatter):"--");
+            dto.setStatus(bookBorrowHistory.getStatus());
+            dto.setStatusDesc(bookBorrowHistory.getStatus().toString());
+            queueDetailDTO.getMembers().add(dto);
+            if(bookBorrowHistory.getStatus().equals(BorrowStatus.WAITING_RETURN)){
+                waitToReturnFlag = true;
+            }
+        }
+        if(!waitToReturnFlag && queueDetailDTO.getStatus().equals(QueueStatus.ACTIVE)){
+            BookQueueHoldHistoryRecord bookQueueHoldHistoryRecord = bookQueueHoldHistoryRecordRepository.getBookQueueHoldHistoryByBookQueue(bookQueueRecord);
+            BookQueueHoldHistoryRecordDTO dto = new BookQueueHoldHistoryRecordDTO();
+            dto.setId(bookQueueHoldHistoryRecord.getId());
+            dto.setUserId(bookQueueHoldHistoryRecord.getUserId());
+            dto.setEndDate(bookQueueHoldHistoryRecord.getEndDate().format(formatter));
+            queueDetailDTO.setHoldDTO(dto);
+        }
+            queueDetailDTO.setHoldFlag(queueDetailDTO.getStatus().equals(QueueStatus.ACTIVE) && !waitToReturnFlag);
+        queueDetailDTO.setStartDate(bookQueueRecord.getCreatedDate().format(formatter));
+        return queueDetailDTO;
     }
 }

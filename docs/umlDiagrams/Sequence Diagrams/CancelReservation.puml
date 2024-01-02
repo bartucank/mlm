@@ -41,6 +41,5 @@ deactivate Controller
 Email --> System: Email sent confirmation
 deactivate Email
 
-System --> Librarian:  reservation cancelled and email sent message
 deactivate System
 @enduml

@@ -1,0 +1,16 @@
+${AnsiColor.WHITE}Welcome to
+${AnsiColor.RED}  __  __   ______   _______   _    _   _   _    _____    _____
+${AnsiColor.RED} |  \/  | |  ____| |__   __| | |  | | | \ | |  / ____|  / ____|
+${AnsiColor.RED} | \  / | | |__       | |    | |  | | |  \| | | |      | |
+${AnsiColor.RED} | |\/| | |  __|      | |    | |  | | | . ` | | |      | |
+${AnsiColor.RED} | |  | | | |____     | |    | |__| | | |\  | | |____  | |____
+${AnsiColor.RED} |_|  |_| |______|    |_|     \____/  |_| \_|  \_____|  \_____|
+${AnsiColor.WHITE}                   __  __   _        __  __
+${AnsiColor.WHITE}                   |  \/  | | |      |  \/  |
+${AnsiColor.WHITE}                   | \  / | | |      | \  / |
+${AnsiColor.WHITE}                   | |\/| | | |      | |\/| |
+${AnsiColor.WHITE}                   | |  | | | |____  | |  | |
+${AnsiColor.WHITE}                   |_|  |_| |______| |_|  |_|
+${AnsiColor.BRIGHT_CYAN}Backend side -> https://github.com/bartucank/mlm
+${AnsiColor.BRIGHT_CYAN}Client  side -> https://github.com/bartucank/mlmui
+

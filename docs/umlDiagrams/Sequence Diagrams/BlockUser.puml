@@ -1,15 +1,12 @@
 @startuml BlockUser
 actor Librarian
-participant HomePage as HomePage
 participant UserPage as UserPage
 participant Controller as Controller
 database Database
 
-Librarian-> HomePage: Enter HomePage
-activate HomePage
 
-HomePage -> UserPage: Enter UserPage
-deactivate HomePage
+Librarian -> UserPage: Enter UserPage
+
 activate UserPage
 
 UserPage -> UserPage: Enter the Details of the User to be Blocked in the Pop-up

@@ -8,6 +8,7 @@ import com.metuncc.mlm.api.response.UserNamesDTOListResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.OpenLibraryBookDetails;
+import com.metuncc.mlm.dto.QueueDetailDTO;
 import com.metuncc.mlm.dto.StatisticsDTO;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.service.MlmQueryServices;
@@ -115,5 +116,10 @@ public class MLMAdminController {
     @GetMapping("/getUsersForBorrowPage")
     public ResponseEntity<ApiResponse<UserNamesDTOListResponse>> getUsersForBorrowPage(){
         return responseService.createResponse(mlmQueryServices.getAllUsers());
+    }
+
+    @GetMapping(value="/getQueueStatusBasedOnBookForLibrarian")
+    public ResponseEntity<ApiResponse<QueueDetailDTO>> getQueueStatusBasedOnBookForLibrarian(@RequestParam("id") Long id) {
+        return responseService.createResponse(mlmQueryServices.getQueueStatusBasedOnBookForLibrarian(id));
     }
 }

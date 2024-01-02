@@ -1,14 +1,10 @@
 @startuml
 actor "Librarian" as Librarian
-participant "HomePage" as Home
 participant "Book Page" as Page
 participant "Controller" as Controller
 database "Database" as LendingDB
 
-Librarian -> Home: Click on book page button
-activate Home
-Home -> Page: Request list of borrowed books
-deactivate Home
+Librarian -> Page: Request list of borrowed books
 activate Page
 
 Page -> Controller: Get borrowed books
