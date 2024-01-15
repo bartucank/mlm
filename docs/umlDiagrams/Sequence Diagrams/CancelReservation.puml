@@ -38,7 +38,7 @@ System -> Controller: Sends cancellation email to user
 activate Email
 Controller -> Email:Send the information through email
 deactivate Controller
-Email --> System: Email sent confirmation
+Email -> System: Send email confirmation
 deactivate Email
 
 deactivate System
