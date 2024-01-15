@@ -7,7 +7,7 @@
   <h3 align="center">METU NCC Library Management</h3>
 
   <p align="center">
-    Graduate project, Library Management System for METU NCC, for METU NCC CNG 23-24 Fall&Spring semesters.
+    Graduate project, Library Management System for METU NCC
     <br/>
     <br/>
   </p>
