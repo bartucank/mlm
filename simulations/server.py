@@ -1,3 +1,12 @@
+import subprocess
+
+libraries_to_install = ["requests", "flask", "flask_cors"]
+for library in libraries_to_install:
+    try:
+        subprocess.run(["pip3", "install", library], check=False)
+        print(f"{library} installed")
+    except subprocess.CalledProcessError as e:
+        print(f"Error !!! library: {library}  error: {e}")
 from flask import Flask, request, jsonify
 from datetime import datetime
 import logging
@@ -30,7 +39,7 @@ def avg_arrival_time(people_data):
 
     date_differences = []
     for i in range(1, len(dates)):
-        # If the queue date is the same as the previous one, use the difference in borrow dates
+        #Compare with previous on
         if dates[i] == dates[i - 1]:
             diff = (borrow_dates[i] - borrow_dates[i - 1]).days
         else:
