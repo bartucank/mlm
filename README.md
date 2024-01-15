@@ -60,24 +60,24 @@ Back-end side of this project built with Java. Also, we used Spring Boot framewo
    ```
 
 2. Change SMTP server information, DB information, secret key for authentication in bootstrap.yml file.
-3. If you have a certificate, put it in the directory where the bootstrap.yml file is located, and edit following code given below in the bootstrap.yml file.
-   ```sh
-   server.ssl.key-store=classpath:<certificate_name>.p12
-   server.ssl.key-store-password=<password>
-   server.ssl.keyStoreType= PKCS12
-   ```
- If not, please comment the code given below in the bootstrap.yml file.
-   ```sh
-   server.ssl.key-store=classpath:<certificate_name>.p12
-   server.ssl.key-store-password=<password>
-   server.ssl.keyStoreType= PKCS12
-   ```
+3. If you have a certificate, put it in the directory where the bootstrap.yml file is located, and edit following code given below in the bootstrap.yml file. <b>(If not please see step 4)</b>
+         ```sh
+         server.ssl.key-store=classpath:<certificate_name>.p12
+         server.ssl.key-store-password=<password>
+         server.ssl.keyStoreType= PKCS12
+         ```
+4. <b>(If you have a certificate, bypass this step!)</b> Please comment the code given below in the bootstrap.yml file.
+         ```sh
+         server.ssl.key-store=classpath:<certificate_name>.p12
+         server.ssl.key-store-password=<password>
+         server.ssl.keyStoreType= PKCS12
+         ```
 
-4. To build the project execute the following command:
+5. To build the project execute the following command:
    ```sh
    ./gradlew build
    ```
-5. Enjoy!
+6. Run the project!
 
 
 ## Contributing
