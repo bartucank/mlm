@@ -1,3 +1,18 @@
+<br/>
+<p align="center">
+  <a href="https://github.com/bartucank/mlm">
+    <img src="https://www.metu.edu.tr/system/files/logo_orj/3/3.8.png" alt="Logo" >
+  </a>
+
+  <h3 align="center">METU NCC Library Management</h3>
+
+  <p align="center">
+    Graduate project, Library Management System for METU NCC
+    <br/>
+    <br/>
+  </p>
+</p>
+
 # Code of Conduct
 
 All participants of MLM are expected to abide by our Code of Conduct, both online and during in-person events that are hosted and/or associated with MLM.
