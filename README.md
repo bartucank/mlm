@@ -97,7 +97,7 @@ Distributed under the MIT License. See [LICENSE](https://github.com/bartucank/ml
 
 ## Authors
 
-* **Bartu Can PALAUT** - *Computer Engineering Student* - [Bartu Can PALAUT](https://github.com/bartucank/) 
+* **Bartu Can PALAUT** - *Computer Engineering Student* - [Bartu Can PALAMUT](https://github.com/bartucank/) 
 * **Doğukan AKDAĞ** - *Computer Engineering Student* - [Doğukan AKDAĞ](https://github.com/dokann/)
 * **Eren ÖZTÜRK** - *Computer Engineering Student* - [Eren ÖZTÜRK](https://github.com/ozturkeren/)
 * **Ataberk Türk ATAĞ** - *Computer Engineering Student* - [Ataberk Türk ATAĞ](https://github.com/ataberkatag/) 
