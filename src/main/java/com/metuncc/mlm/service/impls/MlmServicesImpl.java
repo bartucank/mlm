@@ -22,6 +22,8 @@ import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.utils.ImageUtil;
 import com.metuncc.mlm.utils.MailUtil;
+import com.metuncc.mlm.utils.excel.ExcelBookRow;
+import com.metuncc.mlm.utils.excel.ExcelReader;
 import lombok.AllArgsConstructor;
 import net.glxn.qrgen.QRCode;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -801,6 +803,23 @@ public class MlmServicesImpl implements MlmServices {
         bookReview.setComment(request.getComment());
         bookReview.setStar(request.getStar());
         bookReviewRepository.save(bookReview);
+        return success;
+    }
+
+    public StatusDTO bulkCreateBook(MultipartFile file){
+        ExcelReader excelReader = new ExcelReader();
+        try{
+            List<ExcelBookRow> excelBooks = excelReader.parseExcel(file);
+            for (ExcelBookRow excelBook : excelBooks) {
+                if(Objects.isNull(excelBook.getIsbn())){
+                    continue; // INVALID BOOK!
+                }
+
+                //todo: continue after google book api.
+            }
+        }catch (Exception e){
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
         return success;
     }
 }
