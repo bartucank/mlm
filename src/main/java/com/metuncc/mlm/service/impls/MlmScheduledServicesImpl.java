@@ -1,19 +1,18 @@
 package com.metuncc.mlm.service.impls;
 
 import com.metuncc.mlm.entity.*;
-import com.metuncc.mlm.entity.enums.BookStatus;
-import com.metuncc.mlm.entity.enums.BorrowStatus;
-import com.metuncc.mlm.entity.enums.QueueStatus;
-import com.metuncc.mlm.entity.enums.RoomSlotDays;
+import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.repository.*;
 import com.metuncc.mlm.security.JwtTokenProvider;
 import com.metuncc.mlm.service.MlmScheduledServices;
 import com.metuncc.mlm.utils.MailUtil;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
@@ -43,6 +42,7 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
     private Long lateDebt;
 
 
+    private LocalDateTime lastExecutionTime;
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
@@ -62,8 +62,9 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
     private MlmServicesImpl mlmServices;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
     private StatisticsRepository statisticsRepository;
+    private EmailRepository emailRepository;
 
-    public MlmScheduledServicesImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, MlmServicesImpl mlmServices, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, StatisticsRepository statisticsRepository) {
+    public MlmScheduledServicesImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, MlmServicesImpl mlmServices, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, StatisticsRepository statisticsRepository, EmailRepository emailRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.shelfRepository = shelfRepository;
@@ -82,6 +83,7 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
         this.mlmServices = mlmServices;
         this.bookQueueHoldHistoryRecordRepository = bookQueueHoldHistoryRecordRepository;
         this.statisticsRepository = statisticsRepository;
+        this.emailRepository = emailRepository;
     }
 
     //Every hour with minute 15.
@@ -97,10 +99,10 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
                 roomReservation.getRoomSlot().setAvailable(true);
                 roomSlotRepository.save(roomReservation.getRoomSlot());
                 User user = userRepository.getById(roomReservation.getUserId());
-                mailUtil.sendCustomEmail(user.getEmail(),
+                emailRepository.save(new Email().set(user.getEmail(),
                         "Your room reservation has been canceled \uD83D\uDE14 ",
                         "Since 15 minutes have passed since your reservation time and you have not made a reservation, your reservation has been cancelled.",
-                        "Reservation has been canceled");
+                        "Reservation has been canceled"));
             } catch (Exception e) {
                 //Do nothing.
             }
@@ -152,18 +154,18 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
             bookQueueHoldHistoryRecord.setEndDate(LocalDateTime.now().plusDays(1L).withHour(23).withMinute(30).withSecond(0).withNano(0));
             bookQueueHoldHistoryRecordRepository.save(newbookQueueHoldHistoryRecord);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            mailUtil.sendCustomEmail(restOfUsers.get(0).getUserId().getEmail(),
+            emailRepository.save(new Email().set(restOfUsers.get(0).getUserId().getEmail(),
                     "The Book is Available \uD83C\uDF89 ",
                     bookQueueRecord.getBookId().getName()+" is available now! We keep the book for you for a day. We would like to remind you that if you do not take the book by "+ bookQueueHoldHistoryRecord.getEndDate().format(formatter)+", the book will be reserved for the next person in line.",
-                    "The Book is Available!");
+                    "The Book is Available!"));
+
         }
         bookQueueHoldHistoryRecordRepository.deleteAll(bookQueueHoldHistoryRecords);
     }
     //Every day, at 23.45
-    @Scheduled(cron = "0 45 23 * * ?")
+    @Scheduled(cron = "0 41 11 * * ?")
     @Override
     public void increaseDebt(){
-        System.out.println("Çalıştı!");
         LocalDateTime localDateTime = LocalDateTime.now().minusDays(day+1);
         List<BookBorrowHistory> bookBorrowHistoryList = bookBorrowHistoryRepository.getBookBorrowHistoriesByStatusAndDate(localDateTime,BorrowStatus.WAITING_RETURN);
         for (BookBorrowHistory bookBorrowHistory : bookBorrowHistoryList) {
@@ -173,17 +175,18 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
                 bookBorrowHistory.getUserId().setDebt(bookBorrowHistory.getUserId().getDebt().add(BigDecimal.valueOf(lateDebt)));
             }
             userRepository.save(bookBorrowHistory.getUserId());
-            mailUtil.sendCustomEmail(bookBorrowHistory.getUserId().getEmail(),
+            emailRepository.save(new Email().set(
+                    bookBorrowHistory.getUserId().getEmail(),
                     "Reminder for "+bookBorrowHistory.getBookQueueRecord().getBookId().getName(),
                     "We saw that you did not return "+bookBorrowHistory.getBookQueueRecord().getBookId().getName()+". You must return the book to the library to avoid penalties.",
-                    "Remainder");
+                    "Remainder"
+            ));
         }
     }
     //Every day, at 23.45
-    @Scheduled(cron = "0 40 04 * * ?")
+    @Scheduled(cron = "0 01 00 * * ?")
     @Override
     public void logStatistics(){
-        System.out.println("okkkk");
         LocalDateTime localDateTime = LocalDateTime.now();
         DayOfWeek now = localDateTime.getDayOfWeek();
         List<Statistics> statistics = statisticsRepository.findAll();
@@ -201,6 +204,34 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
         if(statistics.size()>7){
             Collections.sort(statistics, Comparator.comparingLong(Statistics::getId));
             statisticsRepository.delete(statistics.get(0));
+        }
+    }
+
+    //Every min.
+    @Scheduled(fixedRate = 60000)
+    public void sendScheduledEmails(){
+        List<Email> emails = emailRepository.findAllEmailsByStatus(EmailStatus.SCHEDULED);
+        if(emails.size()>5){
+            emails = emails.subList(0,4);
+        }
+        emailRepository.updateAllStatus(emails);
+        for (Email email : emails) {
+            email.setLastTryDate(LocalDateTime.now());
+            email.setTryCount(Objects.nonNull(email.getTryCount())?email.getTryCount()+1:1L);
+            emailRepository.save(email);
+            try{
+                mailUtil.sendCustomEmail(
+                        email.getToEmail(),
+                        email.getSubject(),
+                        email.getContent(),
+                        email.getTitle()
+                );
+                email.setEmailStatus(EmailStatus.COMPLETED);
+                emailRepository.save(email);
+            }catch (Exception e){
+                email.setEmailStatus(EmailStatus.SCHEDULED);
+                emailRepository.save(email);
+            }
         }
     }
 }

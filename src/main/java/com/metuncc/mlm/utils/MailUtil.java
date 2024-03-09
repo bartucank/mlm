@@ -3,6 +3,9 @@ package com.metuncc.mlm.utils;
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import com.metuncc.mlm.exception.ExceptionCode;
+import com.metuncc.mlm.exception.MLMException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -91,7 +94,7 @@ public class MailUtil {
             message.setContent(htmlContent, "text/html");
             Transport.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            throw new MLMException(ExceptionCode.EMAIL_CANNOT_SEND);
         }
     }
 }

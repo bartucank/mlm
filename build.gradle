@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.metuncc'
 archivesBaseName = 'mlm'
-version = '1.1.0'
+version = '1.3.0'
 
 def customJarName = "app.jar"
 def jarPath = "build/libs/${customJarName}"
@@ -57,6 +57,13 @@ dependencies {
 
 	testAnnotationProcessor 'org.projectlombok:lombok'
 	testCompileOnly 'org.projectlombok:lombok'
+	// https://mvnrepository.com/artifact/io.springfox/springfox-swagger2
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+// https://mvnrepository.com/artifact/io.springfox/springfox-boot-starter
+	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
+// https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
+	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+
 
 }
 

@@ -1,5 +1,6 @@
 package com.metuncc.mlm.api.controller;
 
+import com.metuncc.mlm.api.request.BookRequest;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.api.request.UserRequest;
@@ -17,6 +18,7 @@ import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +41,8 @@ public class MLMController {
 
 
     @GetMapping("/shelf/getById")
-    public ResponseEntity<ApiResponse<ShelfDTO>> getShelf(@RequestParam Long shelfId){
-        return responseService.createResponse(mlmQueryServices.getShelfById(shelfId));
+    public ResponseEntity<ShelfDTO> getShelf(@RequestParam Long shelfId){
+        return new ResponseEntity<>(mlmQueryServices.getShelfById(shelfId), HttpStatus.OK);
     }
     @GetMapping("/shelf/getAll")
     public ResponseEntity<ApiResponse<ShelfDTOListResponse>> getAllShelfs(){

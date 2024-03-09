@@ -59,4 +59,6 @@ public interface MlmQueryServices {
     QueueDetailDTO getQueueStatusBasedOnBookForLibrarian(Long bookId);
 
     List<StatisticsDTO> getStatisticsForChart();
+
+    List<BookReviewDTO> getBookReviewsByBookId(Long id);
 }

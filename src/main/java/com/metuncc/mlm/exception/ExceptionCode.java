@@ -31,7 +31,11 @@ public enum ExceptionCode {
     INVALID_CONFIRMATION("Could not confirmed. Please check your room!"),
     ALREADY_IN_QUEUE("You are already in queue."),
     RECEIPT_NOT_FOUND("Receipt not found."),
-    COPYCARD_NOT_FOUND("Copy card not found.");
+    COPYCARD_NOT_FOUND("Copy card not found."),
+    EMAIL_CANNOT_SEND("Email could not sent."),
+
+
+    STAR_CANNOT_BE_NULL("Star point cannot be empty.");
 
 
 
@@ -42,8 +46,6 @@ public enum ExceptionCode {
     ExceptionCode(String description) {
         this.description = description;
     }
-
-
 
     public String getDescription() {
         return description;

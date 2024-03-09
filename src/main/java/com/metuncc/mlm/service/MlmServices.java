@@ -61,4 +61,6 @@ public interface MlmServices {
     StatusDTO createReceiptHistory(Long imageId);
 
     StatusDTO approveReceipt(Long id, BigDecimal balance);
+
+    StatusDTO addReview(AddReviewRequest request);
 }

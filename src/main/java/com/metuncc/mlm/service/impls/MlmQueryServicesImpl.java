@@ -58,6 +58,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private BookBorrowHistoryRepository bookBorrowHistoryRepository;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
     private StatisticsRepository statisticsRepository;
+    private BookReviewRepository bookReviewRepository;
     @Override
     public UserDTO getOneUserByUserName(String username) {
         return userRepository.findByUsername(username).toDTO();
@@ -107,6 +108,17 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         Book book = bookRepository.getById(id);
         if (Objects.isNull(book)) {
             throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        BookReviewDTO reviewDTO = new BookReviewDTO();
+        try{
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+            BookReview bookReview = bookReviewRepository.getByBookAndUserId(id,jwtUser.getId());
+            if(Objects.nonNull(bookReview)){
+                return book.toDTOWithReview(bookReview.toDTO());
+            }
+        }catch (Exception e){
+            //do nothing.
         }
         return book.toDTO();
     }
@@ -525,6 +537,14 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 .sorted(Comparator.reverseOrder())
                 .collect(Collectors.toList());
         return sortedStatistics;
-
+    }
+    @Override
+    public List<BookReviewDTO> getBookReviewsByBookId(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Pageable pageable = PageRequest.of(0, 10);
+        List<BookReview> bookReviews = bookReviewRepository.getByBookId(id,pageable);
+        return bookReviews.stream().map(BookReview::toDTO).collect(Collectors.toList());
     }
 }

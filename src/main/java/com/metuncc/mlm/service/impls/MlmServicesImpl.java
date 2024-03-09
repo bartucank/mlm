@@ -22,7 +22,6 @@ import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.utils.ImageUtil;
 import com.metuncc.mlm.utils.MailUtil;
-import com.metuncc.mlm.utils.OpenLibraryUtil;
 import lombok.AllArgsConstructor;
 import net.glxn.qrgen.QRCode;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -43,7 +42,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Transactional
 public class MlmServicesImpl implements MlmServices {
-
+    private BookReviewRepository bookReviewRepository;
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private ShelfRepository shelfRepository;
@@ -61,6 +60,7 @@ public class MlmServicesImpl implements MlmServices {
     private RoomReservationRepository roomReservationRepository;
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
     private ReceiptHistoryRepository receiptHistoryRepository;
+    private EmailRepository emailRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
@@ -534,10 +534,10 @@ public class MlmServicesImpl implements MlmServices {
             bookQueueHoldHistoryRecord.setEndDate(LocalDateTime.now().plusDays(1L).withHour(23).withMinute(30).withSecond(0).withNano(0));
             bookQueueHoldHistoryRecordRepository.save(bookQueueHoldHistoryRecord);
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-            mailUtil.sendCustomEmail(restOfUsers.get(0).getUserId().getEmail(),
-                    "The Book is Available \uD83C\uDF89 ",
+            emailRepository.save(new Email().set(restOfUsers.get(0).getUserId().getEmail(),
+                    "The Book is Available \uD83C\uDF89 " ,
                     bookQueueRecord.getBookId().getName()+" is available now! We keep the book for you for a day. We would like to remind you that if you do not take the book by "+ bookQueueHoldHistoryRecord.getEndDate().format(formatter)+", the book will be reserved for the next person in line.",
-                    "The Book is Available!");
+                    "The Book is Available!"));
         }
         return success;
     }
@@ -773,12 +773,34 @@ public class MlmServicesImpl implements MlmServices {
             content.append(copyCard.getBalance().toString());
             content.append(" TL.");
         }
-        mailUtil.sendCustomEmail(
-                user.getEmail(),
-                "Receipt approved! \uD83D\uDCB8",
-                content.toString(),
-                null
-        );
+        emailRepository.save(new Email().set(user.getEmail(),"Receipt approved! \uD83D\uDCB8" ,content.toString(),null));
+        return success;
+    }
+
+    @Override
+    public StatusDTO addReview(AddReviewRequest request){
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(request.getBookId())){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        if(Objects.isNull(request.getStar())){
+            throw new MLMException(ExceptionCode.STAR_CANNOT_BE_NULL);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
+        if (Objects.isNull(user)) {
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        BookReview bookReview = bookReviewRepository.getByBookAndUserId(request.getBookId(),user.getId());
+        if(Objects.isNull(bookReview)){
+            bookReview = new BookReview();
+        }
+        bookReview.setComment(request.getComment());
+        bookReview.setStar(request.getStar());
+        bookReviewRepository.save(bookReview);
         return success;
     }
 }

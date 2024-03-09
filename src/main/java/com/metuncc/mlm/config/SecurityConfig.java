@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -69,6 +70,13 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
+    private static final String[] AUTH_WHITELIST = {
+            "/swagger-resources/**",
+            "/swagger-ui.html",
+            "/v2/api-docs",
+            "/webjars/**"
+    };
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -79,6 +87,12 @@ public class SecurityConfig {
                 .exceptionHandling().authenticationEntryPoint(handler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
+                .antMatchers(AUTH_WHITELIST).authenticated()
+                .antMatchers("/swagger-resources/**").permitAll()
+                .antMatchers("swagger-ui.html").permitAll()
+                .antMatchers("/v2/api-docs").permitAll()
+                .antMatchers("/v2/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui/**").permitAll()
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/admin/**").permitAll()
