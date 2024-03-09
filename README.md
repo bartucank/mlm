@@ -3,15 +3,15 @@
   <a href="https://github.com/bartucank/mlm">
     <img src="https://www.metu.edu.tr/system/files/logo_orj/3/3.8.png" alt="Logo" >
   </a>
-
   <h3 align="center">METU NCC Library Management</h3>
 
   <p align="center">
-    Graduate project, Library Management System for METU NCC, for METU NCC CNG 23-24 Fall&Spring semesters.
+    Graduate project, Library Management System for METU NCC
     <br/>
     <br/>
   </p>
 </p>
+
 
 ![Downloads](https://img.shields.io/github/downloads/bartucank/mlm/total) ![Contributors](https://img.shields.io/github/contributors/bartucank/mlm?color=dark-green) ![Issues](https://img.shields.io/github/issues/bartucank/mlm) ![License](https://img.shields.io/github/license/bartucank/mlm) 
 
@@ -22,16 +22,11 @@
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
-* [Usage](#usage)
-* [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [License](#license)
 * [Authors](#authors)
-* [Acknowledgements](#acknowledgements)
 
 ## Scope
-
-![Screen Shot](images/screenshot.png)
 
 This project aims to combine different kinds of functionalities such as the copy card system, study
 room reservation system, and borrowing and lending books system. The purpose of this project is
@@ -49,26 +44,36 @@ project has the following objectives:
 
 Back-end side of this project built with Java. Also, we used Spring Boot framework. Front-end side of this project built with Flutter.
 
-## Getting Started
-
-
-
-### Prerequisites
-
-
-
-
-
 ### Installation
+1. Clone the repo
+   ```sh
+   git clone https://github.com/bartucank/mlm.git
+   ```
 
+2. Change SMTP server information, DB information, secret key for authentication in bootstrap.yml file.
+3. If you have a certificate, put it in the directory where the bootstrap.yml file is located, and edit following code given below in the bootstrap.yml file. <b>(If not please see step 4)</b>
+   ```sh
+         server.ssl.key-store=classpath:<certificate_name>.p12
+         server.ssl.key-store-password=<password>
+         server.ssl.keyStoreType= PKCS12
+   ```
+4. <b>(If you have a certificate, bypass this step!)</b> Please comment the code given below in the bootstrap.yml file.
+    ```sh
+         server.ssl.key-store=classpath:<certificate_name>.p12
+         server.ssl.key-store-password=<password>
+         server.ssl.keyStoreType= PKCS12
+     ```
 
-
-## Usage
-
-
-
-## Roadmap
-
+5. To build the project execute the following command:
+   ```sh
+   ./gradlew build
+   ```
+6. Run the project!
+7. Clone Frontend side of the project, then follow the instructions on the readme!
+   ```sh
+   https://github.com/bartucank/mlmui
+   ```
+   
 
 ## Contributing
 
@@ -92,7 +97,7 @@ Distributed under the MIT License. See [LICENSE](https://github.com/bartucank/ml
 
 ## Authors
 
-* **Bartu Can PALAUT** - *Computer Engineering Student* - [Bartu Can PALAUT](https://github.com/bartucank/) 
+* **Bartu Can PALAUT** - *Computer Engineering Student* - [Bartu Can PALAMUT](https://github.com/bartucank/) 
 * **Doğukan AKDAĞ** - *Computer Engineering Student* - [Doğukan AKDAĞ](https://github.com/dokann/)
 * **Eren ÖZTÜRK** - *Computer Engineering Student* - [Eren ÖZTÜRK](https://github.com/ozturkeren/)
 * **Ataberk Türk ATAĞ** - *Computer Engineering Student* - [Ataberk Türk ATAĞ](https://github.com/ataberkatag/) 

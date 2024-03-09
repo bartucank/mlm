@@ -68,11 +68,11 @@ alt "Room Reservation Exist"
         Controller -> Database: Send QR Code 
         activate Database
 
-        Database --> Controller:  Confirmation
+        Database --> Controller:  Response of Confirmation
         deactivate Database
 
         
-        Controller --> HomePage:  Confirmation 
+        Controller --> HomePage:  Response of Confirmation 
         deactivate Controller
         activate HomePage
         
