@@ -63,7 +63,10 @@ dependencies {
 	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'
 // https://mvnrepository.com/artifact/io.springfox/springfox-swagger-ui
 	implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
-
+// https://mvnrepository.com/artifact/org.apache.poi/poi
+	implementation group: 'org.apache.poi', name: 'poi', version: '5.2.5'
+// https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+	implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '5.2.5'
 
 }
 
