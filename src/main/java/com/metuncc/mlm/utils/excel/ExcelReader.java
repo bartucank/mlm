@@ -23,7 +23,7 @@ public class ExcelReader {
         DataFormatter dataFormatter = new DataFormatter();
         if(Objects.nonNull(sheet)){
             for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
-                Row row = sheet.getRow(0);
+                Row row = sheet.getRow(i);
                 int columnNo = 0;
                 ExcelBookRow excelBookRow = new ExcelBookRow(nullOrNonNull(dataFormatter.formatCellValue(row.getCell(columnNo++))),
                         nullOrNonNull(dataFormatter.formatCellValue(row.getCell(columnNo++))),

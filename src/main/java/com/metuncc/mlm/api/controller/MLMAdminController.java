@@ -137,4 +137,9 @@ public class MLMAdminController {
         headers.add("Content-Disposition","attachment; filename=Excel.xlsx");
         return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
     }
+
+    @PostMapping("/uploadExcel")
+    public ResponseEntity<ApiResponse<StatusDTO>> uploadExcel(@RequestPart("file")MultipartFile file){
+        return responseService.createResponse(mlmServices.bulkCreateBook(file));
+    }
 }

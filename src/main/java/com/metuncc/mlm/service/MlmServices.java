@@ -63,4 +63,6 @@ public interface MlmServices {
     StatusDTO approveReceipt(Long id, BigDecimal balance);
 
     StatusDTO addReview(AddReviewRequest request);
+
+    StatusDTO bulkCreateBook(MultipartFile file);
 }

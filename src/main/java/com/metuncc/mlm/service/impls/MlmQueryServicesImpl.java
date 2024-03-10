@@ -6,6 +6,8 @@ import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
+import com.metuncc.mlm.dto.google.GoogleResponse;
+import com.metuncc.mlm.dto.google.Item;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
@@ -30,7 +32,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -289,9 +295,60 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 return null;
             }
         }
+
+         String googleEndPoint = "https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn;
+         request = HttpRequest.newBuilder()
+                .uri(URI.create(googleEndPoint))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> googleResp = null;
+        try {
+            googleResp = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String googleBody = googleResp.body();
+        GoogleResponse googleResponse;
+        if(Objects.nonNull(googleBody)){
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                googleResponse = objectMapper.readValue(googleBody, GoogleResponse.class);
+                try{
+                    for (Item item : googleResponse.getItems()) {
+                        String url = Objects.nonNull(item.getVolumeInfo().getImageLinks().getThumbnail())?item.getVolumeInfo().getImageLinks().getThumbnail():
+                                Objects.nonNull(item.getVolumeInfo().getImageLinks().getSmallThumbnail())?item.getVolumeInfo().getImageLinks().getSmallThumbnail():null;
+                        if(Objects.isNull(url)){
+                            break;
+                        }
+                        dto.setImg(getImageBytes(url));
+                    }
+
+                }catch (Exception e){
+                    //Ignore.
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
         return dto;
     }
-
+    public static byte[] getImageBytes(String imageUrl) throws Exception {
+        URL url = new URL(imageUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        InputStream inputStream = connection.getInputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+        inputStream.close();
+        connection.disconnect();
+        return outputStream.toByteArray();
+    }
 
     public  String getByRef(String ref){
         String endpoint = "https://openlibrary.org"+ref+".json";

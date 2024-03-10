@@ -20,6 +20,6 @@ public class OpenLibraryBookDetails {
     private String[] subjects;
     private OpenLibraryBookAuthor[] authors;
 
-    private String img;
+    private byte[] img;
     private String imgName;
 }

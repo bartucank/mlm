@@ -1,17 +1,30 @@
 package com.metuncc.mlm.service.impls;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.LoginResponse;
+import com.metuncc.mlm.dto.OpenLibraryBookAuthor;
+import com.metuncc.mlm.dto.OpenLibraryBookAuthorDetail;
+import com.metuncc.mlm.dto.OpenLibraryBookDetails;
 import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.dto.google.GoogleResponse;
+import com.metuncc.mlm.dto.google.Item;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
@@ -33,11 +46,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
 import java.util.stream.Collectors;
 
 @Service
@@ -806,20 +819,237 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Override
     public StatusDTO bulkCreateBook(MultipartFile file){
         ExcelReader excelReader = new ExcelReader();
         try{
             List<ExcelBookRow> excelBooks = excelReader.parseExcel(file);
             for (ExcelBookRow excelBook : excelBooks) {
-                if(Objects.isNull(excelBook.getIsbn())){
-                    continue; // INVALID BOOK!
-                }
+                if(Objects.isNull(excelBook.getIsbn()) ||Objects.isNull(excelBook.getCategory()) || Objects.isNull(excelBook.getShelf())){
+                    continue;
+                }else{
+                    if(Objects.nonNull(excelBook.getBookName()) && Objects.nonNull(excelBook.getAuthor()) && Objects.nonNull(excelBook.getCategory()) && Objects.nonNull(excelBook.getShelf())){
 
-                //todo: continue after google book api.
+                    }
+                }
+                OpenLibraryBookDetails openLibraryBookDetails = getByISBN(excelBook.getIsbn());
+                if(Objects.isNull(openLibraryBookDetails)){ // If we cannot take information from external system, we have to validate necessary excel infromation.
+                    if(Objects.isNull(excelBook.getBookName()) || Objects.isNull(excelBook.getAuthor()) || Objects.isNull(excelBook.getCategory()) || Objects.isNull(excelBook.getShelf())){
+                        continue;
+                    }
+                    BookRequest bookRequest= new BookRequest();
+                    bookRequest.setName(excelBook.getBookName());
+                    bookRequest.setAuthor(excelBook.getAuthor());
+                    bookRequest.setCategory(BookCategory.valueOf(excelBook.getCategory()));
+                    bookRequest.setIsbn(excelBook.getIsbn());
+                    bookRequest.setPublisher(excelBook.getPublisher());
+                    bookRequest.setDescription(excelBook.getDesc());
+                    Shelf shelf = shelfRepository.getShelfById(Long.parseLong(excelBook.getShelf()));
+                    if (Objects.isNull(shelf)) {
+                        throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+                    }
+                    Image image = new Image();
+                    File defaultPic = ResourceUtils.getFile("classpath:defaultpic.jpg");
+                    image.setImageData(ImageUtil.compressImage(Files.readAllBytes(defaultPic.toPath())));
+                    image.setName("DEFAULTPIC");
+                    image.setType("jpg");
+                    image = imageRepository.save(image);
+                    Book book = new Book().fromRequest(bookRequest);
+                    book.setStatus(BookStatus.AVAILABLE);
+                    book.setShelfId(shelf);
+                    book.setImageId(image);
+                    bookRepository.save(book);
+                }else{
+                    BookRequest bookRequest = new BookRequest();
+                    bookRequest.setName(Objects.nonNull(excelBook.getBookName())?excelBook.getBookName():openLibraryBookDetails.getTitle());
+                    bookRequest.setCategory(BookCategory.valueOf(excelBook.getCategory()));
+                    bookRequest.setIsbn(excelBook.getIsbn());
+
+                    String desc = "";
+                    if(Objects.nonNull(excelBook.getDesc())){
+                        desc = excelBook.getDesc();
+                    }else if(Objects.nonNull(openLibraryBookDetails.getSubjects())){
+                        for (String subject : openLibraryBookDetails.getSubjects()) {
+                            desc = desc + " "+subject;
+                        }
+                    }
+                    bookRequest.setDescription(desc);
+
+                    String publisher = "";
+                    if(Objects.nonNull(excelBook.getPublisher())){
+                        publisher = excelBook.getPublisher();
+                    }else if(Objects.nonNull(openLibraryBookDetails.getPublishers())){
+                        for (String subject : openLibraryBookDetails.getPublishers()) {
+                            publisher = publisher + " "+subject;
+                        }
+                    }
+                    bookRequest.setPublisher(publisher);
+
+                    String author = "";
+                    if(Objects.nonNull(excelBook.getAuthor())){
+                        author = excelBook.getAuthor();
+                    }else if(Objects.nonNull(openLibraryBookDetails.getAuthors())){
+                        for (OpenLibraryBookAuthor subject : openLibraryBookDetails.getAuthors()) {
+                            if (author.equals("")) {
+                                author = author+" , "+subject.getKey();
+                            }else{
+                                author=subject.getKey();
+                            }
+                        }
+                    }
+                    bookRequest.setAuthor(author);
+                    Shelf shelf = shelfRepository.getShelfById(Long.parseLong(excelBook.getShelf()));
+                    if (Objects.isNull(shelf)) {
+                        throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+                    }
+                    Image image = new Image();
+                    if(Objects.nonNull(openLibraryBookDetails.getImg())){
+                        image.setName("FROMGOOGLE");
+                        image.setImageData(ImageUtil.compressImage(openLibraryBookDetails.getImg()));
+                        image.setType("jpg");
+                    }else{
+                        File defaultPic = ResourceUtils.getFile("classpath:defaultpic.jpg");
+                        image.setImageData(ImageUtil.compressImage(Files.readAllBytes(defaultPic.toPath())));
+                        image.setName("DEFAULTPIC");
+                        image.setType("jpg");
+                    }
+                    image = imageRepository.save(image);
+                    Book book = new Book().fromRequest(bookRequest);
+                    book.setStatus(BookStatus.AVAILABLE);
+                    book.setShelfId(shelf);
+                    book.setImageId(image);
+                    bookRepository.save(book);
+                }
             }
         }catch (Exception e){
             throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
         }
         return success;
+    }
+
+
+
+    public OpenLibraryBookDetails getByISBN(String isbn){
+
+        String endpoint = "https://openlibrary.org/isbn/"+isbn+".json";
+        OpenLibraryBookDetails  dto = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String newUrl = response.headers().map().get("location").get(0);
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(newUrl))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String body = response.body();
+        if(Objects.nonNull(body)){
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                dto = objectMapper.readValue(body, OpenLibraryBookDetails.class);
+                try{
+                    for (OpenLibraryBookAuthor author : dto.getAuthors()) {
+                        if(Objects.nonNull(author.getKey())){
+                            author.setKey(getByRef(author.getKey()));
+                        }
+                    }
+                }catch (Exception e){
+                    //Ignore.
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        String googleEndPoint = "https://www.googleapis.com/books/v1/volumes?q=isbn:"+isbn;
+        request = HttpRequest.newBuilder()
+                .uri(URI.create(googleEndPoint))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> googleResp = null;
+        try {
+            googleResp = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String googleBody = googleResp.body();
+        GoogleResponse googleResponse;
+        if(Objects.nonNull(googleBody)){
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                googleResponse = objectMapper.readValue(googleBody, GoogleResponse.class);
+                try{
+                    for (Item item : googleResponse.getItems()) {
+                        String url = Objects.nonNull(item.getVolumeInfo().getImageLinks().getThumbnail())?item.getVolumeInfo().getImageLinks().getThumbnail():
+                                Objects.nonNull(item.getVolumeInfo().getImageLinks().getSmallThumbnail())?item.getVolumeInfo().getImageLinks().getSmallThumbnail():null;
+                        if(Objects.isNull(url)){
+                            break;
+                        }
+                        dto.setImg(getImageBytes(url));
+                    }
+
+                }catch (Exception e){
+                    //Ignore.
+                }
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        return dto;
+    }
+    public static byte[] getImageBytes(String imageUrl) throws Exception {
+        URL url = new URL(imageUrl);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        InputStream inputStream = connection.getInputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = inputStream.read(buffer)) != -1) {
+            outputStream.write(buffer, 0, bytesRead);
+        }
+        inputStream.close();
+        connection.disconnect();
+        return outputStream.toByteArray();
+    }
+
+    public  String getByRef(String ref){
+        String endpoint = "https://openlibrary.org"+ref+".json";
+        OpenLibraryBookAuthorDetail dto = null;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(endpoint))
+                .method("GET", HttpRequest.BodyPublishers.noBody())
+                .build();
+        HttpResponse<String> response = null;
+        try {
+            response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String body = response.body();
+        if(Objects.nonNull(body)){
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+                dto = objectMapper.readValue(body, OpenLibraryBookAuthorDetail.class);
+            } catch (JsonProcessingException e) {
+                return null;
+            }
+        }
+        return dto.getName();
     }
 }
