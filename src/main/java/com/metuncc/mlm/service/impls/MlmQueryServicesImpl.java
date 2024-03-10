@@ -3,6 +3,7 @@ package com.metuncc.mlm.service.impls;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metuncc.mlm.api.request.FindBookRequest;
+import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
@@ -404,6 +405,24 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return response;
     }
     @Override
+    public ReceiptHistoryDTOListResponse getReceiptsByStatus(GetReceiptRequest request){
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(request.getPage()) ||Objects.isNull(request.getSize())){
+            request.setPage(0);
+            request.setPage(10);
+        }
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<ReceiptHistory> receiptPage = receiptHistoryRepository.getByStatus(request.getIsApproved(), pageable);
+        List<ReceiptHistoryDTO> receiptDTOs = receiptPage.getContent().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList());
+        ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
+        response.setReceiptHistoryDTOList(receiptDTOs);
+        response.setTotalPage(receiptPage.getTotalPages());
+        response.setTotalResult(receiptPage.getTotalElements());
+        return response;
+    }
+    @Override
     public ReceiptHistoryDTOListResponse getReceiptsByUser(Long id){
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
         response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(id).stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
@@ -607,7 +626,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Pageable pageable = PageRequest.of(0, 10);
-        List<BookReview> bookReviews = bookReviewRepository.getByBookId(id,pageable);
+        Page<BookReview> bookReviews = bookReviewRepository.getByBookId(id,pageable);
         return bookReviews.stream().map(BookReview::toDTO).collect(Collectors.toList());
     }
 

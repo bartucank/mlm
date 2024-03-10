@@ -96,6 +96,10 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceipts(){
         return responseService.createResponse((mlmQueryServices.getReceipts()));
     }
+    @PostMapping("/getReceiptsByStatus")
+    public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByStat(@RequestBody GetReceiptRequest request){
+        return responseService.createResponse((mlmQueryServices.getReceiptsByStatus(request)));
+    }
     @GetMapping("/getReceiptByUser")
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByUser(@RequestParam("userId") Long id){
         return responseService.createResponse(mlmQueryServices.getReceiptsByUser(id));
