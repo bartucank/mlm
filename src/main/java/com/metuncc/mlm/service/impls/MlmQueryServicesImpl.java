@@ -20,6 +20,7 @@ import com.metuncc.mlm.repository.specifications.UserSpecification;
 import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.utils.ImageUtil;
+import com.metuncc.mlm.utils.excel.ExcelWriter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -200,6 +202,10 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         List<BookDTO> bookDTOS = bookPage.getContent().stream()
                 .map(Book::toDTO)
                 .collect(Collectors.toList());
+        for (BookDTO bookDTO : bookDTOS) {
+            BigDecimal avg = bookReviewRepository.getAvgByBookId(bookDTO.getId());
+            bookDTO.setAveragePoint(avg);
+        }
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(bookDTOS);
         response.setTotalPage(bookPage.getTotalPages());
@@ -546,5 +552,26 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         Pageable pageable = PageRequest.of(0, 10);
         List<BookReview> bookReviews = bookReviewRepository.getByBookId(id,pageable);
         return bookReviews.stream().map(BookReview::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public byte[] getExcel(){
+        try{
+            List<Shelf> shelfs = shelfRepository.findAll();
+            List<ShelfDTO> shelfDTOList = new ArrayList<>();
+            for (Shelf shelf : shelfs) {
+                ShelfDTO shelfDTO = new ShelfDTO();
+                shelfDTO.setId(shelf.getId());
+                shelfDTO.setFloor(shelf.getFloor());
+                shelfDTOList.add(shelfDTO);
+            }
+            ExcelWriter excelWriter = ExcelWriter.builder()
+                    .categoryEnumDTOList(getAllBookCategories())
+                    .shelfDTOList(shelfDTOList)
+                    .build();
+            return excelWriter.create();
+        }catch (Exception e){
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
     }
 }

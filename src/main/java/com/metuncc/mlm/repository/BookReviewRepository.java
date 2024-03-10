@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,4 +24,7 @@ public interface BookReviewRepository extends JpaRepository<BookReview,Long>{
 
     @Query("select r from BookReview r where r.bookId.id=:id")
     List<BookReview> getByBookId(@Param("id") Long id, Pageable pageable);
+
+    @Query("select AVG(b.star) from BookReview b where b.bookId.id=:id")
+    BigDecimal getAvgByBookId(@Param("id") Long id);
 }

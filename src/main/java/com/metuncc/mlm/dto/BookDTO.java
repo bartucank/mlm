@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -32,5 +33,6 @@ public class BookDTO extends MLMBaseClassDTO {
     private String statusStr;
 
     private  BookReviewDTO reviewDTO;
+    private BigDecimal averagePoint;
 
 }

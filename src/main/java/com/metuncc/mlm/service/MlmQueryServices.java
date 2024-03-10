@@ -61,4 +61,6 @@ public interface MlmQueryServices {
     List<StatisticsDTO> getStatisticsForChart();
 
     List<BookReviewDTO> getBookReviewsByBookId(Long id);
+
+    byte[] getExcel();
 }

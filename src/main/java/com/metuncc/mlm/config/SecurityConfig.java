@@ -93,6 +93,15 @@ public class SecurityConfig {
                 .antMatchers("/v2/api-docs").permitAll()
                 .antMatchers("/v2/api-docs/**").permitAll()
                 .antMatchers("/swagger-ui/**").permitAll()
+
+                .antMatchers("/swagger-ui/swagger-resources/**").permitAll()
+                .antMatchers("/swagger-uiswagger-ui.html").permitAll()
+                .antMatchers("/swagger-ui/v2/api-docs").permitAll()
+                .antMatchers("/swagger-ui/v2/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui/swagger-ui/**").permitAll()
+
+
+
                 .antMatchers("/api/auth/**").permitAll()
                 .antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/admin/**").permitAll()
