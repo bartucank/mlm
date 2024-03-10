@@ -569,7 +569,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         Pageable pageable = PageRequest.of(0, 10);
-        List<BookReview> bookReviews = bookReviewRepository.getByBookId(id,pageable);
+        Page<BookReview> bookReviews = bookReviewRepository.getByBookId(id,pageable);
         return bookReviews.stream().map(BookReview::toDTO).collect(Collectors.toList());
     }
 
