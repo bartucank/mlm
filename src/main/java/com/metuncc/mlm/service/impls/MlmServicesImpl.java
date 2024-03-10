@@ -183,6 +183,20 @@ public class MlmServicesImpl implements MlmServices {
         img = imageRepository.save(img);
         return StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
     }
+    @Override
+    public StatusDTO uploadImageByBase64(UploadImageByBase64 request) throws IOException {
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        byte[] byteArray = Base64.getDecoder().decode(request.getBase64());
+
+        Image img = new Image();
+        img.setImageData(ImageUtil.compressImage(byteArray));
+        img.setName("frombase4");
+        img.setType("jpg");
+        img = imageRepository.save(img);
+        return StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
+    }
 
     public Image uploadImageReturnImage(MultipartFile file) throws IOException {
 

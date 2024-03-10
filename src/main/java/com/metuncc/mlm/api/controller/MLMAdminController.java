@@ -47,6 +47,10 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<StatusDTO>> uploadImage(@RequestParam("image") MultipartFile file) throws IOException {
         return responseService.createResponse(mlmServices.uploadImage(file));
     }
+    @PostMapping(value="/uploadImageByBase64")
+    public ResponseEntity<ApiResponse<StatusDTO>> uploadImageByBase64(@RequestBody UploadImageByBase64 request )throws IOException {
+        return responseService.createResponse(mlmServices.uploadImageByBase64(request));
+    }
 
     @PostMapping("/user/getUsersBySpecifications")
     public ResponseEntity<ApiResponse<UserDTOListResponse>> getUsersBySpecifications(@RequestBody FindUserRequest request){
