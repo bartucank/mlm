@@ -30,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -201,6 +202,10 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         List<BookDTO> bookDTOS = bookPage.getContent().stream()
                 .map(Book::toDTO)
                 .collect(Collectors.toList());
+        for (BookDTO bookDTO : bookDTOS) {
+            BigDecimal avg = bookReviewRepository.getAvgByBookId(bookDTO.getId());
+            bookDTO.setAveragePoint(avg);
+        }
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(bookDTOS);
         response.setTotalPage(bookPage.getTotalPages());
