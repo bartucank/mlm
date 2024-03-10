@@ -1,6 +1,7 @@
 package com.metuncc.mlm.service;
 
 import com.metuncc.mlm.api.request.FindBookRequest;
+import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
@@ -39,7 +40,8 @@ public interface MlmQueryServices {
 
     ReceiptHistoryDTOListResponse getReceipts();
 
-    ReceiptHistoryDTOListResponse getReceiptsByStatus(Boolean status);
+
+    ReceiptHistoryDTOListResponse getReceiptsByStatus(GetReceiptRequest request);
 
     ReceiptHistoryDTOListResponse getReceiptsByUser(Long id);
 
