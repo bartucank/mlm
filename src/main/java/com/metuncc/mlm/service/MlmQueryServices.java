@@ -39,6 +39,8 @@ public interface MlmQueryServices {
 
     ReceiptHistoryDTOListResponse getReceipts();
 
+    ReceiptHistoryDTOListResponse getReceiptsByStatus(Boolean status);
+
     ReceiptHistoryDTOListResponse getReceiptsByUser(Long id);
 
     ReceiptHistoryDTOHashMapResponse getReceiptsHashMap();

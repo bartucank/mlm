@@ -347,6 +347,17 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return response;
     }
     @Override
+    public ReceiptHistoryDTOListResponse getReceiptsByStatus(Boolean approved){
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<ReceiptHistory> receiptPage = receiptHistoryRepository.getByStatus(approved, pageable);
+        List<ReceiptHistoryDTO> receiptDTOs = receiptPage.getContent().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList());
+        ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
+        response.setReceiptHistoryDTOList(receiptDTOs);
+        response.setTotalPage(receiptPage.getTotalPages());
+        response.setTotalResult(receiptPage.getTotalElements());
+        return response;
+    }
+    @Override
     public ReceiptHistoryDTOListResponse getReceiptsByUser(Long id){
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
         response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(id).stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
