@@ -104,13 +104,13 @@ public class ExcelWriter {
         rowCount =0;
         columnNo =0;
         Row header = sheet.createRow(rowCount++);
-        createCell(header,columnNo++,"ISBN Number",headerStyle);
+        createCell(header,columnNo++,"ISBN Number*",headerStyle,"This is required. Please note that, if you enter isbn number only, this row will be ignored. If you want to add books by isbn only, please enter shelf and category too.",sheet,workbook);
         createCell(header,columnNo++,"Book Name",headerStyle);
         createCell(header,columnNo++,"Book Description",headerStyle);
         createCell(header,columnNo++,"Book Publisher",headerStyle);
         createCell(header,columnNo++,"Book Author",headerStyle);
-        createCell(header,columnNo++,"Shelf",headerStyle,"You can choose shelf from dropdown list. Also, you can enter shelf id.",sheet,workbook);
-        createCell(header,columnNo++,"Category",headerStyle,"You can choose category from dropdown list. Also, you can enter category key.",sheet,workbook);
+        createCell(header,columnNo++,"Shelf*",headerStyle,"This is required. You can choose shelf from dropdown list. Also, you can enter shelf id.",sheet,workbook);
+        createCell(header,columnNo++,"Category*",headerStyle,"This is required.  You can choose category from dropdown list. Also, you can enter category key.",sheet,workbook);
 
 
         for (int i = 0; i < 7; i++) {
