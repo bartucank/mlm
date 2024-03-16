@@ -39,6 +39,7 @@ public class ExcelReader {
     }
 
     public String nullOrNonNull(String a){
+        System.out.println("Read:"+a);
         if(Objects.isNull(a)){
             return null;
         }
