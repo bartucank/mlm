@@ -21,6 +21,8 @@ public interface MlmServices {
 
     StatusDTO uploadImage(MultipartFile file) throws IOException;
 
+    StatusDTO uploadImageByBase64(UploadImageByBase64 request) throws IOException;
+
     StatusDTO verifyEmail(String code);
 
     StatusDTO createBook(BookRequest request);
