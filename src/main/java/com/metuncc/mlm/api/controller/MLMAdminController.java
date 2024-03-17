@@ -104,6 +104,18 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByStat(@RequestBody GetReceiptRequest request){
         return responseService.createResponse((mlmQueryServices.getReceiptsByStatus(request)));
     }
+    @PostMapping("/createRoom")
+    public ResponseEntity<ApiResponse<StatusDTO>> getReceiptsByStat(@RequestBody CreateRoomRequest request){
+        return responseService.createResponse((mlmServices.createRoom(request)));
+    }
+    @PostMapping("/setNFCForRoom")
+    public ResponseEntity<ApiResponse<StatusDTO>> setNFCForRoom(@RequestBody SetNFCForRoomRequest request){
+        return responseService.createResponse((mlmServices.setNFCForRoom(request.getRoomId(), request.getNfcNo())));
+    }
+    @DeleteMapping("/deleteRoom")
+    public ResponseEntity<ApiResponse<StatusDTO>> deleteRoom(@RequestParam("roomId") Long roomId){
+        return responseService.createResponse((mlmServices.deleteRoom(roomId)));
+    }
     @GetMapping("/getReceiptByUser")
     public ResponseEntity<ApiResponse<ReceiptHistoryDTOListResponse>> getReceiptsByUser(@RequestParam("userId") Long id){
         return responseService.createResponse(mlmQueryServices.getReceiptsByUser(id));

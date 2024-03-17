@@ -115,4 +115,14 @@ public class MLMController {
     public ResponseEntity<ApiResponse<StatusDTO>> enqueue(@RequestParam("id") Long id) {
         return responseService.createResponse(mlmServices.enqueue(id));
     }
+
+    @GetMapping(value="/getRoomById")
+    public ResponseEntity<ApiResponse<RoomDTO>> getRoomById(@RequestParam("id") Long id) {
+        return responseService.createResponse(mlmQueryServices.getRoomById(id));
+    }
+    @GetMapping(value="/getRooms")
+    public ResponseEntity<ApiResponse<RoomDTOListResponse>> getRooms() {
+        return responseService.createResponse(mlmQueryServices.getRooms());
+    }
+
 }
