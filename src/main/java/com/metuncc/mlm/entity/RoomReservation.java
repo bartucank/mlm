@@ -27,7 +27,6 @@ public class RoomReservation extends MLMBaseClass{
         dto.setId(getId());
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM");
         dto.setDate(getDate().format(dateTimeFormatter));
-        dto.setRoomSlot(getRoomSlot());
         dto.setUserId(getUserId());
         dto.setApproved(getApproved());
         return dto;
