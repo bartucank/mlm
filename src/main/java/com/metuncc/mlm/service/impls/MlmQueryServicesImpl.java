@@ -670,14 +670,16 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         for (RoomSlot roomSlot : roomSlotList) {
             if(!roomSlot.getAvailable()){
                 RoomSlotWithResDTO dto = roomSlot.toResDto();
-                RoomReservation reservation = roomReservationRepository.findByRoomSlot(roomSlot);
-                dto.setReservationDTO(reservation.toDTO());
+                RoomReservation reservation = roomReservationRepository.findByRoomSlot(roomSlot.getId());
+                if(Objects.nonNull(reservation)){
+                    dto.setReservationDTO(reservation.toDTO());
+                }
                 roomSlotDTOList.add(dto);
             }else{
                 roomSlotDTOList.add(roomSlot.toResDto());
             }
         }
-        return new RoomSlotWithResDTOListResponse(roomSlotList.stream().map(RoomSlot::toResDto).collect(Collectors.toList()));
+        return new RoomSlotWithResDTOListResponse(roomSlotDTOList);
 
     }
 }

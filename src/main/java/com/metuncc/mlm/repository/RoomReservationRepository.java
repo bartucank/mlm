@@ -24,6 +24,6 @@ public interface RoomReservationRepository extends JpaRepository<RoomReservation
     @Query("select r from RoomReservation r where r.roomSlot in :roomSlotList ")
     List<RoomReservation> findAllByRoomSlotList(@Param("roomSlotList") List<RoomSlot> roomSlotList);
 
-    @Query("select r from RoomReservation r where r.roomSlot =:roomSlot")
-    RoomReservation findByRoomSlot(@Param("roomSlot") RoomSlot roomSlot);
+    @Query("select r from RoomReservation r where r.roomSlot.id =:roomSlot")
+    RoomReservation findByRoomSlot(@Param("roomSlot") Long roomSlot);
 }

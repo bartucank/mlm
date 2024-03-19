@@ -11,7 +11,6 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=true)
 public class RoomReservationDTO extends MLMBaseClassDTO{
     private String date;
-    private RoomSlot roomSlot;
     private Long userId;
     private Boolean approved;
 }
