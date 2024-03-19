@@ -161,4 +161,8 @@ public class MLMAdminController {
     public ResponseEntity<ApiResponse<StatusDTO>> uploadExcel(@RequestParam("file")MultipartFile file){
         return responseService.createResponse(mlmServices.bulkCreateBook(file));
     }
+    @GetMapping(value="/getRoomSlotsWithReservationById")
+    public ResponseEntity<ApiResponse<RoomSlotWithResDTOListResponse>> getRoomSlotsWithReservationById(@RequestParam("id") Long id) {
+        return responseService.createResponse(mlmQueryServices.getRoomSlotsWithReservationById(id));
+    }
 }

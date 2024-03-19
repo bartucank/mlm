@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper=true)
 public class RoomReservationDTO extends MLMBaseClassDTO{
-    private LocalDate date;
+    private String date;
     private RoomSlot roomSlot;
     private Long userId;
     private Boolean approved;

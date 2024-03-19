@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
@@ -24,7 +25,8 @@ public class RoomReservation extends MLMBaseClass{
     public RoomReservationDTO toDTO(){
         RoomReservationDTO dto = new RoomReservationDTO();
         dto.setId(getId());
-        dto.setDate(getDate());
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd-MM");
+        dto.setDate(getDate().format(dateTimeFormatter));
         dto.setRoomSlot(getRoomSlot());
         dto.setUserId(getUserId());
         dto.setApproved(getApproved());

@@ -1,21 +1,18 @@
 package com.metuncc.mlm.dto;
 
-import com.metuncc.mlm.entity.RoomSlot;
 import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
-public class RoomSlotDTO extends MLMBaseClassDTO{
+public class RoomSlotWithResDTO extends MLMBaseClassDTO{
     private String startHour;
     private String endHour;
     private RoomSlotDays day;
     private Boolean available;
+    private RoomReservationDTO reservationDTO;
 }
