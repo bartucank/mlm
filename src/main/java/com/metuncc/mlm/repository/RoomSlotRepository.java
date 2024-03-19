@@ -21,4 +21,7 @@ public interface RoomSlotRepository extends JpaRepository<RoomSlot,Long> {
                                             @Param("roomSlotDay") RoomSlotDays roomSlotDay);
     @Query("select r from RoomSlot r where r.day=:roomSlotDay")
     List<RoomSlot> getRoomSlotsByDay(@Param("roomSlotDay")RoomSlotDays previousDay);
+
+    @Query("select r from RoomSlot r where r.room.id=:roomId")
+    List<RoomSlot> getRoomSlotsByRoomId(@Param("roomId") Long roomId);
 }

@@ -127,9 +127,22 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
             mlmServices.createSlots(todayEnum, startHour, endHour);
         }
 
+        LocalDateTime oneDayLater = LocalDateTime.now();
+        RoomSlotDays oneDayLaterEnum = RoomSlotDays.fromValue(oneDayLater.getDayOfWeek().getValue());
+        List<RoomSlot> roomSlotListForTomorrow = roomSlotRepository.getRoomSlotsByDay(oneDayLaterEnum);
+        if (CollectionUtils.isEmpty(roomSlotListForTomorrow)) {
+            mlmServices.createSlots(oneDayLaterEnum, startHour, endHour);
+        }
+
         LocalDateTime twoDaysLater = LocalDateTime.now().plusDays(2L);
         RoomSlotDays twoDayLater = RoomSlotDays.fromValue(twoDaysLater.getDayOfWeek().getValue());
-        mlmServices.createSlots(twoDayLater, startHour, endHour);
+        List<RoomSlot> twoDayLaterList = roomSlotRepository.getRoomSlotsByDay(twoDayLater);
+        if(CollectionUtils.isEmpty(twoDayLaterList)){
+            mlmServices.createSlots(twoDayLater, startHour, endHour);
+        }
+
+
+
     }
 
     //Every day, at 23.45

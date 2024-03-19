@@ -68,6 +68,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
     private StatisticsRepository statisticsRepository;
     private BookReviewRepository bookReviewRepository;
+    private RoomReservationRepository roomReservationRepository;
     @Override
     public UserDTO getOneUserByUserName(String username) {
         return userRepository.findByUsername(username).toDTO();
@@ -649,5 +650,34 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         }catch (Exception e){
             throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
         }
+    }
+    @Override
+    public RoomSlotDTOListResponse getRoomSlotsById(Long roomId){
+        if(Objects.isNull(roomRepository.getById(roomId))){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+        List<RoomSlot> roomSlotList = roomSlotRepository.getRoomSlotsByRoomId(roomId);
+        return new RoomSlotDTOListResponse(roomSlotList.stream().map(RoomSlot::toDto).collect(Collectors.toList()));
+
+    }
+    @Override
+    public RoomSlotWithResDTOListResponse getRoomSlotsWithReservationById(Long roomId){
+        if(Objects.isNull(roomRepository.getById(roomId))){
+            throw new MLMException(ExceptionCode.ROOM_NOT_FOUND);
+        }
+        List<RoomSlotWithResDTO> roomSlotDTOList =new ArrayList<>();
+        List<RoomSlot> roomSlotList = roomSlotRepository.getRoomSlotsByRoomId(roomId);
+        for (RoomSlot roomSlot : roomSlotList) {
+            if(!roomSlot.getAvailable()){
+                RoomSlotWithResDTO dto = roomSlot.toResDto();
+                RoomReservation reservation = roomReservationRepository.findByRoomSlot(roomSlot);
+                dto.setReservationDTO(reservation.toDTO());
+                roomSlotDTOList.add(dto);
+            }else{
+                roomSlotDTOList.add(roomSlot.toResDto());
+            }
+        }
+        return new RoomSlotWithResDTOListResponse(roomSlotList.stream().map(RoomSlot::toResDto).collect(Collectors.toList()));
+
     }
 }

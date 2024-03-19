@@ -5,6 +5,7 @@ import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
+import com.metuncc.mlm.entity.Room;
 import com.metuncc.mlm.entity.User;
 
 import java.math.BigDecimal;
@@ -67,4 +68,8 @@ public interface MlmQueryServices {
     List<BookReviewDTO> getBookReviewsByBookId(Long id);
 
     byte[] getExcel();
+
+    RoomSlotDTOListResponse getRoomSlotsById(Long roomId);
+
+    RoomSlotWithResDTOListResponse getRoomSlotsWithReservationById(Long roomId);
 }

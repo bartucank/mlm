@@ -124,5 +124,8 @@ public class MLMController {
     public ResponseEntity<ApiResponse<RoomDTOListResponse>> getRooms() {
         return responseService.createResponse(mlmQueryServices.getRooms());
     }
-
+    @GetMapping(value="/getRoomSlotsByRoomId")
+    public ResponseEntity<ApiResponse<RoomSlotDTOListResponse>> getRoomSlotsById(@RequestParam("id") Long id) {
+        return responseService.createResponse(mlmQueryServices.getRoomSlotsById(id));
+    }
 }

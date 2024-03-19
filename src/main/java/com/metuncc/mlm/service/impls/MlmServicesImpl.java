@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -46,7 +45,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -322,16 +320,21 @@ public class MlmServicesImpl implements MlmServices {
         days.add(todayEnum);
         days.add(tomorrowEnum);
         days.add(twoDatsLaterEnum);
+        LocalTime time = LocalTime.now();
         for (RoomSlotDays day : days) {
+
             for (int i = Integer.valueOf("08"); i <= Integer.valueOf("23"); i++) {
                 LocalTime localTimeStart = LocalTime.of(i, 0, 0, 0);
                 LocalTime localTimeEnd = LocalTime.of(i, 59, 0, 0);
                 RoomSlot roomSlot = new RoomSlot();
                 roomSlot.setStartHour(localTimeStart);
                 roomSlot.setEndHour(localTimeEnd);
+                roomSlot.setRoom(room);
                 roomSlot.setDay(day);
+                roomSlot.setAvailable(day.equals(todayEnum)?!(i <= time.getHour()):true);
                 room.getRoomSlotList().add(roomSlot);
             }
+
         }
         roomRepository.save(room);
         return success;
@@ -362,6 +365,7 @@ public class MlmServicesImpl implements MlmServices {
         }
         room.setDeleted(true);
         room.setDeletedDate(LocalDateTime.now());
+        roomSlotRepository.deleteAll(room.getRoomSlotList());
         roomRepository.save(room);
         return success;
     }
@@ -376,10 +380,9 @@ public class MlmServicesImpl implements MlmServices {
             return success;
         }
         for (Room room : roomList) {
-            if (!CollectionUtils.isEmpty(room.getRoomSlotList())) {
-                roomSlotRepository.deleteAll(room.getRoomSlotList());
+            if(Objects.isNull(room.getRoomSlotList())){
+                room.setRoomSlotList(new ArrayList<>());
             }
-            room.setRoomSlotList(new ArrayList<>());
             for (int i = Integer.valueOf(start); i <= Integer.valueOf(end); i++) {
                 LocalTime localTimeStart = LocalTime.of(i, 0, 0, 0);
                 LocalTime localTimeEnd = LocalTime.of(i, 59, 0, 0);
@@ -387,6 +390,8 @@ public class MlmServicesImpl implements MlmServices {
                 roomSlot.setStartHour(localTimeStart);
                 roomSlot.setEndHour(localTimeEnd);
                 roomSlot.setDay(day);
+                roomSlot.setRoom(room);
+                roomSlot.setAvailable(true);
                 room.getRoomSlotList().add(roomSlot);
             }
         }
@@ -650,6 +655,9 @@ public class MlmServicesImpl implements MlmServices {
             throw new MLMException(ExceptionCode.RESERVATION_NOT_FOUND);
         }
         if (user.getRole().equals(Role.LIB) || (roomReservation.getUserId().equals(user.getId()))) {
+            RoomSlot roomslot = roomSlotRepository.getById(roomReservation.getRoomSlot().getId());
+            roomslot.setAvailable(true);
+            roomSlotRepository.save(roomslot);
             roomReservationRepository.delete(roomReservation);
             return success;
         }
