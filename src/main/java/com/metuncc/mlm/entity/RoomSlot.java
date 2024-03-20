@@ -35,6 +35,7 @@ public class RoomSlot extends MLMBaseClass{
         dto.setEndHour(getEndHour().format(dateTimeFormatter));
         dto.setDay(getDay());
         dto.setAvailable(getAvailable());
+        dto.setDayInt(getDay().getValue());
         return dto;
     }
     public RoomSlotWithResDTO toResDto(){
@@ -44,6 +45,7 @@ public class RoomSlot extends MLMBaseClass{
         dto.setStartHour(getStartHour().format(dateTimeFormatter));
         dto.setEndHour(getEndHour().format(dateTimeFormatter));
         dto.setDay(getDay());
+        dto.setDayInt(getDay().getValue());
         dto.setAvailable(getAvailable());
         return dto;
     }

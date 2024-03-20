@@ -14,5 +14,8 @@ public class RoomSlotWithResDTO extends MLMBaseClassDTO{
     private String endHour;
     private RoomSlotDays day;
     private Boolean available;
+
+
+    private int dayInt;
     private RoomReservationDTO reservationDTO;
 }
