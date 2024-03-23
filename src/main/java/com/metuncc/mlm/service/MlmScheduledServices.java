@@ -3,6 +3,10 @@ package com.metuncc.mlm.service;
 import org.springframework.scheduling.annotation.Scheduled;
 
 public interface MlmScheduledServices {
+    //Every Hour with minute 1.
+    @Scheduled(cron ="0 1 * * * *")
+    void cancelPastHourSlot();
+
     @Scheduled(cron = "0 15 * * * *")
     void cancelUnconfirmedReservations();
 
