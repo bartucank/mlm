@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Objects;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -35,6 +36,13 @@ public class Room extends MLMBaseClass{
         dto.setId(getId());
         dto.setName(getName());
         dto.setImageId(getImageId().getId());
+        dto.setQrImage(getQrImage().getId());
+        if(Objects.isNull(getNFC_no())){
+            dto.setNFC_no("PLEASE SCAN NFC CARD");
+        }
+        else{
+            dto.setNFC_no(getNFC_no());
+        }
         return dto;
     }
 }

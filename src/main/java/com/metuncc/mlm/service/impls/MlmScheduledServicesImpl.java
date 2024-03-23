@@ -6,13 +6,11 @@ import com.metuncc.mlm.repository.*;
 import com.metuncc.mlm.security.JwtTokenProvider;
 import com.metuncc.mlm.service.MlmScheduledServices;
 import com.metuncc.mlm.utils.MailUtil;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.util.CollectionUtils;
 
 import javax.transaction.Transactional;
@@ -84,6 +82,22 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
         this.bookQueueHoldHistoryRecordRepository = bookQueueHoldHistoryRecordRepository;
         this.statisticsRepository = statisticsRepository;
         this.emailRepository = emailRepository;
+    }
+
+    //Every Hour with minute 1.
+    @Scheduled(cron ="0 1 * * * *")
+    @Override
+    public void cancelPastHourSlot(){
+        int currentDay = LocalDateTime.now().getDayOfWeek().getValue();
+        int previousHour = LocalTime.now().minusHours(1).getHour();
+
+        LocalTime previousSlotTime = LocalTime.of(previousHour, 0);
+        List<RoomSlot> previousHourSlots = roomSlotRepository.getRoomSlotsByTimeAndDay(previousSlotTime, RoomSlotDays.fromValue(currentDay));
+
+        for (RoomSlot slot : previousHourSlots){
+            slot.setAvailable(false);
+            roomSlotRepository.save(slot);
+        }
     }
 
     //Every hour with minute 15.
