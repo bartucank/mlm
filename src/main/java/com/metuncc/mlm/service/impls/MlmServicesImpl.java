@@ -88,7 +88,8 @@ public class MlmServicesImpl implements MlmServices {
                 Objects.isNull(userRequest.getNameSurname()) ||
                 StringUtils.isEmpty(userRequest.getNameSurname()) ||
                 Objects.isNull(userRequest.getEmail()) ||
-                StringUtils.isEmpty(userRequest.getEmail())
+                StringUtils.isEmpty(userRequest.getEmail()) ||
+                Objects.isNull(userRequest.getDepartment())
         ) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
@@ -101,6 +102,7 @@ public class MlmServicesImpl implements MlmServices {
         }
         User user = new User().fromRequest(userRequest);
         user.setVerified(false);
+        user.setDepartment(userRequest.getDepartment());
         user.setPassword(passwordEncoder.encode(userRequest.getPass()));
         user = userRepository.save(user);
         VerificationCode verificationCode = new VerificationCode();

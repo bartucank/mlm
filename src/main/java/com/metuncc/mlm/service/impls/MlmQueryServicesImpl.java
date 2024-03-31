@@ -682,4 +682,18 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return new RoomSlotWithResDTOListResponse(roomSlotDTOList);
 
     }
+
+    @Override
+    public DepartmentDTOListResponse getDeps() {
+        List<DepartmentDTO> departmentDTOList = new ArrayList<>();
+        for (Department department : Department.values()) {
+            DepartmentDTO departmentDTO = new DepartmentDTO();
+            departmentDTO.setDepartment(department);
+            departmentDTO.setDepartmentString(department.toString());
+            departmentDTOList.add(departmentDTO);
+        }
+        DepartmentDTOListResponse response = new DepartmentDTOListResponse();
+        response.setDepartmentDTOList(departmentDTOList);
+        return response;
+    }
 }

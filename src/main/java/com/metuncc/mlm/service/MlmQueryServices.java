@@ -72,4 +72,6 @@ public interface MlmQueryServices {
     RoomSlotDTOListResponse getRoomSlotsById(Long roomId);
 
     RoomSlotWithResDTOListResponse getRoomSlotsWithReservationById(Long roomId);
+
+    DepartmentDTOListResponse getDeps();
 }

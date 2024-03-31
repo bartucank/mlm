@@ -1,5 +1,6 @@
 package com.metuncc.mlm.api.request;
 
+import com.metuncc.mlm.entity.enums.Department;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,4 +12,5 @@ public class UserRequest {
     private String nameSurname;
 
     private String email;
+    private Department department;
 }

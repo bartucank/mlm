@@ -3,6 +3,7 @@ package com.metuncc.mlm.entity;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.dto.UserDTO;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
+import com.metuncc.mlm.entity.enums.Department;
 import com.metuncc.mlm.entity.enums.Role;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,6 +17,8 @@ import java.math.BigDecimal;
 @Table(name = "sysUser")
 public class User extends MLMBaseClass {
 
+    @Enumerated(value = EnumType.STRING)
+    private Department department;
     @Enumerated(value = EnumType.STRING)
     private Role role;
     private String fullName;

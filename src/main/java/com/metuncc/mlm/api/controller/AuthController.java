@@ -2,6 +2,7 @@ package com.metuncc.mlm.api.controller;
 
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.api.request.VerifyChangePasswordRequest;
+import com.metuncc.mlm.api.response.DepartmentDTOListResponse;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
@@ -61,6 +62,11 @@ public class AuthController {
     @PostMapping("/completeCodeForResetPassword")
     public ResponseEntity<ApiResponse<LoginResponse>> completeCodeForResetPassword(@RequestBody VerifyChangePasswordRequest request){
         return responseService.createResponse(mlmServices.completeCodeForResetPassword(request));
+    }
+
+    @GetMapping("/getDeps")
+    public ResponseEntity<ApiResponse<DepartmentDTOListResponse>> getDeps(){
+        return responseService.createResponse(mlmQueryServices.getDeps());
     }
 
 
