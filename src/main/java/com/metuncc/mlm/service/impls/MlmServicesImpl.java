@@ -553,6 +553,14 @@ public class MlmServicesImpl implements MlmServices {
         if (Objects.isNull(bookBorrowHistory)) {
             throw new MLMException(ExceptionCode.THIS_USER_DID_NOT_TAKE_THIS_BOOK);
         }
+        try{
+            emailRepository.save(new Email().set(bookBorrowHistory.getUserId().getEmail(),
+                    "Would you like to give review for "+bookBorrowHistory.getBookQueueRecord().getBookId().getName(),
+                    "For better recommendation please give review for "+bookBorrowHistory.getBookQueueRecord().getBookId().getName(),
+                    ""));
+        }catch (Exception e){
+
+        }
         bookBorrowHistory.setStatus(BorrowStatus.RETURNED);
         bookBorrowHistory.setReturnDate(LocalDateTime.now());
         bookQueueRecord.updateBookBorrow(bookBorrowHistory);
