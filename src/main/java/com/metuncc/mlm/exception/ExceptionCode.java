@@ -35,7 +35,10 @@ public enum ExceptionCode {
     EMAIL_CANNOT_SEND("Email could not sent."),
 
 
-    STAR_CANNOT_BE_NULL("Star point cannot be empty.");
+    STAR_CANNOT_BE_NULL("Star point cannot be empty."),
+    OLD_PASSWORD_CANNOT_BE_NULL("Your current password is incorrect."),
+    PASSWORD_CANNOT_BE_NULL("New password cannot be empty."),
+    OLD_PASSWORD_INCORRECT("Old password incorrect!"), EMAIL_OR_USERNAME_SHOULD_BE_NOT_EMPTY("You have to enter email or username to reset password.");
 
 
 

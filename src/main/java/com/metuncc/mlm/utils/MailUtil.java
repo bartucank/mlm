@@ -72,6 +72,34 @@ public class MailUtil {
             e.printStackTrace();
         }
     }
+
+    public void sendResetPasswordEmail(String to,String code) {
+        Properties props = new Properties();
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.smtp.host", smtp);
+        props.put("mail.smtp.port", port);
+        Session session = Session.getInstance(props, new Authenticator() {
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(username, password);
+            }
+        });
+        try {
+            Message message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+            message.setSubject("Please verify your account \uD83D\uDE4C ");
+            String htmlContent = defaultEmailTemplate;
+            htmlContent = htmlContent.replace("{TITLE}","Confirm Your Email");
+            String content = "You have received this e-mail to confirm your change password request.. Please enter the verification code below into the application. <br> <center>"+code+"</center>";
+            htmlContent = htmlContent.replace("{CONTENT}",content);
+            message.setContent(htmlContent, "text/html");
+            Transport.send(message);
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendCustomEmail(String to,String subject, String content, String title) {
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

@@ -67,4 +67,12 @@ public interface MlmServices {
     StatusDTO addReview(AddReviewRequest request);
 
     StatusDTO bulkCreateBook(MultipartFile file);
+
+    LoginResponse changePassword(ChangePasswordRequest request);
+
+    StatusDTO startForgotPasswordProcess(UserRequest request);
+
+    Boolean checkCodeForResetPassword(String code);
+
+    LoginResponse completeCodeForResetPassword(VerifyChangePasswordRequest request);
 }

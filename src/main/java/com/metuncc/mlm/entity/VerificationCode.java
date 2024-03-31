@@ -3,12 +3,11 @@ package com.metuncc.mlm.entity;
 import com.metuncc.mlm.api.request.ShelfCreateRequest;
 import com.metuncc.mlm.dto.ShelfDTO;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
+import com.metuncc.mlm.entity.enums.VerificationType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Entity;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -19,5 +18,7 @@ public class VerificationCode extends MLMBaseClass{
     private Boolean isCompleted;
     @OneToOne
     private User user;
+    @Enumerated(value = EnumType.STRING)
+    private VerificationType verificationType;
 
 }

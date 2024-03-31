@@ -35,6 +35,9 @@ public class JwtUserDetails implements UserDetails {
             case LIB:
                 authorityList.add(new SimpleGrantedAuthority("lib"));
                 break;
+            case LEC:
+                authorityList.add(new SimpleGrantedAuthority("lec"));
+                break;
             default:
                 break;
         }

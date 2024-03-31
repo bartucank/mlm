@@ -106,6 +106,7 @@ public class MlmServicesImpl implements MlmServices {
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setUser(user);
         verificationCode.setCode(generateRandomCode(4));
+        verificationCode.setVerificationType(VerificationType.REGISTER);
         verificationCodeRepository.save(verificationCode);
         mailUtil.sendVerifyEmailEmail(user.getEmail(), verificationCode.getCode());
         CopyCard copyCard = new CopyCard();
@@ -215,7 +216,7 @@ public class MlmServicesImpl implements MlmServices {
         if (Objects.isNull(user)) {
             return StatusDTO.builder().statusCode("E").msg("Unauthorized person.").build();
         }
-        VerificationCode verificationCode = verificationCodeRepository.getByUser(user);
+        VerificationCode verificationCode = verificationCodeRepository.getByUserAndType(user, VerificationType.REGISTER);
         if (verificationCode.getCode().equals(code)) {
             verificationCode.setIsCompleted(true);
             verificationCodeRepository.save(verificationCode);
@@ -837,6 +838,9 @@ public class MlmServicesImpl implements MlmServices {
         }
         bookReview.setComment(request.getComment());
         bookReview.setStar(request.getStar());
+        Book book = bookRepository.getById(request.getBookId());
+        bookReview.setBookId(book);
+        bookReview.setUserId(user);
         bookReviewRepository.save(bookReview);
         return success;
     }
@@ -1078,5 +1082,79 @@ public class MlmServicesImpl implements MlmServices {
             }
         }
         return dto.getName();
+    }
+
+
+    @Override
+    public LoginResponse changePassword(ChangePasswordRequest request){
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(request.getOldPassword())){
+            throw new MLMException(ExceptionCode.OLD_PASSWORD_CANNOT_BE_NULL);
+        }
+        if(Objects.isNull(request.getNewPassword())){
+            throw new MLMException(ExceptionCode.PASSWORD_CANNOT_BE_NULL);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
+        if (Objects.isNull(user)) {
+            throw new MLMException(ExceptionCode.UNAUTHORIZED);
+        }
+        if(user.getPassword().equals(passwordEncoder.encode(request.getOldPassword()))){
+            throw new MLMException(ExceptionCode.OLD_PASSWORD_INCORRECT);
+        }
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername(user.getUsername());
+        userRequest.setPass(user.getPassword());
+        return login(userRequest);
+    }
+
+    @Override
+    public StatusDTO startForgotPasswordProcess(UserRequest request){
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(request.getEmail()) && Objects.isNull(request.getUsername())){
+            throw new MLMException(ExceptionCode.EMAIL_OR_USERNAME_SHOULD_BE_NOT_EMPTY);
+        }
+        User user = userRepository.getByEmailOrUsername(request.getEmail(),request.getUsername());
+        if(Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        VerificationCode verificationCode = new VerificationCode();
+        verificationCode.setUser(user);
+        verificationCode.setCode(generateRandomCode(4));
+        verificationCode.setVerificationType(VerificationType.RESET_PASSWORD);
+        verificationCodeRepository.save(verificationCode);
+        mailUtil.sendResetPasswordEmail(user.getEmail(), verificationCode.getCode());
+        return  success;
+    }
+
+    @Override
+    public Boolean checkCodeForResetPassword(String code){
+        VerificationCode verificationCode = verificationCodeRepository.getByCode(code);
+        if(Objects.isNull(verificationCode)){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public LoginResponse completeCodeForResetPassword(VerifyChangePasswordRequest request){
+        VerificationCode verificationCode = verificationCodeRepository.getByCode(request.getCode());
+        if(Objects.isNull(verificationCode)){
+            throw new MLMException(ExceptionCode.UNAUTHORIZED);
+        }
+        User user =verificationCode.getUser();
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername(user.getUsername());
+        userRequest.setPass(user.getPassword());
+        return login(userRequest);
     }
 }

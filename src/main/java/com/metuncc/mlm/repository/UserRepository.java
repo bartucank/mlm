@@ -31,4 +31,7 @@ public interface UserRepository extends JpaRepository<User,Long> , JpaSpecificat
 
     @Query("select c from User c where c.role=:role")
     List<User> findAllByRoles(@Param("role") Role role);
+
+    @Query("select c from User c where (:email is not null and c.email=:email) and (:username is not null and c.username=:username) ")
+    User getByEmailOrUsername(@Param("email") String email, @Param("username")String username);
 }

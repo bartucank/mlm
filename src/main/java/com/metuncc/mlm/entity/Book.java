@@ -40,6 +40,7 @@ public class Book extends MLMBaseClass {
 
 
 
+
     public BookDTO toDTO() {
         BookDTO bookDTO = new BookDTO();
         bookDTO.setId(getId());

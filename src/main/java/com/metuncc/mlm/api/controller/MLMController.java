@@ -1,9 +1,6 @@
 package com.metuncc.mlm.api.controller;
 
-import com.metuncc.mlm.api.request.BookRequest;
-import com.metuncc.mlm.api.request.FindBookRequest;
-import com.metuncc.mlm.api.request.ShelfCreateRequest;
-import com.metuncc.mlm.api.request.UserRequest;
+import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
@@ -115,6 +112,10 @@ public class MLMController {
     public ResponseEntity<ApiResponse<StatusDTO>> enqueue(@RequestParam("id") Long id) {
         return responseService.createResponse(mlmServices.enqueue(id));
     }
+    @PostMapping(value="/addReview")
+    public ResponseEntity<ApiResponse<StatusDTO>> addReview(@RequestBody AddReviewRequest request) {
+        return responseService.createResponse(mlmServices.addReview(request));
+    }
 
     @GetMapping(value="/getRoomById")
     public ResponseEntity<ApiResponse<RoomDTO>> getRoomById(@RequestParam("id") Long id) {
@@ -127,5 +128,9 @@ public class MLMController {
     @GetMapping(value="/getRoomSlotsByRoomId")
     public ResponseEntity<ApiResponse<RoomSlotDTOListResponse>> getRoomSlotsById(@RequestParam("id") Long id) {
         return responseService.createResponse(mlmQueryServices.getRoomSlotsById(id));
+    }
+    @PostMapping(value = "/changePassword")
+    public ResponseEntity<ApiResponse<LoginResponse>> changePassword(@RequestBody ChangePasswordRequest request){
+        return responseService.createResponse(mlmServices.changePassword(request));
     }
 }

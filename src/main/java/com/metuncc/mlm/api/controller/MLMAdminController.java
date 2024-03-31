@@ -4,10 +4,7 @@ import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
-import com.metuncc.mlm.dto.OpenLibraryBookDetails;
-import com.metuncc.mlm.dto.QueueDetailDTO;
-import com.metuncc.mlm.dto.StatisticsDTO;
-import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
 import org.springframework.core.io.ByteArrayResource;
@@ -164,5 +161,13 @@ public class MLMAdminController {
     @GetMapping(value="/getRoomSlotsWithReservationById")
     public ResponseEntity<ApiResponse<RoomSlotWithResDTOListResponse>> getRoomSlotsWithReservationById(@RequestParam("id") Long id) {
         return responseService.createResponse(mlmQueryServices.getRoomSlotsWithReservationById(id));
+    }
+    @GetMapping("/downloadImg")
+    public ResponseEntity<Resource>  downloadImg(@RequestParam(name = "id")Long id){
+        byte[] bytes =mlmQueryServices.getImageById(id).getImageData();
+        ByteArrayResource byteArrayResource = new ByteArrayResource(bytes);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition","attachment; filename=img.jpg");
+        return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
     }
 }

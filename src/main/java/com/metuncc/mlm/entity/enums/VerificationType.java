@@ -1,15 +1,16 @@
 package com.metuncc.mlm.entity.enums;
 
-public enum Role {
-    USER("Student"),
-    LIB("Librarian"),
-    LEC("Lecturer")
+
+public enum VerificationType {
+
+    REGISTER("FOR REGISTER"),
+    RESET_PASSWORD("FOR RESET PASSWORD")
 
     ;
 
     private String desc;
 
-    Role(String s) {
+    VerificationType(String s) {
         this.desc=s;
     }
 
