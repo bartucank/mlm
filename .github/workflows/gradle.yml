@@ -9,15 +9,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Connect to server and Pull the MLM
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{secrets.ADDRESS}}
-          username: ${{secrets.USERNAME}}
-          password: ${{secrets.PASSWORD}}
-          script: |
-            cd /home/ubuntu/repo/mlm
-            git pull
       - name: Build and Package
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -26,6 +17,7 @@ jobs:
           password: ${{secrets.PASSWORD}}
           script: |
             cd /home/ubuntu/repo/mlm
+            git pull
             gradle clean    
             gradle build
       - name: Copy Test report to 
