@@ -14,9 +14,9 @@ jobs:
       - name: Deploy to server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{secrets.USERNAME}}
+          host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
-          password: ${{secrets.USERNAME}}
+          password: ${{secrets.PASSWORD}}
           script: |
             cd /home
             mkdir test
