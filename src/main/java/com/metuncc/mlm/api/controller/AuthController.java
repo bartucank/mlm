@@ -70,7 +70,7 @@ public class AuthController {
     }
 
     @GetMapping("/getDepsssss")
-    public ResponseEntity<ApiResponse<DepartmentDTOListResponse>> getDeps(){
+    public ResponseEntity<ApiResponse<DepartmentDTOListResponse>> getDepsss(){
         return responseService.createResponse(mlmQueryServices.getDeps());
     }
 
