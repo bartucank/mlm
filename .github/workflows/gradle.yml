@@ -28,9 +28,6 @@ jobs:
             cd /home/ubuntu/repo/mlm
             gradle clean    
             gradle build
-  test:
-    runs-on: ubuntu-latest
-    steps:
       - name: Copy Test report to 
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -46,9 +43,6 @@ jobs:
             mkdir "$destination/"
             cp -r "$origin" "$destination"
             systemctl restart nginx
-  start-mlm:
-    runs-on: ubuntu-latest
-    steps:
       - name: Start MLM Server
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -72,4 +66,4 @@ jobs:
             mv mlm-1.3.0.jar app.jar
             systemctl stop app
             systemctl daemon-reload
-            systemctl start app          
+            systemctl start app    
