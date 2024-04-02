@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Build and Package
+      - name: Build
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
@@ -21,7 +21,7 @@ jobs:
             chmod +x gradlew
             ./gradlew clean    
             ./gradlew build
-      - name: Copy Test report to 
+      - name: Generate Test Report
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
@@ -44,15 +44,7 @@ jobs:
           password: ${{secrets.PASSWORD}}
           script: |
             cd /home/ubuntu/repo/mlm
-            git pull
-      - name: Build and Package
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{secrets.ADDRESS}}
-          username: ${{secrets.USERNAME}}
-          password: ${{secrets.PASSWORD}}
-          script: |
-            cd /home/ubuntu/repo/mlm
+            ./gradlew bootJar
             cp /home/ubuntu/repo/mlm/build/libs/mlm-1.3.0.jar /home/ubuntu/jar/
             cd /home/ubuntu/jar/
             rm app.jar
