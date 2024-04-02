@@ -31,8 +31,8 @@ jobs:
             cd /home/ubuntu/repo/mlm
             ./gradlew test
             currentdate=$(date +"%d%m%Y-%H%M")
-            origin = "/home/ubuntu/repo/mlm/build/reports/tests/test"
-            destination = "/var/www/html/reports/$currentdate"
+            origin="/home/ubuntu/repo/mlm/build/reports/tests/test"
+            destination="/var/www/html/reports/$currentdate"
             mkdir "$destination/"
             cp -r "$origin" "$destination"
             systemctl restart nginx
