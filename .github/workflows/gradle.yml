@@ -32,7 +32,7 @@ jobs:
             ./gradlew test
             currentdate=$(date +"%d%m%Y-%H%M")
             origin = "/home/ubuntu/repo/mlm/build/reports/tests/test"
-            destination = "/var/www/html/reports/$tarih"
+            destination = "/var/www/html/reports/$currentdate"
             mkdir "$destination/"
             cp -r "$origin" "$destination"
             systemctl restart nginx
