@@ -11,6 +11,11 @@
     <br/>
   </p>
 </p>
+<center>
+  
+  [![Build & Test & Report & Deploy](https://github.com/bartucank/mlm/actions/workflows/gradle.yml/badge.svg)](https://github.com/bartucank/mlm/actions/workflows/gradle.yml)
+  
+  </center>
 
 
 ![Downloads](https://img.shields.io/github/downloads/bartucank/mlm/total) ![Contributors](https://img.shields.io/github/contributors/bartucank/mlm?color=dark-green) ![Issues](https://img.shields.io/github/issues/bartucank/mlm) ![License](https://img.shields.io/github/license/bartucank/mlm) 
