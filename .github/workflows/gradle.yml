@@ -1,4 +1,4 @@
-name: Java CI with Gradle
+name: Build & Test & Report & Deploy
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
             chmod +x gradlew
             ./gradlew clean    
             ./gradlew build
-      - name: Generate Test Report
+      - name: Publish Test Report
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
