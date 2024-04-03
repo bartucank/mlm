@@ -1,4 +1,4 @@
-package com.metuncc.mlm.utilTests;
+package com.metuncc.mlm.serviceTests;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metuncc.mlm.external.ApiCall;
