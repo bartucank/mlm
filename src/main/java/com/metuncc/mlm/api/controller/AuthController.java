@@ -69,5 +69,9 @@ public class AuthController {
         return responseService.createResponse(mlmQueryServices.getDeps());
     }
 
+    @GetMapping("/getDepsssss")
+    public ResponseEntity<ApiResponse<DepartmentDTOListResponse>> getDepsss(){
+        return responseService.createResponse(mlmQueryServices.getDeps());
+    }
 
 }
