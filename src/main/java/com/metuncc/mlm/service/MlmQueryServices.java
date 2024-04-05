@@ -7,6 +7,7 @@ import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.entity.Room;
 import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.entity.enums.Role;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -74,4 +75,19 @@ public interface MlmQueryServices {
     RoomSlotWithResDTOListResponse getRoomSlotsWithReservationById(Long roomId);
 
     DepartmentDTOListResponse getDeps();
+
+    StatusDTO updateRoleOfUser(Long userId, Role role);
+
+    byte[] getCourseStudentExcelTemplate();
+
+    CourseDTO getCourseById(Long id);
+
+    CourseDTO getCourseByIdForLecturer(Long id);
+
+
+    CourseDTOListResponse getCoursesForUser();
+
+    CourseDTOListResponse getCoursesForLecturer();
+
+    CourseMaterialDTO getCourseMaterialById(Long id);
 }

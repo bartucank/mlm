@@ -4,6 +4,7 @@ public enum ExceptionCode {
     UNEXPECTED_ERROR("Unexpected error. Please contact with admin."),
     USERNAME_ALREADY_TAKEN("This username already taken."),
     INVALID_REQUEST("Invalid request."),
+    INVALID_STUDENT_NUMBER("Invalid student number."),
     SHELF_NOT_FOUND("Shelf not found."),
     ONLY_METU("Only metuians can register this application."),
     PLEASE_VERIFY_ACCOUNT("Please verify your account via email."),
@@ -38,7 +39,13 @@ public enum ExceptionCode {
     STAR_CANNOT_BE_NULL("Star point cannot be empty."),
     OLD_PASSWORD_CANNOT_BE_NULL("Your current password is incorrect."),
     PASSWORD_CANNOT_BE_NULL("New password cannot be empty."),
-    OLD_PASSWORD_INCORRECT("Old password incorrect!"), EMAIL_OR_USERNAME_SHOULD_BE_NOT_EMPTY("You have to enter email or username to reset password.");
+    OLD_PASSWORD_INCORRECT("Old password incorrect!"),
+    EMAIL_OR_USERNAME_SHOULD_BE_NOT_EMPTY("You have to enter email or username to reset password."),
+    COURSE_NAME_CANNOT_BE_NULL("Course name cannot be empty."),
+
+    COURSE_NOT_FOUND("Course not found."),
+    COURSE_VISIBILITY_CANNOT_BE_NULL("Course visibility cannot be empty."),
+    COURSE_IMAGE_CANNOT_BE_NULL("Course image cannot be empty."), MATERIAL_NOT_FOUND("Material not found."),;
 
 
 

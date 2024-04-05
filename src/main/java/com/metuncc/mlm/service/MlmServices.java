@@ -75,4 +75,18 @@ public interface MlmServices {
     Boolean checkCodeForResetPassword(String code);
 
     LoginResponse completeCodeForResetPassword(VerifyChangePasswordRequest request);
+
+    StatusDTO createCourse(CreateCourseRequest createCourseRequest);
+
+    StatusDTO inviteStudent(InviteStudentRequest request);
+
+    StatusDTO bulkAddStudentToCourse(MultipartFile file, Long courseId);
+
+    StatusDTO uploadCourseMaterial(MultipartFile file, Long courseId, String name) throws IOException;
+
+    StatusDTO deleteCourseMaterial(Long materialId);
+
+    StatusDTO removeStudentFromCourse(Long courseId, Long courseStudentId);
+
+    StatusDTO bulkRemoveStudentFromCourse(Long courseId, MultipartFile file);
 }

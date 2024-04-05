@@ -43,26 +43,18 @@ public class IntegrationTests {
     @Autowired
     private  UserRepository userRepository;
 
-    @Before
-    public void setUp(){
-        User user = new User();
-        user.setVerified(true);
-        user.setDepartment(Department.ASE);
-        user.setEmail("c@metu.edu.tr");
-        user.setPassword("123");
-        user.setUsername("c");
-        user.setFullName("c");
-        userRepository.save(user);
-    }
+
     @DisplayName("Create User Test")
     @Test
     public void testCreateUser() throws Exception {
 
         UserRequest userRequest = new UserRequest();
-        userRequest.setUsername("a");
-        userRequest.setPass("a");
-        userRequest.setEmail("a@metu.edu.tr");
-        userRequest.setDepartment(Department.ASE);
+        userRequest.setUsername("bartu");
+        userRequest.setNameSurname("Bartu Can Palamut");
+        userRequest.setPass("VerySecurePassword");
+        userRequest.setEmail("e238622@metu.edu.tr");
+        userRequest.setStudentNumber("2386225");
+        userRequest.setDepartment(Department.CNG);
         userRequest.setNameSurname("a a");
         ObjectMapper objectMapper = new ObjectMapper();
         String userJson = objectMapper.writeValueAsString(userRequest);
@@ -79,6 +71,7 @@ public class IntegrationTests {
 
         assertFalse(content.contains("\"jwt\":null"));
     }
+
 
 
 

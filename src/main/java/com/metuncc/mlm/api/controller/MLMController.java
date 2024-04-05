@@ -133,4 +133,16 @@ public class MLMController {
     public ResponseEntity<ApiResponse<LoginResponse>> changePassword(@RequestBody ChangePasswordRequest request){
         return responseService.createResponse(mlmServices.changePassword(request));
     }
+    @GetMapping("/course/getCourseById")
+    public ResponseEntity<ApiResponse<CourseDTO>> getCourseById(@RequestParam("id") Long id){
+        return responseService.createResponse(mlmQueryServices.getCourseById(id));
+    }
+    @GetMapping("/course/getCoursesForUser")
+    public ResponseEntity<ApiResponse<CourseDTOListResponse>> getCoursesForUser(){
+        return responseService.createResponse(mlmQueryServices.getCoursesForUser());
+    }
+    @GetMapping("/course/getCourseMaterialById")
+    public ResponseEntity<ApiResponse<CourseMaterialDTO>> getCourseMaterialById(@RequestParam("id") Long id){
+        return responseService.createResponse(mlmQueryServices.getCourseMaterialById(id));
+    }
 }

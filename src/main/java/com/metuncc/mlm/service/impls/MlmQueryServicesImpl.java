@@ -23,12 +23,14 @@ import com.metuncc.mlm.repository.specifications.UserSpecification;
 import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.utils.ImageUtil;
-import com.metuncc.mlm.utils.excel.ExcelWriter;
+import com.metuncc.mlm.utils.excel.BookExcelWriter;
+import com.metuncc.mlm.utils.excel.CourseStudentExcelWriter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -69,6 +71,11 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private StatisticsRepository statisticsRepository;
     private BookReviewRepository bookReviewRepository;
     private RoomReservationRepository roomReservationRepository;
+    private CourseRepository courseRepository;
+    private CourseMaterialRepository courseMaterialRepository;
+    private CourseStudentRepository courseStudentRepository;
+
+
     @Override
     public UserDTO getOneUserByUserName(String username) {
         return userRepository.findByUsername(username).toDTO();
@@ -642,11 +649,11 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 shelfDTO.setFloor(shelf.getFloor());
                 shelfDTOList.add(shelfDTO);
             }
-            ExcelWriter excelWriter = ExcelWriter.builder()
+            BookExcelWriter bookExcelWriter = BookExcelWriter.builder()
                     .categoryEnumDTOList(getAllBookCategories())
                     .shelfDTOList(shelfDTOList)
                     .build();
-            return excelWriter.create();
+            return bookExcelWriter.create();
         }catch (Exception e){
             throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
         }
@@ -696,4 +703,92 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         response.setDepartmentDTOList(departmentDTOList);
         return response;
     }
+
+    @Override
+    public StatusDTO updateRoleOfUser(Long userId, Role role){
+        if(Objects.isNull(userId) ||Objects.isNull(role)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        User user = userRepository.getById(userId);
+        if(Objects.isNull(user)){
+            throw new MLMException(ExceptionCode.USER_NOT_FOUND);
+        }
+        user.setRole(role);
+        userRepository.save(user);
+        return StatusDTO.builder().statusCode("S").msg("Role updated successfully!").build();
+    }
+
+    @Override
+    public byte[] getCourseStudentExcelTemplate(){
+        try{
+            CourseStudentExcelWriter courseStudentExcelWriter = CourseStudentExcelWriter.builder()
+                    .build();
+            return courseStudentExcelWriter.create();
+        }catch (Exception e){
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+    }
+
+    @Override
+    public CourseDTO getCourseById(Long id){
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Course course = courseRepository.getById(id);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        if(jwtUser.getAuthorities().contains(new SimpleGrantedAuthority("lec"))){
+             return course.toDTOForLecturer();
+        }
+        return course.toDTOForUsers();
+    }
+    @Override
+    public CourseDTO getCourseByIdForLecturer(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Course course = courseRepository.getById(id);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        return course.toDTOForLecturer();
+    }
+
+    @Override
+    public CourseDTOListResponse getCoursesForUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        List<CourseDTO> courseDTOList = courseRepository.getAllPublicCoursesAndRegisteredCourses(jwtUser.getId()).stream().map(Course::toDTOForUsers).collect(Collectors.toList());
+        CourseDTOListResponse response = new CourseDTOListResponse();
+        response.setCourseDTOList(courseDTOList);
+        return response;
+    }
+
+    @Override
+    public CourseDTOListResponse getCoursesForLecturer(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        List<CourseDTO> courseDTOList = courseRepository.getCoursesByLecturerId(jwtUser.getId()).stream().map(Course::toDTOForLecturer).collect(Collectors.toList());
+        CourseDTOListResponse response = new CourseDTOListResponse();
+        response.setCourseDTOList(courseDTOList);
+        return response;
+    }
+
+    @Override
+    public CourseMaterialDTO getCourseMaterialById(Long id){
+        if(Objects.isNull(id)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        CourseMaterial courseMaterial = courseMaterialRepository.getById(id);
+        if(Objects.isNull(courseMaterial)){
+            throw new MLMException(ExceptionCode.MATERIAL_NOT_FOUND);
+        }
+        return courseMaterial.toFullContentDTO();
+    }
+
 }

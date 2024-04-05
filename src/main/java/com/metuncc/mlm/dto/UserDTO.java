@@ -1,6 +1,7 @@
 package com.metuncc.mlm.dto;
 
 import com.metuncc.mlm.entity.base.MLMBaseClass;
+import com.metuncc.mlm.entity.enums.Department;
 import com.metuncc.mlm.entity.enums.Role;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +24,9 @@ public class UserDTO extends MLMBaseClassDTO {
     private Boolean verified;
     private String email;
     private BigDecimal debt;
-
+    private String studentNumber;
     private CopyCardDTO copyCardDTO;
+    private Department department;
+    private String departmentStr;
 
 }

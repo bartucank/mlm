@@ -32,10 +32,14 @@ public class User extends MLMBaseClass {
     private CopyCard copyCard;
 
     private BigDecimal debt;
+    private String studentNumber;
 
 
     public UserDTO toDTO() {
         UserDTO userDTO = new UserDTO();
+        userDTO.setDepartment(getDepartment());
+        userDTO.setDepartmentStr(getDepartment().toString());
+        userDTO.setStudentNumber(getStudentNumber());
         userDTO.setEmail(getEmail());
         userDTO.setId(getId());
         userDTO.setRole(getRole());
@@ -52,6 +56,8 @@ public class User extends MLMBaseClass {
         setUsername(userRequest.getUsername());
         setFullName(userRequest.getNameSurname());
         setRole(Role.USER);
+        setDepartment(userRequest.getDepartment());
+        setStudentNumber(userRequest.getStudentNumber());
         setEmail(userRequest.getEmail());
         return this;
     }
