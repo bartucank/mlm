@@ -36,8 +36,8 @@ import com.metuncc.mlm.utils.ImageUtil;
 import com.metuncc.mlm.utils.MailUtil;
 import com.metuncc.mlm.utils.excel.ExcelBookRow;
 import com.metuncc.mlm.utils.excel.ExcelReader;
-import lombok.AllArgsConstructor;
 import net.glxn.qrgen.QRCode;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,7 +52,6 @@ import javax.transaction.Transactional;
 import java.util.stream.Collectors;
 
 @Service
-@AllArgsConstructor
 @Transactional
 public class MlmServicesImpl implements MlmServices {
     private BookReviewRepository bookReviewRepository;
@@ -74,9 +73,39 @@ public class MlmServicesImpl implements MlmServices {
     private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
     private ReceiptHistoryRepository receiptHistoryRepository;
     private EmailRepository emailRepository;
+    private CourseRepository courseRepository;
+    private CourseMaterialRepository courseMaterialRepository;
+    private CourseStudentRepository courseStudentRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
+    @Value("${webpage.link:https://metu.edu.tr}")
+    private String webpageLink;
+
+    public MlmServicesImpl(BookReviewRepository bookReviewRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, ReceiptHistoryRepository receiptHistoryRepository, EmailRepository emailRepository, CourseRepository courseRepository, CourseMaterialRepository courseMaterialRepository, CourseStudentRepository courseStudentRepository) {
+        this.bookReviewRepository = bookReviewRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.shelfRepository = shelfRepository;
+        this.roomRepository = roomRepository;
+        this.imageRepository = imageRepository;
+        this.bookRepository = bookRepository;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.mailUtil = mailUtil;
+        this.verificationCodeRepository = verificationCodeRepository;
+        this.bookBorrowHistoryRepository = bookBorrowHistoryRepository;
+        this.bookQueueRecordRepository = bookQueueRecordRepository;
+        this.copyCardRepository = copyCardRepository;
+        this.roomSlotRepository = roomSlotRepository;
+        this.roomReservationRepository = roomReservationRepository;
+        this.bookQueueHoldHistoryRecordRepository = bookQueueHoldHistoryRecordRepository;
+        this.receiptHistoryRepository = receiptHistoryRepository;
+        this.emailRepository = emailRepository;
+        this.courseRepository = courseRepository;
+        this.courseMaterialRepository = courseMaterialRepository;
+        this.courseStudentRepository = courseStudentRepository;
+    }
 
     @Override
     public LoginResponse createUser(UserRequest userRequest) {
@@ -89,12 +118,17 @@ public class MlmServicesImpl implements MlmServices {
                 StringUtils.isEmpty(userRequest.getNameSurname()) ||
                 Objects.isNull(userRequest.getEmail()) ||
                 StringUtils.isEmpty(userRequest.getEmail()) ||
-                Objects.isNull(userRequest.getDepartment())
+                Objects.isNull(userRequest.getDepartment()) ||
+                Objects.isNull(userRequest.getStudentNumber())
         ) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         if (!userRequest.getEmail().endsWith("@metu.edu.tr")) {
             throw new MLMException(ExceptionCode.ONLY_METU);
+        }
+        //check student number pattern. it should be in 7 digits.
+        if (!userRequest.getStudentNumber().matches("[0-9]{7}")) {
+            throw new MLMException(ExceptionCode.INVALID_STUDENT_NUMBER);
         }
         if (Objects.nonNull(userRepository.findByUsername(userRequest.getUsername())) ||
                 Objects.nonNull(userRepository.findByEmail(userRequest.getEmail()))) {
@@ -102,9 +136,16 @@ public class MlmServicesImpl implements MlmServices {
         }
         User user = new User().fromRequest(userRequest);
         user.setVerified(false);
-        user.setDepartment(userRequest.getDepartment());
         user.setPassword(passwordEncoder.encode(userRequest.getPass()));
         user = userRepository.save(user);
+
+
+        //Check inv exists for any course;
+        List<CourseStudent> courseStudentList = courseStudentRepository.getByStudentId(user.getStudentNumber());
+        for (CourseStudent courseStudent : courseStudentList) {
+            courseStudent.setStudent(user);
+        }
+        courseStudentRepository.saveAll(courseStudentList);
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setUser(user);
         verificationCode.setCode(generateRandomCode(4));
@@ -860,7 +901,7 @@ public class MlmServicesImpl implements MlmServices {
         ExcelReader excelReader = new ExcelReader();
         int counter =0;
         try{
-            List<ExcelBookRow> excelBooks = excelReader.parseExcel(file);
+            List<ExcelBookRow> excelBooks = excelReader.parseBookExcel(file);
             for (ExcelBookRow excelBook : excelBooks) {
                 try{
                     if(Objects.isNull(excelBook.getIsbn()) ||Objects.isNull(excelBook.getCategory()) || Objects.isNull(excelBook.getShelf())){
@@ -1167,4 +1208,243 @@ public class MlmServicesImpl implements MlmServices {
         userRequest.setPass(user.getPassword());
         return login(userRequest);
     }
+
+    @Override
+    public StatusDTO createCourse(CreateCourseRequest createCourseRequest){
+        if(Objects.isNull(createCourseRequest)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(createCourseRequest.getName())){
+            throw new MLMException(ExceptionCode.COURSE_NAME_CANNOT_BE_NULL);
+        }
+        if(Objects.isNull(createCourseRequest.getIsPublic())){
+            throw new MLMException(ExceptionCode.COURSE_VISIBILITY_CANNOT_BE_NULL);
+        }
+        if(Objects.isNull(createCourseRequest.getImageId())){
+            throw new MLMException(ExceptionCode.COURSE_IMAGE_CANNOT_BE_NULL);
+        }
+        Image image = imageRepository.getById(createCourseRequest.getImageId());
+        if(Objects.isNull(image)){
+            throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
+        }
+        Course course = new Course();
+        course.setName(createCourseRequest.getName());
+        course.setIsPublic(createCourseRequest.getIsPublic());
+        course.setImageId(image);
+        courseRepository.save(course);
+        return success;
+    }
+    @Override
+    public StatusDTO inviteStudent(InviteStudentRequest request){
+        User currentUser = null;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        currentUser = userRepository.getById(jwtUser.getId());
+        if(Objects.isNull(request)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(request.getCourseId())){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        if(StringUtils.isEmpty(request.getStudentNumber())){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        //Now check student id patternç. it should be in 7 digits. only numbers.
+        if(!request.getStudentNumber().matches("[0-9]{7}")){
+            throw new MLMException(ExceptionCode.INVALID_STUDENT_NUMBER);
+        }
+        Course course = courseRepository.getById(request.getCourseId());
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        //Now get first 5 digit of student number and check s/he registered to the system or not.
+        String studentNumber = request.getStudentNumber();
+        User user = userRepository.findByStudentNumber(studentNumber);
+        CourseStudent courseStudent = new CourseStudent();
+        courseStudent.setCourse(course);
+        courseStudent.setStudentNumber(request.getStudentNumber());
+        if(Objects.isNull(user)){
+            //Not registered. Send invitation email.
+            String title = currentUser.getFullName() + " is inviting you to join the "+course.getName()+" course.";
+            StringBuilder content = new StringBuilder();
+            content.append("You are invited to join the "+course.getName()+" course. <br>");
+            if(Objects.nonNull(webpageLink)){
+                content.append("Please click the link below to register to the system. <br>");
+                content.append(webpageLink+"/#/register <br>");
+            }else{
+                content.append("You can download MLM app from the app store and register to the system. <br>");
+            }
+            emailRepository.save(new Email().set("e"+studentNumber.substring(0,5)+"@metu.edu.tr",title ,content.toString(),null));
+        }else{
+            courseStudent.setStudent(user);
+        }
+        courseStudentRepository.save(courseStudent);
+        if(Objects.isNull(course.getCourseStudentList())){
+            course.setCourseStudentList(new ArrayList<>());
+        }
+        course.getCourseStudentList().add(courseStudent);
+        courseRepository.save(course);
+        return success;
+    }
+    @Override
+    public StatusDTO bulkAddStudentToCourse(MultipartFile file, Long courseId){
+        if(Objects.isNull(file)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(courseId)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        Course course = courseRepository.getById(courseId);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        ExcelReader excelReader = new ExcelReader();
+        List<String> studentNumbers = null;
+        try {
+            studentNumbers = excelReader.parseStudentExcel(file);
+        } catch (IOException e) {
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+        if(Objects.isNull(studentNumbers)){
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+        List<CourseStudent> courseStudents;
+        if(CollectionUtils.isEmpty(course.getCourseStudentList())){
+            courseStudents = new ArrayList<>();
+        } else {
+            courseStudents = course.getCourseStudentList();
+        }
+        for (String studentNumber : studentNumbers) {
+            if(studentNumber.matches("[0-9]{7}")){
+                courseStudents.stream().filter(c->c.getStudentNumber().equals(studentNumber)).findFirst().ifPresentOrElse(
+                        c->{
+                            //Do nothing.
+                        },
+                        ()->{
+                            CourseStudent courseStudent = new CourseStudent();
+                            courseStudent.setCourse(course);
+                            courseStudent.setStudentNumber(studentNumber);
+                            courseStudents.add(courseStudent);
+                            User mayBeUser = userRepository.findByStudentNumber(studentNumber);
+                            if(Objects.isNull(mayBeUser)) {
+                                //Send invitation email.
+                                String title = "You are invited to join the " + course.getName() + " course.";
+                                StringBuilder content = new StringBuilder();
+                                content.append("You are invited to join the " + course.getName() + " course. <br>");
+                                if (Objects.nonNull(webpageLink)) {
+                                    content.append("Please click the link below to register to the system. <br>");
+                                    content.append(webpageLink + "/#/register <br>");
+                                } else {
+                                    content.append("You can download MLM app from the app store and register to the system. <br>");
+                                }
+                                emailRepository.save(new Email().set("e" + studentNumber.substring(0, 5) + "@metu.edu.tr", title, content.toString(), null));
+                            }else {
+                                courseStudent.setStudent(mayBeUser);
+                            }
+                            courseStudentRepository.save(courseStudent);
+                        }
+                );
+            }
+        }
+        course.setCourseStudentList(courseStudents);
+        courseRepository.save(course);
+        return success;
+    }
+
+    @Override
+    public StatusDTO uploadCourseMaterial(MultipartFile file, Long courseId, String name) throws IOException {
+        if(Objects.isNull(file)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(Objects.isNull(courseId)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        Course course = courseRepository.getById(courseId);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        CourseMaterial courseMaterial = new CourseMaterial();
+        courseMaterial.setData(ImageUtil.compressImage(file.getBytes()));
+        courseMaterial.setFileName(file.getOriginalFilename());
+        courseMaterial.setExtension(file.getContentType());
+        courseMaterial.setName(name);
+        courseMaterial.setCourse(course);
+        courseMaterialRepository.save(courseMaterial);
+        return success;
+    }
+
+    @Override
+    public StatusDTO deleteCourseMaterial(Long materialId){
+        if(Objects.isNull(materialId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        CourseMaterial courseMaterial = courseMaterialRepository.getById(materialId);
+        if(Objects.isNull(courseMaterial)){
+            throw new MLMException(ExceptionCode.MATERIAL_NOT_FOUND);
+        }
+        Course course = courseMaterial.getCourse();
+        course.getCourseMaterialList().remove(courseMaterial);
+        courseRepository.save(course);
+        courseMaterialRepository.delete(courseMaterial);
+        return success;
+    }
+    @Override
+    public StatusDTO removeStudentFromCourse(Long courseId, Long courseStudentId){
+        if(Objects.isNull(courseId)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        if(Objects.isNull(courseStudentId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Course course = courseRepository.getById(courseId);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        CourseStudent courseStudent = courseStudentRepository.getById(courseStudentId);
+        if(Objects.isNull(courseStudent)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        course.getCourseStudentList().remove(courseStudent);
+        courseRepository.save(course);
+        courseStudentRepository.delete(courseStudent);
+        return success;
+    }
+    @Override
+    public StatusDTO bulkRemoveStudentFromCourse(Long courseId, MultipartFile file){
+        if(Objects.isNull(courseId)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        if(Objects.isNull(file)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Course course = courseRepository.getById(courseId);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        ExcelReader excelReader = new ExcelReader();
+        List<String> studentNumbers = null;
+        try {
+            studentNumbers = excelReader.parseStudentExcel(file);
+        } catch (IOException e) {
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+        if(Objects.isNull(studentNumbers)){
+            throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
+        }
+        List<CourseStudent> courseStudents = course.getCourseStudentList();
+        for (String studentNumber : studentNumbers) {
+            courseStudents.stream().filter(c->c.getStudentNumber().equals(studentNumber)).findFirst().ifPresentOrElse(
+                    c->{
+                        course.getCourseStudentList().remove(c);
+                        courseStudentRepository.delete(c);
+                    },
+                    ()->{
+                        //Do nothing.
+                    }
+            );
+        }
+        courseRepository.save(course);
+        return success;
+    }
+
 }

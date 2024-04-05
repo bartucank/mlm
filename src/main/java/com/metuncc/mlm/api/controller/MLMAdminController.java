@@ -5,6 +5,7 @@ import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.*;
+import com.metuncc.mlm.entity.enums.Role;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
 import org.springframework.core.io.ByteArrayResource;
@@ -169,5 +170,59 @@ public class MLMAdminController {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition","attachment; filename=img.jpg");
         return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
+    }
+    @PutMapping("/updateRoleOfUser")
+    public ResponseEntity<ApiResponse<StatusDTO>> updateRoleOfUser(@RequestParam("userId") Long userId,
+                                                                   @RequestParam("role") Role role){
+        return responseService.createResponse(mlmQueryServices.updateRoleOfUser(userId,role));
+    }
+    @GetMapping("/getCourseStudentExcelTemplate")
+    public ResponseEntity<Resource> getCourseStudentExcelTemplate(){
+        byte[] bytes = mlmQueryServices.getCourseStudentExcelTemplate();
+        ByteArrayResource byteArrayResource = new ByteArrayResource(bytes);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition","attachment; filename=CourseStudentExcelTemplate.xlsx");
+        return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
+    }
+    @PostMapping("/course/create")
+    public ResponseEntity<ApiResponse<StatusDTO>> createCourse(@RequestBody CreateCourseRequest request){
+        return responseService.createResponse(mlmServices.createCourse(request));
+    }
+    @PutMapping("/course/invite")
+    public ResponseEntity<ApiResponse<StatusDTO>> inviteStudent(@RequestBody InviteStudentRequest request){
+        return responseService.createResponse(mlmServices.inviteStudent(request));
+    }
+    @PostMapping(value = "/course/bulkAddStudentToCourse",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<StatusDTO>> bulkAddStudentToCourse(@RequestParam("file")MultipartFile file,
+                                                                         @RequestParam("courseId") Long courseId){
+        return responseService.createResponse(mlmServices.bulkAddStudentToCourse(file,courseId));
+    }
+    @PostMapping(value = "/course/uploadCourseMaterial",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<StatusDTO>> uploadCourseMaterial(@RequestParam("file")MultipartFile file,
+                                                                      @RequestParam("courseId") Long courseId,
+                                                                      @RequestParam("name") String name) throws IOException {
+        return responseService.createResponse(mlmServices.uploadCourseMaterial(file,courseId,name));
+    }
+    @DeleteMapping("/course/deleteCourseMaterial")
+    public ResponseEntity<ApiResponse<StatusDTO>> deleteCourseMaterial(@RequestParam("materialId") Long materialId){
+        return responseService.createResponse(mlmServices.deleteCourseMaterial(materialId));
+    }
+    @DeleteMapping("/course/removeStudentFromCourse")
+    public ResponseEntity<ApiResponse<StatusDTO>> removeStudentFromCourse(@RequestParam("courseId") Long courseId,
+                                                                         @RequestParam("courseStudentId") Long courseStudentId){
+        return responseService.createResponse(mlmServices.removeStudentFromCourse(courseId,courseStudentId));
+    }
+    @PostMapping(value = "/course/bulkRemoveStudentFromCourse",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<StatusDTO>> bulkRemoveStudentFromCourse(@RequestParam("file")MultipartFile file,
+                                                                         @RequestParam("courseId") Long courseId){
+        return responseService.createResponse(mlmServices.bulkRemoveStudentFromCourse(courseId,file));
+    }
+    @GetMapping("/course/getCourseByIdForLecturer")
+    public ResponseEntity<ApiResponse<CourseDTO>> getCourseByIdForLecturer(@RequestParam("id") Long id){
+        return responseService.createResponse(mlmQueryServices.getCourseByIdForLecturer(id));
+    }
+    @GetMapping("/course/getCoursesForLecturer")
+    public ResponseEntity<ApiResponse<CourseDTOListResponse>> getCoursesForLecturer(){
+        return responseService.createResponse(mlmQueryServices.getCoursesForLecturer());
     }
 }

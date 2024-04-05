@@ -2,30 +2,25 @@ package com.metuncc.mlm.utils.excel;
 
 import com.metuncc.mlm.dto.BookCategoryEnumDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddressList;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFDataFormat;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
 @Data
 @Builder
-public class ExcelWriter {
+public class BookExcelWriter {
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
     private List<ShelfDTO> shelfDTOList;
     private List<BookCategoryEnumDTO> categoryEnumDTOList;

@@ -13,4 +13,5 @@ public class UserRequest {
 
     private String email;
     private Department department;
+    private String studentNumber;
 }

@@ -1,6 +1,5 @@
 package com.metuncc.mlm.utils.excel;
 
-import lombok.Builder;
 import lombok.Data;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,7 +15,7 @@ import java.util.Objects;
 
 @Data
 public class ExcelReader {
-    public List<ExcelBookRow> parseExcel(MultipartFile file) throws IOException {
+    public List<ExcelBookRow> parseBookExcel(MultipartFile file) throws IOException {
         List<ExcelBookRow> rows = new ArrayList<>();
         Workbook workbook = new XSSFWorkbook(file.getInputStream());
         Sheet sheet = workbook.getSheetAt(0);
@@ -33,6 +32,19 @@ public class ExcelReader {
                         nullOrNonNull(dataFormatter.formatCellValue(row.getCell(columnNo++))),
                         nullOrNonNull(dataFormatter.formatCellValue(row.getCell(columnNo++))));
                 rows.add(excelBookRow);
+            }
+        }
+        return rows;
+    }
+    public List<String> parseStudentExcel(MultipartFile file) throws IOException {
+        List<String> rows = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(file.getInputStream());
+        Sheet sheet = workbook.getSheetAt(0);
+        DataFormatter dataFormatter = new DataFormatter();
+        if(Objects.nonNull(sheet)){
+            for (int i = 1; i < sheet.getPhysicalNumberOfRows(); i++) {
+                Row row = sheet.getRow(i);
+                rows.add(nullOrNonNull(dataFormatter.formatCellValue(row.getCell(0))));
             }
         }
         return rows;
