@@ -234,11 +234,13 @@ public class DOSHelper {
         Course course = new Course();
         course.setId(1L);
         course.setName("course name");
-        course.setLecturer(user1());
+        course.setLecturer(lecturer1());
         course.setIsPublic(true);
         course.setImageId(image1());
         course.setCourseMaterialList(new ArrayList<>());
         course.setCourseStudentList(new ArrayList<>());
+        course.getCourseMaterialList().add(courseMaterial1());
+        course.getCourseStudentList().add(courseStudent1());
         course.setCreatedDate(LocalDateTime.now());
         course.setLastModifiedDate(LocalDateTime.now());
         course.setDeleted(false);
@@ -246,6 +248,47 @@ public class DOSHelper {
         return course;
     }
 
+    public CourseStudent courseStudent1(){
+        CourseStudent courseStudent = new CourseStudent();
+        courseStudent.setId(1L);
+        courseStudent.setStudentNumber("1234");
+        courseStudent.setCourse(course1());
+        courseStudent.setStudent(user1());
+        courseStudent.setCreatedDate(LocalDateTime.now());
+        courseStudent.setLastModifiedDate(LocalDateTime.now());
+        courseStudent.setDeleted(false);
+        courseStudent.setDeletedDate(null);
+        return courseStudent;
+    }
+
+    public CourseMaterial courseMaterial1(){
+        CourseMaterial courseMaterial = new CourseMaterial();
+        courseMaterial.setId(1L);
+        courseMaterial.setCourse(course1());
+        courseMaterial.setName("material name");
+        courseMaterial.setData(new byte[1]);
+        courseMaterial.setFileName("file name");
+        courseMaterial.setExtension("extension");
+        courseMaterial.setCreatedDate(LocalDateTime.now());
+        courseMaterial.setLastModifiedDate(LocalDateTime.now());
+        courseMaterial.setDeleted(false);
+        courseMaterial.setDeletedDate(null);
+        return courseMaterial;
+    }
+
+    public ReceiptHistory receiptHistory1(){
+        ReceiptHistory receiptHistory = new ReceiptHistory();
+        receiptHistory.setId(1L);
+        receiptHistory.setUser(user1());
+        receiptHistory.setImg(image1());
+        receiptHistory.setApproved(false);
+        receiptHistory.setBalance(BigDecimal.ONE);
+        receiptHistory.setCreatedDate(LocalDateTime.now());
+        receiptHistory.setLastModifiedDate(LocalDateTime.now());
+        receiptHistory.setDeleted(false);
+        receiptHistory.setDeletedDate(null);
+        return receiptHistory;
+    }
 
 }
 
