@@ -1,5 +1,8 @@
 package com.metuncc.mlm.datas;
 
+import com.metuncc.mlm.api.request.BookRequest;
+import com.metuncc.mlm.api.request.CreateRoomRequest;
+import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.dto.ImageDTO;
 import com.metuncc.mlm.dto.ShelfDTO;
@@ -10,6 +13,7 @@ import com.metuncc.mlm.entity.Shelf;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.entity.enums.BookStatus;
+import com.metuncc.mlm.entity.enums.Department;
 import com.metuncc.mlm.entity.enums.Role;
 
 import java.time.LocalDate;
@@ -74,5 +78,39 @@ public class DTOSHelper {
         book.setDeletedDate(null);
         return book.toDTO();
 
+    }
+
+    public UserRequest userRequest1(){
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername("bartu");
+        userRequest.setNameSurname("Bartu Can Palamut");
+        userRequest.setPass("VerySecurePassword");
+        userRequest.setEmail("e238622@metu.edu.tr");
+        userRequest.setStudentNumber("2386225");
+        userRequest.setDepartment(Department.CNG);
+        userRequest.setNameSurname("a a");
+        return userRequest;
+    }
+
+    public BookRequest getBookRequest1() {
+        BookRequest bookRequest = new BookRequest();
+        bookRequest.setName("name");
+        bookRequest.setIsbn("isbn");
+        bookRequest.setAuthor("author");
+        bookRequest.setCategory(BookCategory.FICTION);
+        bookRequest.setShelfId(1L);
+        bookRequest.setImageId(1L);
+        bookRequest.setBarcode("barcode");
+        bookRequest.setDescription("description");
+        bookRequest.setEdition("edition");
+        bookRequest.setPublisher("publisher");
+        return bookRequest;
+    }
+
+    public CreateRoomRequest getCreateRoomRequest1() {
+        CreateRoomRequest createRoomRequest = new CreateRoomRequest();
+        createRoomRequest.setName("1");
+        createRoomRequest.setImageId(1L);
+        return createRoomRequest;
     }
 }
