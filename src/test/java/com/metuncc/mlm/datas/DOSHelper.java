@@ -4,6 +4,7 @@ import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,8 +24,78 @@ public class DOSHelper {
         user.setLastModifiedDate(LocalDateTime.now());
         user.setDeleted(false);
         user.setDeletedDate(null);
+        user.setCopyCard(copyCard1());
         return user;
     }
+
+    public CopyCard copyCard1(){
+        CopyCard copyCard = new CopyCard();
+        copyCard.setId(1L);
+        copyCard.setOwner(user1());
+        copyCard.setBalance(BigDecimal.ZERO);
+        copyCard.setCreatedDate(LocalDateTime.now());
+        copyCard.setLastModifiedDate(LocalDateTime.now());
+        copyCard.setDeleted(false);
+        copyCard.setDeletedDate(null);
+        return copyCard;
+    }
+    public User user2(){
+        User user = new User();
+        user.setPassword("1234");
+        user.setRole(Role.USER);
+        user.setUsername("username2");
+        user.setEmail("a2@metu.edu.tr");
+        user.setFullName("full name2");
+        user.setId(2L);
+        user.setCreatedDate(LocalDateTime.now());
+        user.setLastModifiedDate(LocalDateTime.now());
+        user.setDeleted(false);
+        user.setDeletedDate(null);
+        user.setCopyCard(copyCard2());
+        return user;
+    }
+
+
+    public CopyCard copyCard2(){
+        CopyCard copyCard = new CopyCard();
+        copyCard.setId(1L);
+        copyCard.setOwner(user2());
+        copyCard.setBalance(BigDecimal.ZERO);
+        copyCard.setCreatedDate(LocalDateTime.now());
+        copyCard.setLastModifiedDate(LocalDateTime.now());
+        copyCard.setDeleted(false);
+        copyCard.setDeletedDate(null);
+        return copyCard;
+    }
+    public User librarian1(){
+        User user = new User();
+        user.setPassword("1234");
+        user.setRole(Role.LIB);
+        user.setUsername("username3");
+        user.setEmail("a3@metu.edu.tr");
+        user.setFullName("full name2");
+        user.setId(2L);
+        user.setCreatedDate(LocalDateTime.now());
+        user.setLastModifiedDate(LocalDateTime.now());
+        user.setDeleted(false);
+        user.setDeletedDate(null);
+        return user;
+    }
+    public User lecturer1(){
+        User user = new User();
+        user.setPassword("1234");
+        user.setRole(Role.LEC);
+        user.setUsername("username4");
+        user.setEmail("a3@metu.edu.tr");
+        user.setFullName("full name2");
+        user.setId(2L);
+        user.setCreatedDate(LocalDateTime.now());
+        user.setLastModifiedDate(LocalDateTime.now());
+        user.setDeleted(false);
+        user.setDeletedDate(null);
+        return user;
+    }
+
 
     public Shelf shelf1(){
         Shelf shelf = new Shelf();
@@ -127,6 +198,7 @@ public class DOSHelper {
         bookQueueRecord.setCompleteDate(null);
         bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
         bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory1());
+        bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory2());
         return bookQueueRecord;
     }
     public BookBorrowHistory bookBorrowHistory1(){
@@ -143,7 +215,20 @@ public class DOSHelper {
         bookBorrowHistory.setDeletedDate(null);
         return bookBorrowHistory;
     }
-
+    public BookBorrowHistory bookBorrowHistory2(){
+        BookBorrowHistory bookBorrowHistory = new BookBorrowHistory();
+        bookBorrowHistory.setId(1L);
+        bookBorrowHistory.setStatus(BorrowStatus.WAITING_TAKE);
+        bookBorrowHistory.setUserId(user2());
+        bookBorrowHistory.setBookQueueRecord(bookQueueRecord1());
+        bookBorrowHistory.setReturnDate(null);
+        bookBorrowHistory.setTakeDate(LocalDateTime.now());
+        bookBorrowHistory.setCreatedDate(LocalDateTime.now());
+        bookBorrowHistory.setLastModifiedDate(LocalDateTime.now());
+        bookBorrowHistory.setDeleted(false);
+        bookBorrowHistory.setDeletedDate(null);
+        return bookBorrowHistory;
+    }
 
 
 
