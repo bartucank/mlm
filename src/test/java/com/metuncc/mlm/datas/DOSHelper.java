@@ -31,7 +31,7 @@ public class DOSHelper {
     public CopyCard copyCard1(){
         CopyCard copyCard = new CopyCard();
         copyCard.setId(1L);
-        copyCard.setOwner(user1());
+//        copyCard.setOwner(user1());
         copyCard.setBalance(BigDecimal.ZERO);
         copyCard.setCreatedDate(LocalDateTime.now());
         copyCard.setLastModifiedDate(LocalDateTime.now());
@@ -59,7 +59,7 @@ public class DOSHelper {
     public CopyCard copyCard2(){
         CopyCard copyCard = new CopyCard();
         copyCard.setId(1L);
-        copyCard.setOwner(user2());
+//        copyCard.setOwner(user2());
         copyCard.setBalance(BigDecimal.ZERO);
         copyCard.setCreatedDate(LocalDateTime.now());
         copyCard.setLastModifiedDate(LocalDateTime.now());
@@ -252,7 +252,7 @@ public class DOSHelper {
         CourseStudent courseStudent = new CourseStudent();
         courseStudent.setId(1L);
         courseStudent.setStudentNumber("1234");
-        courseStudent.setCourse(course1());
+//        courseStudent.setCourse(course1());
         courseStudent.setStudent(user1());
         courseStudent.setCreatedDate(LocalDateTime.now());
         courseStudent.setLastModifiedDate(LocalDateTime.now());
@@ -264,7 +264,7 @@ public class DOSHelper {
     public CourseMaterial courseMaterial1(){
         CourseMaterial courseMaterial = new CourseMaterial();
         courseMaterial.setId(1L);
-        courseMaterial.setCourse(course1());
+//        courseMaterial.setCourse(course1());
         courseMaterial.setName("material name");
         courseMaterial.setData(new byte[1]);
         courseMaterial.setFileName("file name");
