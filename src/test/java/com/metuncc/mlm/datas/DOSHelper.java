@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class DOSHelper {
 
@@ -113,4 +114,69 @@ public class DOSHelper {
         reservation.setApproved(false);
         return reservation;
     }
+
+    public BookQueueRecord bookQueueRecord1(){
+        BookQueueRecord bookQueueRecord = new BookQueueRecord();
+        bookQueueRecord.setId(1L);
+        bookQueueRecord.setCreatedDate(LocalDateTime.now());
+        bookQueueRecord.setLastModifiedDate(LocalDateTime.now());
+        bookQueueRecord.setDeleted(false);
+        bookQueueRecord.setDeletedDate(null);
+        bookQueueRecord.setBookId(book1());
+        bookQueueRecord.setStatus(QueueStatus.ACTIVE);
+        bookQueueRecord.setCompleteDate(null);
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory1());
+        return bookQueueRecord;
+    }
+    public BookBorrowHistory bookBorrowHistory1(){
+        BookBorrowHistory bookBorrowHistory = new BookBorrowHistory();
+        bookBorrowHistory.setId(1L);
+        bookBorrowHistory.setStatus(BorrowStatus.WAITING_RETURN);
+        bookBorrowHistory.setUserId(user1());
+        bookBorrowHistory.setBookQueueRecord(bookQueueRecord1());
+        bookBorrowHistory.setReturnDate(null);
+        bookBorrowHistory.setTakeDate(LocalDateTime.now());
+        bookBorrowHistory.setCreatedDate(LocalDateTime.now());
+        bookBorrowHistory.setLastModifiedDate(LocalDateTime.now());
+        bookBorrowHistory.setDeleted(false);
+        bookBorrowHistory.setDeletedDate(null);
+        return bookBorrowHistory;
+    }
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
