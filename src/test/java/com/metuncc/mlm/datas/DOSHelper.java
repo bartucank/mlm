@@ -58,7 +58,7 @@ public class DOSHelper {
 
     public CopyCard copyCard2(){
         CopyCard copyCard = new CopyCard();
-        copyCard.setId(1L);
+        copyCard.setId(2L);
 //        copyCard.setOwner(user2());
         copyCard.setBalance(BigDecimal.ZERO);
         copyCard.setCreatedDate(LocalDateTime.now());
@@ -291,35 +291,3 @@ public class DOSHelper {
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

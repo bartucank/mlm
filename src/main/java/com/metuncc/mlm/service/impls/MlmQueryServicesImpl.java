@@ -57,7 +57,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 @AllArgsConstructor
 public class MlmQueryServicesImpl implements MlmQueryServices {
 
-    private final UserRepository userRepository;
+    private UserRepository userRepository;
     private ShelfRepository shelfRepository;
     private RoomRepository roomRepository;
     private ImageRepository imageRepository;
