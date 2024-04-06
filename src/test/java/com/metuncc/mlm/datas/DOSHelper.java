@@ -230,6 +230,21 @@ public class DOSHelper {
         return bookBorrowHistory;
     }
 
+    public Course course1(){
+        Course course = new Course();
+        course.setId(1L);
+        course.setName("course name");
+        course.setLecturer(user1());
+        course.setIsPublic(true);
+        course.setImageId(image1());
+        course.setCourseMaterialList(new ArrayList<>());
+        course.setCourseStudentList(new ArrayList<>());
+        course.setCreatedDate(LocalDateTime.now());
+        course.setLastModifiedDate(LocalDateTime.now());
+        course.setDeleted(false);
+        course.setDeletedDate(null);
+        return course;
+    }
 
 
 }
