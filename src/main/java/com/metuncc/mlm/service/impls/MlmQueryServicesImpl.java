@@ -721,8 +721,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public byte[] getCourseStudentExcelTemplate(){
         try{
-            CourseStudentExcelWriter courseStudentExcelWriter = CourseStudentExcelWriter.builder()
-                    .build();
+            CourseStudentExcelWriter courseStudentExcelWriter = new CourseStudentExcelWriter();
             return courseStudentExcelWriter.create();
         }catch (Exception e){
             throw new MLMException(ExceptionCode.UNEXPECTED_ERROR);
