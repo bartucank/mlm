@@ -43,7 +43,7 @@ jobs:
             cd /home/ubuntu/repo/mlm
             currentdate=$(date +"%d%m%Y-%H%M")
             originForGradleReport="/home/ubuntu/repo/mlm/build/reports/tests/test"
-            originForJacocoReport="/home/ubuntu/repo/mlm/build/reports/jacoco/test/html"
+            originForJacocoReport="/home/ubuntu/repo/mlm/build/reports/jacoco/test/html/"
             destination="/var/www/html/reports/$currentdate"
             destinationforJacoco="/var/www/html/reports/$currentdate/jacoco"
             mkdir "$destination/"
