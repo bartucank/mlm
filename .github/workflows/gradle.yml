@@ -47,6 +47,7 @@ jobs:
             cp -r "$originForJacocoReport" "$destination"
             systemctl restart nginx
       - name: Check Code Coverage
+        id: coverage_check
         uses: appleboy/ssh-action@v1.0.3
         if: ${{ failure() }}
         with:
@@ -57,6 +58,7 @@ jobs:
             cd /home/ubuntu/repo/mlm
             ./gradlew jacocoTestCoverageVerification
       - name: Start MLM Server
+        if: steps.coverage_check.outcome == 'success'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
