@@ -20,7 +20,7 @@ jobs:
             git pull
             chmod +x gradlew
             ./gradlew clean    
-            ./gradlew build
+            ./gradlew build -x test 
       - name: Run Tests
         uses: appleboy/ssh-action@v1.0.3
         with:
