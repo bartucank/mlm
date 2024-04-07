@@ -22,7 +22,16 @@ jar {
 java {
 	sourceCompatibility = '17'
 }
-
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.5
+			}
+		}
+	}
+}
+check.dependsOn jacocoTestCoverageVerification
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
