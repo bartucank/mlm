@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 
 @Data
-@Builder
 public class CourseStudentExcelWriter {
     private final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 

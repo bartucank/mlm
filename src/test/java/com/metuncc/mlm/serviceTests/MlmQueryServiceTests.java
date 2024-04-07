@@ -3,19 +3,24 @@ package com.metuncc.mlm.serviceTests;
 import com.metuncc.mlm.datas.DOSHelper;
 import com.metuncc.mlm.datas.DTOSHelper;
 import com.metuncc.mlm.dto.StatusDTO;
+import com.metuncc.mlm.entity.Course;
+import com.metuncc.mlm.entity.CourseMaterial;
 import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.Role;
+import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
 import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.impls.MlmQueryServicesImpl;
 import com.metuncc.mlm.utils.ImageUtil;
+import com.metuncc.mlm.utils.excel.CourseStudentExcelWriter;
 import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
@@ -29,6 +34,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -56,19 +62,30 @@ public class MlmQueryServiceTests {
     @Mock
     private  Authentication authentication;
     @Mock
-    private  SecurityContextHolder securityContextHolder;
+    private CourseStudentExcelWriter courseStudentExcelWriter;
 
-    @Mock
-    private static SecurityContext securityContext;
 
     @InjectMocks
     private MlmQueryServicesImpl service;
 
     @BeforeEach
-    public void initSecurityContext() {
+    public void init() {
         authentication = mock(Authentication.class);
         lenient().when(authentication.getPrincipal()).thenReturn(JwtUserDetails.create(dosHelper.user1()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    }
+    public void initSecurityForLecturer() {
+        SecurityContextHolder.clearContext();
+        lenient().when(authentication.getPrincipal()).thenReturn(JwtUserDetails.create(dosHelper.lecturer1()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+    }
+    public void initSecurityForLibrarian() {
+        SecurityContextHolder.clearContext();
+        lenient().when(authentication.getPrincipal()).thenReturn(JwtUserDetails.create(dosHelper.librarian1()));
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
     }
 
     @AfterEach
@@ -159,12 +176,24 @@ public class MlmQueryServiceTests {
         });
     }
 
-//    @DisplayName("getCourseMaterialbyId with valid id")
-//    @Test
-//    public void getCourseMaterialById_valid_case() {
-//        when(courseMaterialRepository.getById(any())).thenReturn(dosHelper.courseMaterial1());
-//        assertNotNull(service.getCourseMaterialById(1L));
-//    }
+    @DisplayName("getCourseMaterialbyId with valid id")
+    @Test
+    public void getCourseMaterialById_valid_case() throws IOException {
+
+        ClassPathResource resource = new ClassPathResource("image.jpg");
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "image.jpg",
+                "image/jpeg",
+                resource.getInputStream()
+        );
+
+
+        CourseMaterial courseMaterial= dosHelper.courseMaterial1();
+        courseMaterial.setData(ImageUtil.compressImage(multipartFile.getBytes()));
+        when(courseMaterialRepository.getById(any())).thenReturn(courseMaterial);
+        assertNotNull(service.getCourseMaterialById(1L));
+    }
 
     @DisplayName("getCourseMaterialById with id null")
     @Test
@@ -185,7 +214,6 @@ public class MlmQueryServiceTests {
 
     @DisplayName("getCoursesForLecturer")
     @Test
-    @WithMockUser(username = "username",  roles = "lec")
     public void getCoursesForLecturer() {
         when(courseRepository.getCoursesByLecturerId(any())).thenReturn(List.of(dosHelper.course1()));
         assertNotNull(service.getCoursesForLecturer());
@@ -193,7 +221,6 @@ public class MlmQueryServiceTests {
 
     @DisplayName("getCoursesForUser")
     @Test
-    @WithMockUser(username = "username", password = "password", roles = "user")
     public void getCoursesForUser() {
         when(courseRepository.getAllPublicCoursesAndRegisteredCourses(any())).thenReturn(List.of(dosHelper.course1()));
         assertNotNull(service.getCoursesForUser());
@@ -226,6 +253,14 @@ public class MlmQueryServiceTests {
     @DisplayName("getCourseById with valid id")
     @Test
     public void getCourseById_valid_case() {
+        when(courseRepository.getById(any())).thenReturn(dosHelper.course1());
+        assertNotNull(service.getCourseById(1L));
+    }
+
+    @DisplayName("getCourseById with valid case with lecturer")
+    @Test
+    public void getCourseById_valid_case2() {
+        initSecurityForLecturer();
         when(courseRepository.getById(any())).thenReturn(dosHelper.course1());
         assertNotNull(service.getCourseById(1L));
     }
