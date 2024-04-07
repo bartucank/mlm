@@ -49,6 +49,9 @@ jobs:
             cp -r "$originForGradleReport" "$destination"
             cp -r "$originForJacocoReport" "$destination"
             systemctl restart nginx
+      - name: Exit if there is/are failed test/s
+        if: steps.run_tests.outcome != 'success'
+        run: exit 1
       - name: Check Code Coverage
         id: coverage_check
         uses: appleboy/ssh-action@v1.0.3
