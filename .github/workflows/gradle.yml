@@ -22,7 +22,9 @@ jobs:
             ./gradlew clean    
             ./gradlew build -x test 
       - name: Run Tests
+        id: run_tests
         uses: appleboy/ssh-action@v1.0.3
+        continue-on-error: true
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -32,6 +34,7 @@ jobs:
             ./gradlew test
       - name: Publish Tests Report
         uses: appleboy/ssh-action@v1.0.3
+        if: always()
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -49,7 +52,7 @@ jobs:
       - name: Check Code Coverage
         id: coverage_check
         uses: appleboy/ssh-action@v1.0.3
-        if: ${{ failure() }}
+        if: ${{ steps.run_tests.outcome == 'success' }}
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
