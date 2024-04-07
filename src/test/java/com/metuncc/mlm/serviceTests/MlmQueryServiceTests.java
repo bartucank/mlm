@@ -188,7 +188,7 @@ public class MlmQueryServiceTests {
     @WithMockUser(username = "username",  roles = "lec")
     public void getCoursesForLecturer() {
         when(courseRepository.getCoursesByLecturerId(any())).thenReturn(List.of(dosHelper.course1()));
-        assertNull(service.getCoursesForLecturer());
+        assertNotNull(service.getCoursesForLecturer());
     }
 
     @DisplayName("getCoursesForUser")
