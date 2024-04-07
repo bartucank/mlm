@@ -57,6 +57,9 @@ jobs:
           script: |
             cd /home/ubuntu/repo/mlm
             ./gradlew jacocoTestCoverageVerification
+      - name: Exit if coverage is less than criteria
+        if: steps.coverage_check.outcome != 'success'
+        run: exit 1
       - name: Start MLM Server
         if: steps.coverage_check.outcome == 'success'
         uses: appleboy/ssh-action@v1.0.3
