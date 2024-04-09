@@ -52,6 +52,22 @@ public class User extends MLMBaseClass {
         return userDTO;
     }
 
+    public UserDTO toDTOwithoutCopyCard() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setDepartment(getDepartment());
+        userDTO.setDepartmentStr(getDepartment().toString());
+        userDTO.setStudentNumber(getStudentNumber());
+        userDTO.setEmail(getEmail());
+        userDTO.setId(getId());
+        userDTO.setRole(getRole());
+        userDTO.setRoleStr(getRole().toString());
+        userDTO.setUsername(getUsername());
+        userDTO.setFullName(getFullName());
+        userDTO.setVerified(getVerified());
+        userDTO.setDebt(getDebt());
+        return userDTO;
+    }
+
     public User fromRequest(UserRequest userRequest) {
         setUsername(userRequest.getUsername());
         setFullName(userRequest.getNameSurname());

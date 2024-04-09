@@ -5,6 +5,7 @@ import com.metuncc.mlm.entity.enums.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class DOSHelper {
         user.setUsername("username");
         user.setEmail("a@metu.edu.tr");
         user.setFullName("full name");
+        user.setDepartment(Department.CNG);
         user.setId(1L);
         user.setCreatedDate(LocalDateTime.now());
         user.setLastModifiedDate(LocalDateTime.now());
@@ -46,6 +48,7 @@ public class DOSHelper {
         user.setUsername("username2");
         user.setEmail("a2@metu.edu.tr");
         user.setFullName("full name2");
+        user.setDepartment(Department.CNG);
         user.setId(2L);
         user.setCreatedDate(LocalDateTime.now());
         user.setLastModifiedDate(LocalDateTime.now());
@@ -172,7 +175,7 @@ public class DOSHelper {
         return roomSlot;
     }
 
-    public RoomReservation reservation1(){
+    public RoomReservation roomReservation1(){
         RoomReservation reservation = new RoomReservation();
         reservation.setId(1L);
         reservation.setRoomSlot(roomSlot1());
@@ -201,12 +204,26 @@ public class DOSHelper {
         bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory2());
         return bookQueueRecord;
     }
+    public BookQueueRecord bookQueueRecord2(){
+        BookQueueRecord bookQueueRecord = new BookQueueRecord();
+        bookQueueRecord.setId(1L);
+        bookQueueRecord.setCreatedDate(LocalDateTime.now());
+        bookQueueRecord.setLastModifiedDate(LocalDateTime.now());
+        bookQueueRecord.setDeleted(false);
+        bookQueueRecord.setDeletedDate(null);
+        bookQueueRecord.setBookId(book1());
+        bookQueueRecord.setStatus(QueueStatus.ACTIVE);
+        bookQueueRecord.setCompleteDate(null);
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        bookQueueRecord.getBookBorrowHistoryList().add(bookBorrowHistory2());
+        return bookQueueRecord;
+    }
     public BookBorrowHistory bookBorrowHistory1(){
         BookBorrowHistory bookBorrowHistory = new BookBorrowHistory();
         bookBorrowHistory.setId(1L);
         bookBorrowHistory.setStatus(BorrowStatus.WAITING_RETURN);
         bookBorrowHistory.setUserId(user1());
-        bookBorrowHistory.setBookQueueRecord(bookQueueRecord1());
+//        bookBorrowHistory.setBookQueueRecord(bookQueueRecord1());
         bookBorrowHistory.setReturnDate(null);
         bookBorrowHistory.setTakeDate(LocalDateTime.now());
         bookBorrowHistory.setCreatedDate(LocalDateTime.now());
@@ -220,7 +237,7 @@ public class DOSHelper {
         bookBorrowHistory.setId(1L);
         bookBorrowHistory.setStatus(BorrowStatus.WAITING_TAKE);
         bookBorrowHistory.setUserId(user2());
-        bookBorrowHistory.setBookQueueRecord(bookQueueRecord1());
+//        bookBorrowHistory.setBookQueueRecord(bookQueueRecord1());
         bookBorrowHistory.setReturnDate(null);
         bookBorrowHistory.setTakeDate(LocalDateTime.now());
         bookBorrowHistory.setCreatedDate(LocalDateTime.now());
@@ -288,6 +305,51 @@ public class DOSHelper {
         receiptHistory.setDeleted(false);
         receiptHistory.setDeletedDate(null);
         return receiptHistory;
+    }
+
+    public BookReview bookReview1(){
+        BookReview bookReview = new BookReview();
+        bookReview.setId(1L);
+        bookReview.setBookId(book1());
+        bookReview.setUserId(user1());
+        bookReview.setStar(5L);
+        bookReview.setComment("comment");
+        bookReview.setCreatedDate(LocalDateTime.now());
+        bookReview.setLastModifiedDate(LocalDateTime.now());
+        bookReview.setDeleted(false);
+        bookReview.setDeletedDate(null);
+        return bookReview;
+    }
+
+    public Statistics statistics1(){
+        Statistics statistics = new Statistics();
+        statistics.setId(1L);
+        statistics.setTotalUserCount(1);
+        statistics.setTotalBookCount(1);
+        statistics.setAvailableBookCount(1);
+        statistics.setUnavailableBookCount(1);
+        statistics.setSumOfBalance(BigDecimal.ONE);
+        statistics.setSumOfDebt(BigDecimal.ONE);
+        statistics.setQueueCount(1);
+        statistics.setDay(DayOfWeek.MONDAY);
+        statistics.setCreatedDate(LocalDateTime.now());
+        statistics.setLastModifiedDate(LocalDateTime.now());
+        statistics.setDeleted(false);
+        statistics.setDeletedDate(null);
+        return statistics;
+    }
+
+    public BookQueueHoldHistoryRecord bookQueueHoldHistoryRecord1(){
+        BookQueueHoldHistoryRecord bookQueueHoldHistoryRecord = new BookQueueHoldHistoryRecord();
+        bookQueueHoldHistoryRecord.setId(1L);
+        bookQueueHoldHistoryRecord.setUserId(1L);
+        bookQueueHoldHistoryRecord.setEndDate(LocalDateTime.now().minusDays(1L));
+        bookQueueHoldHistoryRecord.setBookQueueRecord(bookQueueRecord1());
+        bookQueueHoldHistoryRecord.setCreatedDate(LocalDateTime.now());
+        bookQueueHoldHistoryRecord.setLastModifiedDate(LocalDateTime.now());
+        bookQueueHoldHistoryRecord.setDeleted(false);
+        bookQueueHoldHistoryRecord.setDeletedDate(null);
+        return bookQueueHoldHistoryRecord;
     }
 
 }

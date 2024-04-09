@@ -324,8 +324,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 googleResponse = objectMapper.readValue(googleBody, GoogleResponse.class);
                 try{
                     for (Item item : googleResponse.getItems()) {
-                        String url = Objects.nonNull(item.getVolumeInfo().getImageLinks().getThumbnail())?item.getVolumeInfo().getImageLinks().getThumbnail():
-                                Objects.nonNull(item.getVolumeInfo().getImageLinks().getSmallThumbnail())?item.getVolumeInfo().getImageLinks().getSmallThumbnail():null;
+                        String url = Objects.nonNull(item.getVolumeInfo().getImageLinks().getThumbnail())?item.getVolumeInfo().getImageLinks().getThumbnail(): Objects.nonNull(item.getVolumeInfo().getImageLinks().getSmallThumbnail())?item.getVolumeInfo().getImageLinks().getSmallThumbnail():null;
                         if(Objects.isNull(url)){
                             break;
                         }
@@ -419,7 +418,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         }
         if(Objects.isNull(request.getPage()) ||Objects.isNull(request.getSize())){
             request.setPage(0);
-            request.setPage(10);
+            request.setSize(10);
         }
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<ReceiptHistory> receiptPage = receiptHistoryRepository.getByStatus(request.getIsApproved(), pageable);
@@ -578,7 +577,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         Boolean waitToReturnFlag = false;
         for (BookBorrowHistory bookBorrowHistory : bookBorrowHistoryList) {
             QueueMembersDTO dto = new QueueMembersDTO();
-            dto.setUserDTO(bookBorrowHistory.getUserId().toDTO());
+            dto.setUserDTO(bookBorrowHistory.getUserId().toDTOwithoutCopyCard());
             dto.setEnterDate(bookBorrowHistory.getCreatedDate().format(formatter));
             dto.setTakeDate(Objects.nonNull(bookBorrowHistory.getTakeDate())?bookBorrowHistory.getTakeDate().format(formatter):"--");
             dto.setReturnDate(Objects.nonNull(bookBorrowHistory.getReturnDate())?bookBorrowHistory.getReturnDate().format(formatter):"--");
