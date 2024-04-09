@@ -29,4 +29,9 @@ public abstract class MLMBaseClass {
     @Column(name = "last_modified_date")
     private LocalDateTime lastModifiedDate;
 
+    @Override
+    public String toString(){
+        return null;
+    }
+
 }

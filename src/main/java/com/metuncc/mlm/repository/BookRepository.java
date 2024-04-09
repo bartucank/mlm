@@ -27,4 +27,7 @@ public interface BookRepository extends JpaRepository<Book,Long>, JpaSpecificati
     @Query("select count(b) from Book b where b.status=:status")
     Integer bookCountByAvailability(@Param("status") BookStatus status);
 
+    @Query("select b from Book b where b.status=:status")
+    List<Book> getByStatus(@Param("status")BookStatus status);
+
 }
