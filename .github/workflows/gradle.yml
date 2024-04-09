@@ -3,7 +3,6 @@ name: Build & Test & Report & Deploy
 on:
   push:
     branches: [ "main" ]
-    
 
 jobs:
   build:
@@ -21,10 +20,14 @@ jobs:
             chmod +x gradlew
             ./gradlew clean    
             ./gradlew build -x test 
+
+  run_tests:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    needs: build
+    steps:
       - name: Run Tests
-        id: run_tests
         uses: appleboy/ssh-action@v1.0.3
-        continue-on-error: true
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -32,9 +35,18 @@ jobs:
           script: |
             cd /home/ubuntu/repo/mlm
             ./gradlew test
+
+      - name: Exit if there is/are failed test/s
+        if: ${{ failure() }}
+        run: exit 1
+
+  publish_reports:
+    runs-on: ubuntu-latest
+    needs: run_tests
+    if: always()
+    steps:
       - name: Publish Tests Report
         uses: appleboy/ssh-action@v1.0.3
-        if: always()
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -49,15 +61,16 @@ jobs:
             mkdir "$destination/"
             mkdir "$destinationforJacoco/"
             cp -r "$originForGradleReport" "$destination"
-            cp -r "$originForJacocoReport" "$destinationforJacoco"
+            cp -r "$originForJacocoReport"* "$destinationforJacoco"
             systemctl restart nginx
-      - name: Exit if there is/are failed test/s
-        if: steps.run_tests.outcome != 'success'
-        run: exit 1
+
+  check_coverage:
+    runs-on: ubuntu-latest
+    needs: run_tests
+    if: ${{ needs.run_tests.result == 'success' }}
+    steps:
       - name: Check Code Coverage
-        id: coverage_check
         uses: appleboy/ssh-action@v1.0.3
-        if: ${{ steps.run_tests.outcome == 'success' }}
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -65,11 +78,17 @@ jobs:
           script: |
             cd /home/ubuntu/repo/mlm
             ./gradlew jacocoTestCoverageVerification
+
       - name: Exit if coverage is less than criteria
-        if: steps.coverage_check.outcome != 'success'
+        if: ${{ failure() }}
         run: exit 1
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: check_coverage
+    if: ${{ needs.check_coverage.result == 'success' }}
+    steps:
       - name: Start MLM Server
-        if: steps.coverage_check.outcome == 'success'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
@@ -84,4 +103,4 @@ jobs:
             mv mlm-1.3.0.jar app.jar
             systemctl stop app
             systemctl daemon-reload
-            systemctl start app    
+            systemctl start app
