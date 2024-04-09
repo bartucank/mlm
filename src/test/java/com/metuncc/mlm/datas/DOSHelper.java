@@ -352,4 +352,28 @@ public class DOSHelper {
         return bookQueueHoldHistoryRecord;
     }
 
+
+    public Image imageForIntegrationTest(){
+        Image image = new Image();
+        image.setImageData(new byte[1]);
+        image.setName("name");
+        image.setType("type");
+        image.setId(null);
+        image.setCreatedDate(LocalDateTime.now());
+        image.setLastModifiedDate(LocalDateTime.now());
+        image.setDeleted(false);
+        image.setDeletedDate(null);
+        return image;
+    }
+    public Shelf shelfForIntegrationTest(){
+        Shelf shelf = new Shelf();
+        shelf.setFloor("1");
+        shelf.setId(1L);
+        shelf.setCreatedDate(LocalDateTime.now());
+        shelf.setLastModifiedDate(LocalDateTime.now());
+        shelf.setDeleted(false);
+        shelf.setDeletedDate(null);
+        return shelf;
+    }
+
 }

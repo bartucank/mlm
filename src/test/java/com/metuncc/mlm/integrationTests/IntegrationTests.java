@@ -15,9 +15,7 @@ import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.datas.DOSHelper;
 import com.metuncc.mlm.datas.DTOSHelper;
 import com.metuncc.mlm.entity.*;
-import com.metuncc.mlm.entity.enums.BookStatus;
-import com.metuncc.mlm.entity.enums.Department;
-import com.metuncc.mlm.entity.enums.VerificationType;
+import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.ExceptionHandler;
 import com.metuncc.mlm.exception.MLMException;
@@ -47,8 +45,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -57,13 +57,18 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.util.NestedServletException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 
+import javax.transaction.Transactional;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -72,8 +77,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.properties")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
+@Transactional
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisplayName("Integration Tests")
 public class IntegrationTests {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -108,36 +114,72 @@ public class IntegrationTests {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private BookQueueRecordRepository bookQueueRecordRepository;
+
+    @Autowired
+    private BookBorrowHistoryRepository bookBorrowHistoryRepository;
+    @Autowired
+    private RoomSlotRepository roomSlotRepository;
+    @Autowired
+    private RoomReservationRepository roomReservationRepository;
+
+
     @BeforeAll
     public void before() {
-        Mockito.doNothing().when(mailUtil).sendCustomEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),Mockito.anyString());
-        shelfRepository.save(dosHelper.shelf1());
-        Image image = dosHelper.image1();
-        image.setId(null);
-        image = imageRepository.save(image);
+        doNothing().when(mailUtil).sendCustomEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(),Mockito.anyString());
+        //Shelf;
+        Shelf shelf = shelfRepository.save(dosHelper.shelfForIntegrationTest());
+        //Image
+        Image image = imageRepository.save(dosHelper.imageForIntegrationTest());
+        //User 1;
         User user = dosHelper.user1();
         user.setId(null);
         user.getCopyCard().setId(null);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setVerified(true);
         userRepository.save(user);
+        //User 2;
         User user2 = dosHelper.user2();
         user2.setId(null);
         user2.getCopyCard().setId(null);
         user2.setVerified(true);
         user2.setPassword(passwordEncoder.encode(user2.getPassword()));
         userRepository.save(user2);
+        //User 3;
         User lecturer = dosHelper.lecturer1();
         lecturer.setVerified(true);
         lecturer.setId(null);
         lecturer.setPassword(passwordEncoder.encode(lecturer.getPassword()));
         userRepository.save(lecturer);
 
+        //Room 1;
         Room room = dosHelper.room1();
         room.setId(null);
         room.setQrImage(image);
         room.setImageId(image);
-        roomRepository.save(room);
+        room.setRoomSlotList(new ArrayList<>());
+
+        RoomSlotDays tomorrowEnum = RoomSlotDays.fromValue(LocalDateTime.now().plusDays(1L).getDayOfWeek().getValue());
+        for (int i = Integer.valueOf("08"); i <= Integer.valueOf("23"); i++) {
+            LocalTime localTimeStart = LocalTime.of(i, 0, 0, 0);
+            LocalTime localTimeEnd = LocalTime.of(i, 59, 0, 0);
+            RoomSlot roomSlot = new RoomSlot();
+            roomSlot.setStartHour(localTimeStart);
+            roomSlot.setEndHour(localTimeEnd);
+            roomSlot.setDay(tomorrowEnum);
+            roomSlot.setRoom(room);
+            roomSlot.setAvailable(true);
+            room.getRoomSlotList().add(roomSlot);
+        }
+        room = roomRepository.save(room);
+        //Book 1;
+        Book book = dosHelper.book1();
+        book.setShelfId(shelf);
+        book.setImageId(image);
+        book.setId(null);
+        bookRepository.save(book);
+
 
     }
     public <T> String mapToJson(T obj) throws JsonProcessingException {
@@ -218,6 +260,7 @@ public class IntegrationTests {
     @Test
     @Order(3)
     public void testCreateBook() throws Exception {
+        Long count = bookRepository.count();
         BookRequest bookRequest = dtosHelper.getBookRequest1();
         bookRequest.setShelfId(shelfRepository.findAll().get(0).getId());
         bookRequest.setImageId(imageRepository.findAll().get(0).getId());
@@ -230,37 +273,42 @@ public class IntegrationTests {
         String content = result.getResponse().getContentAsString();
         LinkedHashMap response = (LinkedHashMap) getFromJson(content);
         assertEquals("S",response.get("statusCode"));
+        assertNotEquals(count,bookRepository.count());
     }
 
-    @DisplayName("Update book with valid informations.")
+    @DisplayName("Creating book with invalid informations.")
     @Test
     @Order(4)
-    public void testUpdateBook() throws Exception {
+    public void testCreateBookInvalid() throws Exception {
+        Long count = bookRepository.count();
         BookRequest bookRequest = dtosHelper.getBookRequest1();
-        bookRequest.setId(bookRepository.findAll().get(0).getId());
-        bookRequest.setShelfId(shelfRepository.findAll().get(0).getId());
-        bookRequest.setImageId(imageRepository.findAll().get(0).getId());
+        bookRequest.setName(null);
+        bookRequest.setIsbn(null);
+        bookRequest.setShelfId(null);
+        bookRequest.setImageId(null);
         String userJson = mapToJson(bookRequest);
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.put("/api/admin/book/update")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(userJson))
-                .andReturn();
-        assertEquals(200, result.getResponse().getStatus());
-        String content = result.getResponse().getContentAsString();
-        LinkedHashMap response = (LinkedHashMap) getFromJson(content);
-        assertEquals("S",response.get("statusCode"));
+
+        assertThatThrownBy(() -> {
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/create")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(userJson));
+        }).isExactlyInstanceOf(NestedServletException.class)
+                .hasCauseExactlyInstanceOf(MLMException.class);
+
+        assertEquals(count,bookRepository.count());
     }
 
 
-    @DisplayName("Borrow an available book to a user.")
+
+    @DisplayName("Trying to borrow a book to a user.")
     @Test
     @Order(5)
     public void testBorrowBook() throws Exception {
-        Book book = bookRepository.findAll().get(0);
-        assertEquals(BookStatus.AVAILABLE,book.getStatus());
+        Book before = bookRepository.findAll().get(0);
+        assertEquals(BookStatus.AVAILABLE,before.getStatus());
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/borrow")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("bookId",bookRepository.findAll().get(0).getId().toString())
+                        .param("bookId",before.getId().toString())
                         .param("userId",userRepository.findAll().get(0).getId().toString())
                 )
 
@@ -269,15 +317,55 @@ public class IntegrationTests {
         String content = result.getResponse().getContentAsString();
         LinkedHashMap response = (LinkedHashMap) getFromJson(content);
         assertEquals("S",response.get("statusCode"));
-        book = bookRepository.findAll().get(0);
-        assertEquals(BookStatus.NOT_AVAILABLE,book.getStatus());
+        Book after   = bookRepository.getById(before.getId());
+        assertEquals(BookStatus.NOT_AVAILABLE,after.getStatus());
+    }
+    @DisplayName("Trying to borrow a book that not available and user is not in the queue")
+    @Test
+    @Order(6)
+    public void testBorrowBookInvalid() throws Exception {
+        User userForBorrow = userRepository.findAll().get(0);
+        User userForError = userRepository.findAll().get(1);
+        Book before = bookRepository.findAll().get(0);
+        assertEquals(BookStatus.AVAILABLE,before.getStatus());
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/borrow")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("bookId",before.getId().toString())
+                .param("userId",userForBorrow.getId().toString())
+        ).andReturn();
+        before = bookRepository.getByStatus(BookStatus.NOT_AVAILABLE).get(0);
+        assertEquals(BookStatus.NOT_AVAILABLE,before.getStatus());
+
+        Book finalBefore = before;
+        assertThatThrownBy(() -> {
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/borrow")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("bookId", finalBefore.getId().toString())
+                    .param("userId",userForError.getId().toString()));
+        }).isExactlyInstanceOf(NestedServletException.class)
+                .hasCauseExactlyInstanceOf(MLMException.class);
+        BookQueueRecord bookQueueRecord = bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(before, QueueStatus.ACTIVE);
+        assertEquals(1,bookQueueRecord.getBookBorrowHistoryList().size());
+        assertEquals(userForBorrow.getId(),bookQueueRecord.getBookBorrowHistoryList().get(0).getUserId().getId());
     }
     @DisplayName("Enter queue for borrowed book.")
     @Test
-    @Order(6)
+    @Order(7)
     public void testEnqueue() throws Exception {
-        Book book = bookRepository.findAll().get(0);
-        assertEquals(BookStatus.NOT_AVAILABLE,book.getStatus());
+
+        User userForBorrow = userRepository.findAll().get(0);
+        User userForEnqueue = userRepository.findAll().get(1);
+        Book before = bookRepository.findAll().get(0);
+        assertEquals(BookStatus.AVAILABLE,before.getStatus());
+        MvcResult borrow = mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/borrow")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("bookId",before.getId().toString())
+                .param("userId",userForBorrow.getId().toString())
+        ).andReturn();
+        before = bookRepository.getByStatus(BookStatus.NOT_AVAILABLE).get(0);
+        assertEquals(BookStatus.NOT_AVAILABLE,before.getStatus());
+
+
         String token = loginWithUser(dosHelper.user2());
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/enqueue")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -289,20 +377,34 @@ public class IntegrationTests {
         String content = result.getResponse().getContentAsString();
         LinkedHashMap response = (LinkedHashMap) getFromJson(content);
         assertEquals("S",response.get("statusCode"));
-        book = bookRepository.findAll().get(0);
-        assertEquals(BookStatus.NOT_AVAILABLE,book.getStatus());
+        before = bookRepository.findAll().get(0);
+        assertEquals(BookStatus.NOT_AVAILABLE,before.getStatus());
+        BookQueueRecord bookQueueRecord = bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(before, QueueStatus.ACTIVE);
+        assertEquals(2,bookQueueRecord.getBookBorrowHistoryList().size());
+        assertEquals(userForEnqueue.getId(),bookQueueRecord.getBookBorrowHistoryList().get(1).getUserId().getId());
+
     }
-    @DisplayName("Take back a book from a user.")
+    @DisplayName("Trying to take back a book from the user.")
     @Test
-    @Order(7)
+    @Order(8)
     public void testTakeBackBook() throws Exception {
-        assertEquals(new ArrayList<>(), bookQueueHoldHistoryRecordRepository.findAll());
-        Book book = bookRepository.findAll().get(0);
-        assertEquals(BookStatus.NOT_AVAILABLE,book.getStatus());
+        User userForBorrow = userRepository.findAll().get(0);
+        Book before = bookRepository.findAll().get(0);
+        assertEquals(BookStatus.AVAILABLE,before.getStatus());
+        MvcResult borrow = mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/borrow")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("bookId",before.getId().toString())
+                .param("userId",userForBorrow.getId().toString())
+        ).andReturn();
+        before = bookRepository.getByStatus(BookStatus.NOT_AVAILABLE).get(0);
+        assertEquals(BookStatus.NOT_AVAILABLE,before.getStatus());
+
+
+
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/book/takeBackBook")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .param("bookId",book.getId().toString())
-                        .param("userId",userRepository.findAll().get(0).getId().toString())
+                        .param("bookId",before.getId().toString())
+                        .param("userId",userForBorrow.getId().toString())
                 )
 
                 .andReturn();
@@ -310,41 +412,79 @@ public class IntegrationTests {
         String content = result.getResponse().getContentAsString();
         LinkedHashMap response = (LinkedHashMap) getFromJson(content);
         assertEquals("S",response.get("statusCode"));
-        book = bookRepository.findAll().get(0);
-        assertEquals(BookStatus.NOT_AVAILABLE,book.getStatus());
+        before = bookRepository.getById(before.getId());
+        assertEquals(BookStatus.AVAILABLE,before.getStatus());
         assertNotNull(bookQueueHoldHistoryRecordRepository.findAll());
     }
 
-    @DisplayName("Create room with valid informations.")
-    @Test
-    @Order(8)
-    public void testCreateRoom() throws Exception {
-        CreateRoomRequest request = dtosHelper.getCreateRoomRequest1();
-        request.setImageId(imageRepository.findAll().get(0).getId());
-        String json = mapToJson(request);
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/admin/createRoom")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(json))
-                .andReturn();
-        assertEquals(200, result.getResponse().getStatus());
-        String content = result.getResponse().getContentAsString();
-        LinkedHashMap response = (LinkedHashMap) getFromJson(content);
-        assertEquals("S",response.get("statusCode"));
-    }
-    @DisplayName("Delete a room")
+    @DisplayName("Trying to make a reservation for a room slot.")
     @Test
     @Order(9)
-    public void testDeleteRoom() throws Exception {
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.delete("/api/admin/deleteRoom")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .param("roomId",roomRepository.findAll().get(0).getId().toString())
-                )
+    public void tryingToReservation() throws Exception {
+        Room room = roomRepository.findAll().get(0);
+        assertEquals(0,roomReservationRepository.count());
+        assertNotEquals(0,room.getRoomSlotList().size());
+        User user = userRepository.findAll().get(0);
+        String token = loginWithUser(dosHelper.user1());
+        RoomSlot roomSlot = room.getRoomSlotList().get(0);
 
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/makeReservation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("roomSlotId",roomSlot.getId().toString())
+                        .header("Authorization", "Bearer " + token)
+                )
                 .andReturn();
-        assertEquals(200, result.getResponse().getStatus());
-        String content = result.getResponse().getContentAsString();
-        LinkedHashMap response = (LinkedHashMap) getFromJson(content);
-        assertEquals("S",response.get("statusCode"));
+        room = roomRepository.getById(room.getId());
+        for (RoomSlot slot : room.getRoomSlotList()) {
+            if(slot.getId().equals(roomSlot.getId())){
+                roomSlot = slot;
+                break;
+            }
+        }
+        assertEquals(false,roomSlot.getAvailable());
+        assertEquals(1,roomReservationRepository.count());
+        assertEquals(user.getId(),roomReservationRepository.findAll().get(0).getUserId());
+    }
+    @DisplayName("Trying to make a reservation for a room slot but s/he has already two reservation.")
+    @Test
+    @Order(10)
+    public void tryingToReservationInvalid() throws Exception {
+        Room room = roomRepository.findAll().get(0);
+        User user = userRepository.findAll().get(0);
+        String token = loginWithUser(dosHelper.user1());
+        List<RoomSlot> slots = roomSlotRepository.getRoomSlotsByRoomId(room.getId());
+        RoomSlot roomSlot = slots.get(0);
+        RoomSlot roomSlot1 = slots.get(1);
+        RoomSlot roomSlot2 = slots.get(2);
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/makeReservation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("roomSlotId",roomSlot.getId().toString())
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andReturn();
+        MvcResult result2 = mockMvc.perform(MockMvcRequestBuilders.post("/api/user/makeReservation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .param("roomSlotId",roomSlot1.getId().toString())
+                        .header("Authorization", "Bearer " + token)
+                )
+                .andReturn();
+
+        RoomSlot finalRoomSlot = roomSlot2;
+        assertThatThrownBy(() -> {
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/user/makeReservation")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .param("roomSlotId", finalRoomSlot.getId().toString())
+                    .header("Authorization", "Bearer " + token)
+            );
+        }).isExactlyInstanceOf(NestedServletException.class)
+                .hasCauseExactlyInstanceOf(MLMException.class);
+        assertEquals(2,roomReservationRepository.count());
+        roomSlot2 = roomSlotRepository.getById(roomSlot2.getId());
+        assertEquals(true,roomSlot2.getAvailable());
+
+
+
     }
 
 
