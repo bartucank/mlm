@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.metuncc.mlm.api.controller.AuthController;
+import com.metuncc.mlm.api.controller.MLMAdminController;
+import com.metuncc.mlm.api.controller.MLMController;
 import com.metuncc.mlm.api.request.BookRequest;
 import com.metuncc.mlm.api.request.CreateRoomRequest;
 import com.metuncc.mlm.api.request.UserRequest;
@@ -16,15 +19,20 @@ import com.metuncc.mlm.entity.enums.BookStatus;
 import com.metuncc.mlm.entity.enums.Department;
 import com.metuncc.mlm.entity.enums.VerificationType;
 import com.metuncc.mlm.exception.ExceptionCode;
+import com.metuncc.mlm.exception.ExceptionHandler;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
 import com.metuncc.mlm.security.JwtTokenProvider;
 import com.metuncc.mlm.utils.MailUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.hamcrest.CoreMatchers;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +52,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.util.NestedServletException;
 import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.UnsupportedEncodingException;
@@ -51,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -167,7 +179,7 @@ public class IntegrationTests {
         String token = (String) loginResponse.get("jwt");
         return token;
     }
-    @DisplayName("Creating valid user with metumail.")
+    @DisplayName("Trying to register with metu mail.")
     @Test
     @Order(1)
     public void testCreateUser() throws Exception {
@@ -182,11 +194,29 @@ public class IntegrationTests {
         assertEquals(true,response.get("needVerify"));
         assertNotNull(response.get("jwt"));
     }
+    @DisplayName("Trying to register with mail that is not metu mail.")
+    @Test
+    @Order(2)
+    public void testCreateUserInvalid() throws Exception {
+        UserRequest userRequest = dtosHelper.userRequest1();
+        userRequest.setUsername("notmetuian");
+        userRequest.setEmail("notmetuian@gmail.com");
+        userRequest.setStudentNumber("1");
+        String userJson = mapToJson(userRequest);
+        assertThatThrownBy(() -> {
+            mockMvc.perform(MockMvcRequestBuilders.post("/api/auth/register")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(userJson));
+        }).isExactlyInstanceOf(NestedServletException.class)
+                .hasCauseExactlyInstanceOf(MLMException.class)
+                .hasMessageContaining("Only metuians can register this application.");
+
+    }
 
 
     @DisplayName("Creating book with valid informations.")
     @Test
-    @Order(2)
+    @Order(3)
     public void testCreateBook() throws Exception {
         BookRequest bookRequest = dtosHelper.getBookRequest1();
         bookRequest.setShelfId(shelfRepository.findAll().get(0).getId());
@@ -204,7 +234,7 @@ public class IntegrationTests {
 
     @DisplayName("Update book with valid informations.")
     @Test
-    @Order(3)
+    @Order(4)
     public void testUpdateBook() throws Exception {
         BookRequest bookRequest = dtosHelper.getBookRequest1();
         bookRequest.setId(bookRepository.findAll().get(0).getId());
@@ -224,7 +254,7 @@ public class IntegrationTests {
 
     @DisplayName("Borrow an available book to a user.")
     @Test
-    @Order(4)
+    @Order(5)
     public void testBorrowBook() throws Exception {
         Book book = bookRepository.findAll().get(0);
         assertEquals(BookStatus.AVAILABLE,book.getStatus());
@@ -244,7 +274,7 @@ public class IntegrationTests {
     }
     @DisplayName("Enter queue for borrowed book.")
     @Test
-    @Order(5)
+    @Order(6)
     public void testEnqueue() throws Exception {
         Book book = bookRepository.findAll().get(0);
         assertEquals(BookStatus.NOT_AVAILABLE,book.getStatus());
@@ -264,7 +294,7 @@ public class IntegrationTests {
     }
     @DisplayName("Take back a book from a user.")
     @Test
-    @Order(6)
+    @Order(7)
     public void testTakeBackBook() throws Exception {
         assertEquals(new ArrayList<>(), bookQueueHoldHistoryRecordRepository.findAll());
         Book book = bookRepository.findAll().get(0);
@@ -287,7 +317,7 @@ public class IntegrationTests {
 
     @DisplayName("Create room with valid informations.")
     @Test
-    @Order(7)
+    @Order(8)
     public void testCreateRoom() throws Exception {
         CreateRoomRequest request = dtosHelper.getCreateRoomRequest1();
         request.setImageId(imageRepository.findAll().get(0).getId());
@@ -303,7 +333,7 @@ public class IntegrationTests {
     }
     @DisplayName("Delete a room")
     @Test
-    @Order(7)
+    @Order(9)
     public void testDeleteRoom() throws Exception {
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.delete("/api/admin/deleteRoom")
                         .contentType(MediaType.APPLICATION_JSON)

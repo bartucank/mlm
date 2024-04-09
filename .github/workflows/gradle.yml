@@ -20,9 +20,11 @@ jobs:
             git pull
             chmod +x gradlew
             ./gradlew clean    
-            ./gradlew build
+            ./gradlew build -x test 
       - name: Run Tests
+        id: run_tests
         uses: appleboy/ssh-action@v1.0.3
+        continue-on-error: true
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -32,6 +34,7 @@ jobs:
             ./gradlew test
       - name: Publish Tests Report
         uses: appleboy/ssh-action@v1.0.3
+        if: always()
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -40,15 +43,21 @@ jobs:
             cd /home/ubuntu/repo/mlm
             currentdate=$(date +"%d%m%Y-%H%M")
             originForGradleReport="/home/ubuntu/repo/mlm/build/reports/tests/test"
-            originForJacocoReport="/home/ubuntu/repo/mlm/build/reports/jacoco"
+            originForJacocoReport="/home/ubuntu/repo/mlm/build/reports/jacoco/test/html/"
             destination="/var/www/html/reports/$currentdate"
+            destinationforJacoco="/var/www/html/reports/$currentdate/jacoco"
             mkdir "$destination/"
+            mkdir "$destinationforJacoco/"
             cp -r "$originForGradleReport" "$destination"
-            cp -r "$originForJacocoReport" "$destination"
+            cp -r "$originForJacocoReport" "$destinationforJacoco"
             systemctl restart nginx
+      - name: Exit if there is/are failed test/s
+        if: steps.run_tests.outcome != 'success'
+        run: exit 1
       - name: Check Code Coverage
+        id: coverage_check
         uses: appleboy/ssh-action@v1.0.3
-        if: ${{ failure() }}
+        if: ${{ steps.run_tests.outcome == 'success' }}
         with:
           host: ${{secrets.ADDRESS}}
           username: ${{secrets.USERNAME}}
@@ -56,7 +65,11 @@ jobs:
           script: |
             cd /home/ubuntu/repo/mlm
             ./gradlew jacocoTestCoverageVerification
+      - name: Exit if coverage is less than criteria
+        if: steps.coverage_check.outcome != 'success'
+        run: exit 1
       - name: Start MLM Server
+        if: steps.coverage_check.outcome == 'success'
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
