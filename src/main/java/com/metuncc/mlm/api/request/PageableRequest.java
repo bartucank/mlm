@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @Data
 public class PageableRequest {
 
-    private int page;
-    private int size;
+    private Integer page;
+    private Integer size;
 
 }
