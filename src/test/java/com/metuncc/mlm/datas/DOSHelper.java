@@ -376,4 +376,15 @@ public class DOSHelper {
         return shelf;
     }
 
+    public VerificationCode verificationCode1() {
+        VerificationCode verificationCode = new VerificationCode();
+        verificationCode.setId(1L);
+        verificationCode.setUser(user1());
+        verificationCode.setCode("1234");
+        verificationCode.setCreatedDate(LocalDateTime.now());
+        verificationCode.setLastModifiedDate(LocalDateTime.now());
+        verificationCode.setDeleted(false);
+        verificationCode.setDeletedDate(null);
+        return verificationCode;
+    }
 }

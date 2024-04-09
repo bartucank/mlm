@@ -240,6 +240,7 @@ public class MlmServicesImpl implements MlmServices {
         return StatusDTO.builder().statusCode("S").msg(img.getId().toString()).build();
     }
 
+    @Override
     public Image uploadImageReturnImage(MultipartFile file) throws IOException {
 
         Image img = new Image();
