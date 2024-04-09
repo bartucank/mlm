@@ -27,7 +27,11 @@ public class CopyCard extends MLMBaseClass {
         dto.setBalance(getBalance());
         dto.setNfcCode(getNfcCode());
         dto.setId(getId());
-        dto.setOwnerId(getOwner().getId());
+        try {
+            dto.setOwnerId(getOwner().getId());
+        } catch (NullPointerException e){
+            dto.setOwnerId(null);
+        }
         return dto;
     }
     @Override

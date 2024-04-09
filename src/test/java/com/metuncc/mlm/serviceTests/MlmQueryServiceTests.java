@@ -1,5 +1,7 @@
 package com.metuncc.mlm.serviceTests;
 
+import com.metuncc.mlm.api.request.FindBookRequest;
+import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.datas.DOSHelper;
 import com.metuncc.mlm.datas.DTOSHelper;
@@ -12,6 +14,8 @@ import com.metuncc.mlm.entity.enums.Role;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
+import com.metuncc.mlm.repository.specifications.BookSpecification;
+import com.metuncc.mlm.repository.specifications.UserSpecification;
 import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.impls.MlmQueryServicesImpl;
 import com.metuncc.mlm.utils.ImageUtil;
@@ -19,6 +23,7 @@ import com.metuncc.mlm.utils.excel.CourseStudentExcelWriter;
 import org.junit.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +31,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -688,4 +694,122 @@ public class MlmQueryServiceTests {
     public void getByISBN() throws IOException, InterruptedException {
         assertNotNull(service.getByISBN("9786053921936"));
     }
+
+    @DisplayName("getBookDetailsFromExternalWithISBN")
+    @Test
+    public void getBookDetailsFromExternalWithISBN() throws IOException, InterruptedException {
+        assertNotNull(service.getBookDetailsFromExternalWithISBN("9786053921936"));
+    }
+
+    @DisplayName("getCopyCardDetails")
+    @Test
+    public void getCopyCardDetails() {
+        CopyCard copyCard = new CopyCard();
+        copyCard.setOwner(dosHelper.user1());
+        when(copyCardRepository.getByUser(any())).thenReturn(copyCard);
+        assertNotNull(service.getCopyCardDetails());
+    }
+
+    @DisplayName("getRooms")
+    @Test
+    public void getRooms(){
+        when(roomRepository.findAll()).thenReturn(List.of(dosHelper.room1()));
+        assertNotNull(service.getRooms());
+    }
+
+    @DisplayName("getRoomById id null")
+    @Test
+    public void getRoomById_id_null(){
+        assertThrows(MLMException.class, () -> {
+            service.getRoomById(null);
+        });
+    }
+
+    @DisplayName("getRoomById invalid id")
+    @Test
+    public void getRoomById_id_invalid(){
+        assertThrows(MLMException.class, () -> {
+            when(roomRepository.getById(any())).thenReturn(null);
+            service.getRoomById(1L);
+        });
+    }
+    @DisplayName("getRoomById")
+    @Test
+    public void getRoomById(){
+        when(roomRepository.getById(any())).thenReturn(dosHelper.room1());
+        assertNotNull(service.getRoomById(1L));
+    }
+
+    @DisplayName("getBooksBySpecification")
+    @Test
+    public void getBooksBySpecification(){
+        FindBookRequest request = new FindBookRequest();
+        request.setPage(0);
+        request.setSize(7);
+        Page<Book> bookPage = new PageImpl<>(List.of(dosHelper.book1()));
+        when(bookRepository.findAll(any(BookSpecification.class),any(Pageable.class))).thenReturn(bookPage);
+        when(bookReviewRepository.getAvgByBookId(any())).thenReturn(BigDecimal.ONE);
+        assertNotNull(service.getBooksBySpecification(request));
+    }
+
+    @DisplayName("getBooksBySpecification null request")
+    @Test
+    public void getBooksBySpecification_null_request(){
+        Page<Book> bookPage = new PageImpl<>(List.of(dosHelper.book1()));
+        when(bookRepository.findAll(any(BookSpecification.class),any(Pageable.class))).thenReturn(bookPage);
+        when(bookReviewRepository.getAvgByBookId(any())).thenReturn(BigDecimal.ONE);
+        assertNotNull(service.getBooksBySpecification(null));
+    }
+
+    @DisplayName("getUserDetails")
+    @Test
+    public void getUserDetails(){
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        assertNotNull(service.getUserDetails());
+    }
+
+    @DisplayName("getUsersBySpecification null request")
+    @Test
+    public void getUsersBySpecification_null_request(){
+        Page<User> userPage = new PageImpl<>(List.of(dosHelper.user1()));
+        when(userRepository.findAll(any(UserSpecification.class),any(Pageable.class))).thenReturn(userPage);
+        assertNotNull(service.getUsersBySpecifications(null));
+    }
+
+    @DisplayName("getUsersBySpecification")
+    @Test
+    public void getUsersBySpecification(){
+        FindUserRequest request = new FindUserRequest();
+        request.setPage(0);
+        request.setSize(7);
+        Page<User> userPage = new PageImpl<>(List.of(dosHelper.user1()));
+        when(userRepository.findAll(any(UserSpecification.class),any(Pageable.class))).thenReturn(userPage);
+        assertNotNull(service.getUsersBySpecifications(request));
+    }
+    @DisplayName("getUsersBySpecification invalid request")
+    @Test
+    public void getUsersBySpecification_invalid_request(){
+        assertThrows(MLMException.class, () -> {
+            FindUserRequest request = new FindUserRequest();
+            request.setPage(null);
+            request.setSize(null);
+            service.getUsersBySpecifications(request);
+        });
+    }
+
+    @DisplayName("getBooksByShelfId")
+    @Test
+    public void getBooksByShelfId(){
+        when(bookRepository.getBooksByShelfId(any())).thenReturn(List.of(dosHelper.book1()));
+        assertNotNull(service.getBooksByShelfId(1L));
+    }
+
+    @DisplayName("getBookById")
+    @Test
+    public void getBookById(){
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        when(bookReviewRepository.getByBookAndUserId(any(),any())).thenReturn(dosHelper.bookReview1());
+        assertNotNull(service.getBookById(1L));
+    }
+
 }
