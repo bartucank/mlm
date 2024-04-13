@@ -7,10 +7,7 @@ import com.metuncc.mlm.datas.DOSHelper;
 import com.metuncc.mlm.datas.DTOSHelper;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.*;
-import com.metuncc.mlm.entity.enums.BookStatus;
-import com.metuncc.mlm.entity.enums.BorrowStatus;
-import com.metuncc.mlm.entity.enums.QueueStatus;
-import com.metuncc.mlm.entity.enums.Role;
+import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -810,6 +807,16 @@ public class MlmQueryServiceTests {
         when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
         when(bookReviewRepository.getByBookAndUserId(any(),any())).thenReturn(dosHelper.bookReview1());
         assertNotNull(service.getBookById(1L));
+    }
+
+    @Test
+    public void testForDummyEntities(){
+        Image image = dosHelper.image1();
+        assertNotNull(image.toDTO());
+
+
+        assertEquals(RoomSlotDays.MON,RoomSlotDays.fromValue(1));
+        assertEquals(RoomSlotDays.MON,RoomSlotDays.fromValue(2));
     }
 
 }
