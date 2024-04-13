@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping(value ="/api/user", produces = "application/json;charset=UTF-8")
@@ -144,5 +145,10 @@ public class MLMController {
     @GetMapping("/course/getCourseMaterialById")
     public ResponseEntity<ApiResponse<CourseMaterialDTO>> getCourseMaterialById(@RequestParam("id") Long id){
         return responseService.createResponse(mlmQueryServices.getCourseMaterialById(id));
+    }
+    //getBookReviewsByBookId
+    @GetMapping("/book/getBookReviewsByBookId")
+    public ResponseEntity<ApiResponse<List<BookReviewDTO>>> getBookReviewsByBookId(@RequestParam("id") Long id){
+        return responseService.createResponse(mlmQueryServices.getBookReviewsByBookId(id));
     }
 }

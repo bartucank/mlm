@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -33,6 +34,7 @@ public class BookDTO extends MLMBaseClassDTO {
     private String statusStr;
 
     private  BookReviewDTO reviewDTO;
+    private List<BookReviewDTO> allReviews;
     private BigDecimal averagePoint;
 
 }
