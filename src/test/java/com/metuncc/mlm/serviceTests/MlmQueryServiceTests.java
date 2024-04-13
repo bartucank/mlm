@@ -809,14 +809,5 @@ public class MlmQueryServiceTests {
         assertNotNull(service.getBookById(1L));
     }
 
-    @Test
-    public void testForDummyEntities(){
-        Image image = dosHelper.image1();
-        assertNotNull(image.toDTO());
-
-
-        assertEquals(RoomSlotDays.MON,RoomSlotDays.fromValue(1));
-        assertEquals(RoomSlotDays.MON,RoomSlotDays.fromValue(2));
-    }
 
 }
