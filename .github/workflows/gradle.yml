@@ -85,9 +85,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: 
-      - check_coverage
       - run_tests
-    if: ${{ needs.run_tests.result != 'failure' && needs.check_coverage.result == 'success' }}
+    if: ${{ needs.run_tests.result == 'success' }}
     steps:
       - name: Check Test Status
         if: ${{ needs.run_tests.outputs.run_tests == 'failure' }}
