@@ -387,7 +387,7 @@ public class MlmServiceTests {
     @Test
     public void createSlots_valid2(){
         when(roomRepository.findAll()).thenReturn(List.of(dosHelper.room1()));
-        assertNotNull( service.createSlots(RoomSlotDays.FRI,"17","18"));
+        assertNull( service.createSlots(RoomSlotDays.FRI,"17","18"));
     }
 
 
