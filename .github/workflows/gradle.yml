@@ -90,7 +90,7 @@ jobs:
     if: ${{ needs.run_tests.result == 'success' }}
     steps:
       - name: Check Test Status
-        if: ${{ needs.run_tests.outputs.run_tests == 'failure' }}
+        if: ${{ needs.run_tests.outputs.run_tests != 'success' }}
         run: exit 1
       - name: Start MLM Server
         uses: appleboy/ssh-action@v1.0.3
