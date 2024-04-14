@@ -67,7 +67,7 @@ jobs:
   check_coverage:
     runs-on: ubuntu-latest
     needs: run_tests
-    if: ${{ needs.run_tests.result == 'success' }}
+    if: ${{ needs.run_tests == 'success' }}
     steps:
       - name: Check Code Coverage
         uses: appleboy/ssh-action@v1.0.3
