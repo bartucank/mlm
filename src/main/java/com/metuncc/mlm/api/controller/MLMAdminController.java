@@ -190,18 +190,5 @@ public class MLMAdminController {
         return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
     }
 
-    @GetMapping("/ml/getLightBooks")
-    public ResponseEntity<ApiResponse<List<LightBook>>> getLightBooks(){
-        return responseService.createResponse(mlmQueryServices.getLightBooks());
-    }
 
-    @GetMapping("/ml/getLightUsers")
-    public ResponseEntity<ApiResponse<List<LightUser>>> getLightUsers(){
-        return responseService.createResponse(mlmQueryServices.getLightUsers());
-    }
-
-    @GetMapping("/ml/getLightReviews")
-    public ResponseEntity<ApiResponse<List<LightReview>>> getLightReviews(){
-        return responseService.createResponse(mlmQueryServices.getLightReviews());
-    }
 }

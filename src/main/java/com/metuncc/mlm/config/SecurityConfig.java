@@ -107,6 +107,7 @@ public class SecurityConfig {
                 .antMatchers("/api/admin/**").permitAll()
                 .antMatchers("/api/lecturer/**").permitAll()
                 .antMatchers("/api/admin/getExcel").permitAll()
+                .antMatchers("/api/external/**").permitAll()
                 .anyRequest().authenticated();
         httpSecurity.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return httpSecurity.build();
