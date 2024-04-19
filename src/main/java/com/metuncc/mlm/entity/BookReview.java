@@ -2,6 +2,7 @@ package com.metuncc.mlm.entity;
 
 
 import com.metuncc.mlm.dto.BookReviewDTO;
+import com.metuncc.mlm.dto.ml.LightReview;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
 import com.sun.istack.NotNull;
 import lombok.Data;
@@ -29,4 +30,12 @@ public class BookReview extends MLMBaseClass {
         return dto;
     }
 
+    public LightReview toLightDTO() {
+        LightReview lightReview = new LightReview();
+        lightReview.setId(getId());
+        lightReview.setComment(getComment());
+        lightReview.setRating(getStar());
+        lightReview.setUserId(getUserId().getId());
+        return lightReview;
+    }
 }

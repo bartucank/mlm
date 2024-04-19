@@ -5,6 +5,9 @@ import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.service.ApiResponse;
 import com.metuncc.mlm.api.service.ResponseService;
 import com.metuncc.mlm.dto.*;
+import com.metuncc.mlm.dto.ml.LightBook;
+import com.metuncc.mlm.dto.ml.LightReview;
+import com.metuncc.mlm.dto.ml.LightUser;
 import com.metuncc.mlm.entity.enums.Role;
 import com.metuncc.mlm.service.MlmQueryServices;
 import com.metuncc.mlm.service.MlmServices;
@@ -19,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping(value ="/api/admin", produces = "application/json;charset=UTF-8")
@@ -186,4 +190,18 @@ public class MLMAdminController {
         return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
     }
 
+    @GetMapping("/ml/getLightBooks")
+    public ResponseEntity<ApiResponse<List<LightBook>>> getLightBooks(){
+        return responseService.createResponse(mlmQueryServices.getLightBooks());
+    }
+
+    @GetMapping("/ml/getLightUsers")
+    public ResponseEntity<ApiResponse<List<LightUser>>> getLightUsers(){
+        return responseService.createResponse(mlmQueryServices.getLightUsers());
+    }
+
+    @GetMapping("/ml/getLightReviews")
+    public ResponseEntity<ApiResponse<List<LightReview>>> getLightReviews(){
+        return responseService.createResponse(mlmQueryServices.getLightReviews());
+    }
 }

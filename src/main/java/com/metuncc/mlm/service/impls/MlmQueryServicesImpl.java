@@ -9,6 +9,9 @@ import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
 import com.metuncc.mlm.dto.google.GoogleResponse;
 import com.metuncc.mlm.dto.google.Item;
+import com.metuncc.mlm.dto.ml.LightBook;
+import com.metuncc.mlm.dto.ml.LightReview;
+import com.metuncc.mlm.dto.ml.LightUser;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
@@ -789,4 +792,18 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return courseMaterial.toFullContentDTO();
     }
 
+    @Override
+    public List<LightBook> getLightBooks(){
+        return bookRepository.findAll().stream().map(Book::toLightDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LightUser> getLightUsers(){
+        return userRepository.findAllByRoles(Role.USER).stream().map(User::toLightDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LightReview> getLightReviews(){
+        return bookReviewRepository.findAll().stream().map(BookReview::toLightDTO).collect(Collectors.toList());
+    }
 }

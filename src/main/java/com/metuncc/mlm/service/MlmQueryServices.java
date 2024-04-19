@@ -5,6 +5,9 @@ import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.api.response.*;
 import com.metuncc.mlm.api.request.FindUserRequest;
 import com.metuncc.mlm.dto.*;
+import com.metuncc.mlm.dto.ml.LightBook;
+import com.metuncc.mlm.dto.ml.LightReview;
+import com.metuncc.mlm.dto.ml.LightUser;
 import com.metuncc.mlm.entity.Room;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.Role;
@@ -90,4 +93,10 @@ public interface MlmQueryServices {
     CourseDTOListResponse getCoursesForLecturer();
 
     CourseMaterialDTO getCourseMaterialById(Long id);
+
+    List<LightBook> getLightBooks();
+
+    List<LightUser> getLightUsers();
+
+    List<LightReview> getLightReviews();
 }

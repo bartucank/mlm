@@ -2,6 +2,7 @@ package com.metuncc.mlm.entity;
 
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.dto.UserDTO;
+import com.metuncc.mlm.dto.ml.LightUser;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
 import com.metuncc.mlm.entity.enums.Department;
 import com.metuncc.mlm.entity.enums.Role;
@@ -80,5 +81,14 @@ public class User extends MLMBaseClass {
     @Override
     public String toString(){
         return "";
+    }
+
+    public LightUser toLightDTO() {
+        LightUser lightUser = new LightUser();
+        lightUser.setId(getId());
+        lightUser.setName(getFullName());
+        lightUser.setDepartment(getDepartment());
+        lightUser.setDepartmentStr(getDepartment().toString());
+        return lightUser;
     }
 }

@@ -3,6 +3,7 @@ package com.metuncc.mlm.entity;
 
 import com.metuncc.mlm.dto.BookDTO;
 import com.metuncc.mlm.dto.BookReviewDTO;
+import com.metuncc.mlm.dto.ml.LightBook;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
 import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.entity.enums.BookStatus;
@@ -113,5 +114,15 @@ public class Book extends MLMBaseClass {
         setCategory(bookRequest.getCategory());
 
         return this;
+    }
+
+    public LightBook toLightDTO() {
+        LightBook lightBook = new LightBook();
+        lightBook.setId(getId());
+        lightBook.setTitle(getName());
+        lightBook.setAuthor(getAuthor());
+        lightBook.setDescription(getDescription());
+        lightBook.setIsbn(getIsbn());
+        return lightBook;
     }
 }
