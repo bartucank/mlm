@@ -20,13 +20,15 @@ jobs:
             chmod +x gradlew
             ./gradlew clean    
             ./gradlew build -x test 
-
   run_tests:
     runs-on: ubuntu-latest
     continue-on-error: true
     needs: build
+    outputs:
+      job_status_for_test: ${{ steps.run_tests.outcome == 'success' }}
     steps:
       - name: Run Tests
+        id: run_tests
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{secrets.ADDRESS}}
@@ -35,11 +37,6 @@ jobs:
           script: |
             cd /home/ubuntu/repo/mlm
             ./gradlew test
-
-      - name: Exit if there is/are failed test/s
-        if: ${{ failure() }}
-        run: exit 1
-
   publish_reports:
     runs-on: ubuntu-latest
     needs: run_tests
@@ -63,11 +60,10 @@ jobs:
             cp -r "$originForGradleReport" "$destination"
             cp -r "$originForJacocoReport"* "$destinationforJacoco"
             systemctl restart nginx
-
   check_coverage:
     runs-on: ubuntu-latest
     needs: run_tests
-    if: ${{ needs.run_tests.result == 'success' }}
+    if: ${{ needs.run_tests.outputs.job_status_for_test == 'true' }}
     steps:
       - name: Check Code Coverage
         uses: appleboy/ssh-action@v1.0.3
@@ -78,15 +74,16 @@ jobs:
           script: |
             cd /home/ubuntu/repo/mlm
             ./gradlew jacocoTestCoverageVerification
-
       - name: Exit if coverage is less than criteria
         if: ${{ failure() }}
         run: exit 1
 
   deploy:
     runs-on: ubuntu-latest
-    needs: check_coverage
-    if: ${{ needs.check_coverage.result == 'success' }}
+    needs: 
+      - check_coverage
+      - run_tests
+    if: ${{ needs.run_tests.outputs.job_status_for_test == 'true' }}
     steps:
       - name: Start MLM Server
         uses: appleboy/ssh-action@v1.0.3
