@@ -17,6 +17,7 @@ public class BookReview extends MLMBaseClass {
     @ManyToOne
     private User userId;
     private Long star;
+    @Column(length = 2000)
     private String comment;
 
 

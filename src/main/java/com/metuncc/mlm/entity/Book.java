@@ -28,6 +28,7 @@ public class Book extends MLMBaseClass {
     private String isbn;
     private String publisher;
     private String name;
+    @Column(length = 2000)
     private String description;
     private String author;
     private LocalDate publicationDate;
