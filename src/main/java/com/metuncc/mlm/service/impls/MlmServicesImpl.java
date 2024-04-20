@@ -782,6 +782,7 @@ public class MlmServicesImpl implements MlmServices {
             ) {
                 todaysReservations.get(0).setApproved(true);
                 roomReservationRepository.save(todaysReservations.get(0));
+                return success;
             } else {
                 throw new MLMException(ExceptionCode.INVALID_CONFIRMATION);
             }

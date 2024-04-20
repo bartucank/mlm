@@ -4,9 +4,9 @@ import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.datas.DOSHelper;
 import com.metuncc.mlm.datas.DTOSHelper;
 import com.metuncc.mlm.dto.StatusDTO;
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.Room;
-import com.metuncc.mlm.entity.Shelf;
+import com.metuncc.mlm.entity.*;
+import com.metuncc.mlm.entity.enums.BookStatus;
+import com.metuncc.mlm.entity.enums.Department;
 import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import com.metuncc.mlm.exception.MLMException;
 import com.metuncc.mlm.repository.*;
@@ -15,21 +15,25 @@ import com.metuncc.mlm.security.JwtUserDetails;
 import com.metuncc.mlm.service.MlmServices;
 import com.metuncc.mlm.service.impls.MlmServicesImpl;
 import com.metuncc.mlm.utils.MailUtil;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,11 +71,27 @@ public class MlmServiceTests {
     private MailUtil mailUtil;
     @Mock
     private VerificationCodeRepository verificationCodeRepository;
+    @Mock
+    private CourseRepository courseRepository;
+    @Mock
+    private CourseStudentRepository courseStudentRepository;
+    @Mock
+    private CourseMaterialRepository courseMaterialRepository;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private AuthenticationManager authenticationManager;
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+    @Mock
+    private BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository;
+    @Mock
+    private RoomReservationRepository roomReservationRepository;
+    @Mock
+    private EmailRepository emailRepository;
     @InjectMocks
     private MlmServicesImpl service;
 
-    @Mock
-    private  Authentication authentication;
 
     @BeforeEach
     public void init() {
@@ -105,29 +125,70 @@ public class MlmServiceTests {
 
     @Test
     public void createUser_already_exists_case(){
-//        UserRequest userRequest = new UserRequest();
-//        userRequest.setUsername("username");
-//        userRequest.setPass("123");
-//        userRequest.setEmail("a@metu.edu.tr");
-//        userRequest.setNameSurname("full name");
-//        MLMException thrown = assertThrows(MLMException.class, () -> {
-//            when(userRepository.findByUsername(any())).thenReturn(dosHelper.user1());
-//            service.createUser(userRequest);
-//        });
-//        assertNotNull(thrown.getMessage());
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername("username");
+        userRequest.setPass("123");
+        userRequest.setEmail("a@metu.edu.tr");
+        userRequest.setNameSurname("full name");
+        userRequest.setDepartment(Department.CNG);
+        userRequest.setStudentNumber("1234567");
+        MLMException thrown = assertThrows(MLMException.class, () -> {
+            when(userRepository.findByUsername(any())).thenReturn(dosHelper.user1());
+            service.createUser(userRequest);
+        });
+        assertNotNull(thrown.getMessage());
     }
 
     @Test
-    public void createUser_valid_case(){
-//        UserRequest userRequest = new UserRequest();
-//        userRequest.setUsername("username");
-//        userRequest.setPass("123");
-//        userRequest.setNameSurname("full name");
-//        userRequest.setEmail("a@metu.edu.tr");
-//        when(userRepository.findByUsername(any())).thenReturn(null);
-//        when(passwordEncoder.encode(any())).thenReturn("1");
-//        when(userRepository.save(any())).thenReturn(dosHelper.user1());
-//        assertNotNull(service.createUser(userRequest));
+    public void createUser_valid_case() throws IOException {
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername("username");
+        userRequest.setPass("123");
+        userRequest.setEmail("a@metu.edu.tr");
+        userRequest.setNameSurname("full name");
+        userRequest.setDepartment(Department.CNG);
+        userRequest.setStudentNumber("1234567");
+        User user = dosHelper.user1();
+        user.setVerified(false);
+        when(userRepository.findByUsername(any())).thenReturn(null);
+        when(passwordEncoder.encode(any())).thenReturn("1");
+        when(userRepository.save(any())).thenReturn(dosHelper.user1());
+        when(courseStudentRepository.getByStudentId(any())).thenReturn(List.of(dosHelper.courseStudent1()));
+        when(courseStudentRepository.saveAll(any())).thenReturn(List.of(dosHelper.courseStudent1()));
+        when(authenticationManager.authenticate(any())).thenReturn(authentication);
+        when(jwtTokenProvider.generateJwtToken(any())).thenReturn("token");
+        when(userRepository.getById(any())).thenReturn(user);
+        assertNotNull(service.createUser(userRequest));
+    }
+
+    @DisplayName("non metu mail")
+    @Test
+    public void createUser_invalidCase(){
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername("username");
+        userRequest.setPass("123");
+        userRequest.setEmail("a@hotmail.com");
+        userRequest.setNameSurname("full name");
+        userRequest.setDepartment(Department.CNG);
+        userRequest.setStudentNumber("1234567");
+        assertThrows(MLMException.class, () -> {
+            service.createUser(userRequest);
+        });
+    }
+
+    @DisplayName("invalid student number")
+    @Test
+    public void createUser_invalidCas2(){
+        UserRequest userRequest = new UserRequest();
+        userRequest.setUsername("username");
+        userRequest.setPass("123");
+        userRequest.setEmail("a@hotmail.com");
+        userRequest.setNameSurname("full name");
+        userRequest.setDepartment(Department.CNG);
+        userRequest.setStudentNumber("123456");
+        assertThrows(MLMException.class, () -> {
+            service.createUser(userRequest);
+        });
     }
 
     @Test
@@ -220,29 +281,6 @@ public class MlmServiceTests {
         );
         when(imageRepository.save(any())).thenReturn(dosHelper.image1());
         assertNotNull(service.uploadImageReturnImage(multipartFile));
-    }
-
-    @Test
-    public void verifyEmail(){
-        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
-        when(verificationCodeRepository.getByUserAndType(any(),any())).thenReturn(dosHelper.verificationCode1());
-        assertNotNull(service.verifyEmail(dosHelper.verificationCode1().getCode()));
-
-    }
-
-    @Test
-    public void verifyEmail_invalidCode(){
-        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
-        when(verificationCodeRepository.getByUserAndType(any(),any())).thenReturn(dosHelper.verificationCode1());
-        assertEquals("Wrong code.", service.verifyEmail("invalidCode").getMsg());
-
-    }
-
-    @Test
-    public void verifyEmail_invalidUser(){
-        when(userRepository.getById(any())).thenReturn(null);
-
-        assertEquals("Unauthorized person.", service.verifyEmail("invalidCode").getMsg());
     }
 
     @Test
@@ -390,6 +428,608 @@ public class MlmServiceTests {
         assertNotNull( service.createSlots(RoomSlotDays.FRI,"17","18"));
     }
 
+    @Test
+    public  void createShelf_invalid(){
+        assertThrows(MLMException.class, () -> {
+            service.createShelf(null);
+        });
+    }
 
+    @Test
+    public void createShelf_valid(){
+        ShelfCreateRequest request = new ShelfCreateRequest();
+        request.setFloor("1");
+        when(shelfRepository.save(any())).thenReturn(dosHelper.shelf1());
+        assertNotNull(service.createShelf(request));
+    }
+
+    @DisplayName("Null request")
+    @Test
+    public void updateShelf_invalid(){
+        assertThrows(MLMException.class, () -> {
+            service.updateShelf(null);
+        });
+    }
+
+    @DisplayName("Shelf not found")
+    @Test
+    public void updateShelf_invalid2(){
+        ShelfCreateRequest request = new ShelfCreateRequest();
+        request.setFloor("1");
+        request.setId(1L);
+        when(shelfRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.updateShelf(request);
+        });
+    }
+
+    @Test
+    public void updateShelf_valid(){
+        ShelfCreateRequest request = new ShelfCreateRequest();
+        request.setFloor("1");
+        request.setId(1L);
+        when(shelfRepository.getById(any())).thenReturn(dosHelper.shelf1());
+        assertNotNull(service.updateShelf(request));
+    }
+
+    @Test
+    public void uploadImage_valid() throws IOException {
+        MultipartFile file = new MultipartFile() {
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return null;
+            }
+
+            @Override
+            public String getContentType() {
+                return null;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
+        when(imageRepository.save(any())).thenReturn(dosHelper.image1());
+        assertNotNull(service.uploadImage(file));
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void uploadImageByBase64_invalid() throws IOException {
+        assertThrows(MLMException.class, () -> {
+            service.uploadImageByBase64(null);
+        });
+    }
+
+    @Test
+    public void uploadImageByBase64_valid() throws IOException {
+        UploadImageByBase64 req= new UploadImageByBase64();
+        req.setBase64("base64");
+        when(imageRepository.save(any())).thenReturn(dosHelper.image1());
+        assertNotNull(service.uploadImageByBase64(req));
+    }
+
+    @Test
+    public void uploadImageReturnImage_valid() throws IOException {
+        ClassPathResource resource = new ClassPathResource("image.jpg");
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "image.jpg",
+                "image/jpeg",
+                resource.getInputStream()
+        );
+        when(imageRepository.save(any())).thenReturn(dosHelper.image1());
+        assertNotNull(service.uploadImageReturnImage(multipartFile));
+    }
+
+    @Test
+    public void verifyEmail_valid() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(verificationCodeRepository.getByUserAndType(any(),any())).thenReturn(dosHelper.verificationCode1());
+        assertNotNull(service.verifyEmail(dosHelper.verificationCode1().getCode()));
+    }
+
+    @Test
+    public void verifyEmail_invalidCode() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(verificationCodeRepository.getByUserAndType(any(),any())).thenReturn(dosHelper.verificationCode1());
+        assertEquals("Wrong code.", service.verifyEmail("invalidCode").getMsg());
+    }
+
+    @Test
+    public void verifyEmail_invalidUser() {
+        when(userRepository.getById(any())).thenReturn(null);
+        assertEquals("Unauthorized person.", service.verifyEmail("invalidCode").getMsg());
+    }
+
+    @Test
+    public void createBook_valid() {
+        when(shelfRepository.getShelfById(any())).thenReturn(dosHelper.shelf1());
+        when(imageRepository.getImageById(any())).thenReturn(dosHelper.image1());
+        when(bookRepository.save(any())).thenReturn(dosHelper.book1());
+        assertNotNull(service.createBook(dtosHelper.getBookRequest1()));
+    }
+
+    @DisplayName("Null request")
+    @Test
+    public void createBook_invalid() {
+        assertThrows(MLMException.class, () -> {
+            service.createBook(null);
+        });
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void enqueue_invalidCase() {
+        assertThrows(MLMException.class, () -> {
+            service.enqueue(null);
+        });
+    }
+
+    @DisplayName("invalid book id")
+    @Test
+    public void enqueue_invalidBook() {
+        when(bookRepository.getById(any())).thenReturn(null);
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        assertThrows(MLMException.class, () -> {
+            service.enqueue(1L);
+        });
+    }
+
+    @DisplayName("bookQueueRecord null")
+    @Test
+    public void enqueue_invalidCase2() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.enqueue(1L);
+        });
+    }
+
+    @Test
+    public void enqueue_alreadyInQueue() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(dosHelper.bookQueueRecord1());
+        assertThrows(MLMException.class, () -> {
+            service.enqueue(1L);
+        });
+    }
+
+    @Test
+    public void enqueue_validCase() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        when(bookQueueRecordRepository.save(any())).thenReturn(dosHelper.bookQueueRecord1());
+        assertNotNull(service.enqueue(1L));
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void borrowBook_invalid_case() {
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(null, null);
+        });
+    }
+
+    @DisplayName("invalid id")
+    @Test
+    public void borrowBook_invalid_case2() {
+        when(userRepository.getById(any())).thenReturn(null);
+        when(bookRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(1L, 1L);
+        });
+    }
+
+    @Test
+    public void borrowBook_valid_case() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        assertNotNull(service.borrowBook(1L, 1L));
+    }
+
+    @DisplayName("bookQueueRecord null")
+    @Test
+    public void borrowBook_invalid_case3() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        Book book = dosHelper.book1();
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        when(bookRepository.getById(any())).thenReturn(book);
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(1L, 1L);
+        });
+    }
+
+    @DisplayName("This user already borrowed this book")
+    @Test
+    public void borrowBook_invalid_case4() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        Book book = dosHelper.book1();
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        when(bookRepository.getById(any())).thenReturn(book);
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(dosHelper.bookQueueRecord1());
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(1L, 1L);
+        });
+    }
+
+    @DisplayName("Book Already taken")
+    @Test
+    public void borrowBook_invalid_case5() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        Book book = dosHelper.book1();
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        when(bookRepository.getById(any())).thenReturn(book);
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(1L, 1L);
+        });
+    }
+
+    @DisplayName("Book reserved for someone else")
+    @Test
+    public void borrowBook_invalid_case6() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        Book book = dosHelper.book1();
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        when(bookRepository.getById(any())).thenReturn(book);
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord2();
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(1L, 1L);
+        });
+    }
+
+    @DisplayName("Book not returned yet")
+    @Test
+    public void borrowBook_invalid_case7() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        Book book = dosHelper.book1();
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        when(bookRepository.getById(any())).thenReturn(book);
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        assertThrows(MLMException.class, () -> {
+            service.borrowBook(1L, 1L);
+        });
+    }
+
+    @DisplayName("book reserved for user")
+    @Test
+    public void borrowBook_valid_case2() {
+        when(userRepository.getById(any())).thenReturn(dosHelper.user2());
+        Book book = dosHelper.book1();
+        book.setStatus(BookStatus.NOT_AVAILABLE);
+        when(bookRepository.getById(any())).thenReturn(book);
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord2();
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        when(bookQueueHoldHistoryRecordRepository.getBookQueueHoldHistoryByBookQueue(any())).thenReturn(dosHelper.bookQueueHoldHistoryRecord2());
+        assertNotNull(service.borrowBook(1L, 2L));
+    }
+
+    @DisplayName("null book id")
+    @Test
+    public void takeBackBook_invalidCase() {
+        assertThrows(MLMException.class, () -> {
+            service.takeBackBook(null);
+        });
+    }
+
+    @DisplayName("book not found")
+    @Test
+    public void takeBackBook_invalidCase2() {
+        when(bookRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.takeBackBook(1L);
+        });
+    }
+
+    @DisplayName("BookQueueRecord not found")
+    @Test
+    public void takeBackBook_invalidCase3() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.takeBackBook(1L);
+        });
+    }
+
+    @DisplayName("Book not borrowed")
+    @Test
+    public void takeBackBook_invalidCase4() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        assertThrows(MLMException.class, () -> {
+            service.takeBackBook(1L);
+        });
+    }
+
+    @DisplayName("Book borrowed by someone else")
+    @Test
+    public void takeBackBook_invalidCase5() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord2();
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        assertThrows(MLMException.class, () -> {
+            service.takeBackBook(1L);
+        });
+    }
+
+    @DisplayName("Queue continues")
+    @Test
+    public void takeBackBook_validCase() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        when(emailRepository.save(any())).thenReturn(dosHelper.email1());
+        assertNotNull(service.takeBackBook(1L));
+    }
+
+    @DisplayName("Queue completed")
+    @Test
+    public void takeBackBook_validCase2() {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        BookQueueRecord bookQueueRecord = dosHelper.bookQueueRecord1();
+        bookQueueRecord.setBookBorrowHistoryList(new ArrayList<>());
+        bookQueueRecord.getBookBorrowHistoryList().add(dosHelper.bookBorrowHistory1());
+        when(bookQueueRecordRepository.getBookQueueRecordByBookIdAndDeletedAndStatus(any(),any())).thenReturn(bookQueueRecord);
+        assertNotNull(service.takeBackBook(1L));
+    }
+
+    @DisplayName("nfcCode null")
+    @Test
+    public void givePhysicalCopyCardToUser_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.givePhysicalCopyCardToUser(null,1L);
+        });
+    }
+    @DisplayName("userId null")
+    @Test
+    public void givePhysicalCopyCardToUser_invalidCase2(){
+        assertThrows(MLMException.class, () -> {
+            service.givePhysicalCopyCardToUser("nfcCode",null);
+        });
+    }
+    @DisplayName("user not found")
+    @Test
+    public void givePhysicalCopyCardToUser_invalidCase3(){
+        when(userRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.givePhysicalCopyCardToUser("nfcCode",1L);
+        });
+    }
+
+    @Test
+    public void givePhysicalCopyCardToUser_validCase(){
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        assertNotNull(service.givePhysicalCopyCardToUser("nfcCode",1L));
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void makeReservation_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.makeReservation(null);
+        });
+    }
+
+    @DisplayName("RoomSlot not found")
+    @Test
+    public void makeReservation_invalidCase2(){
+        when(roomSlotRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.makeReservation(1L);
+        });
+    }
+
+    @DisplayName("RoomSlot not available")
+    @Test
+    public void makeReservation_invalidCase3(){
+        RoomSlot roomSlot = dosHelper.roomSlot1();
+        roomSlot.setAvailable(false);
+        when(roomSlotRepository.getById(any())).thenReturn(roomSlot);
+        assertThrows(MLMException.class, () -> {
+            service.makeReservation(1L);
+        });
+    }
+
+    @DisplayName("Max reservation reached")
+    @Test
+    public void makeReservation_invalidCase4(){
+        RoomSlot roomSlot = dosHelper.roomSlot1();
+        roomSlot.setAvailable(true);
+        List<RoomReservation> roomReservations = new ArrayList<>();
+        roomReservations.add(dosHelper.roomReservation1());
+        roomReservations.add(dosHelper.roomReservation2());
+        when(roomSlotRepository.getById(any())).thenReturn(roomSlot);
+        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(roomReservations);
+        assertThrows(MLMException.class, () -> {
+            service.makeReservation(1L);
+        });
+    }
+
+    @DisplayName("valid request")
+    @Test
+    public void makeReservation_validCase(){
+        RoomSlot roomSlot = dosHelper.roomSlot1();
+        roomSlot.setAvailable(true);
+        List<RoomReservation> roomReservations = new ArrayList<>();
+        roomReservations.add(dosHelper.roomReservation1());
+        when(roomSlotRepository.getById(any())).thenReturn(roomSlot);
+        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(roomReservations);
+        when(roomReservationRepository.save(any())).thenReturn(dosHelper.roomReservation1());
+        assertNotNull(service.makeReservation(1L));
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void cancelReservation_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.cancelReservation(null);
+        });
+    }
+
+    @DisplayName("RoomReservation not found")
+    @Test
+    public void cancelReservation_invalidCase2(){
+        when(roomReservationRepository.getById(any())).thenReturn(null);
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        assertThrows(MLMException.class, () -> {
+            service.cancelReservation(1L);
+        });
+    }
+
+    @DisplayName("user not found")
+    @Test
+    public void cancelReservation_invalidCase3(){
+        when(userRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.cancelReservation(1L);
+        });
+    }
+
+    @DisplayName("valid request")
+    @Test
+    public void cancelReservation_validCase(){
+        when(roomReservationRepository.getById(any())).thenReturn(dosHelper.roomReservation1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(roomSlotRepository.getById(any())).thenReturn(dosHelper.roomSlot1());
+        assertNotNull(service.cancelReservation(1L));
+    }
+
+    @DisplayName("unauthorized user")
+    @Test
+    public void cancelReservation_invalidCase4(){
+        when(roomReservationRepository.getById(any())).thenReturn(dosHelper.roomReservation1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user2());
+        assertThrows(MLMException.class, () -> {
+            service.cancelReservation(1L);
+        });
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void generateQrcodeForRoom_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.generateQRcodeForRoom(null);
+        });
+    }
+
+    @DisplayName("room not found")
+    @Test
+    public void generateQrcodeForRoom_invalidCase2(){
+        when(roomRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.generateQRcodeForRoom(1L);
+        });
+    }
+
+    @Test
+    public void generateQrcodeForRoom_validCase(){
+        when(roomRepository.getById(any())).thenReturn(dosHelper.room1());
+        assertNotNull(service.generateQRcodeForRoom(1L));
+    }
+
+    @DisplayName("null request")
+    @Test
+    public void readingNFC_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.readingNFC(null, 1L);
+        });
+    }
+
+    @DisplayName("room not found")
+    @Test
+    public void readingNFC_invalidCase2(){
+        when(roomRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.readingNFC("nfcCode", 1L);
+        });
+    }
+
+    @Test
+    public void readingNFC_validCase(){
+        when(roomRepository.getById(any())).thenReturn(dosHelper.room1());
+        assertNotNull(service.readingNFC("nfcCode", 1L));
+    }
+
+    @DisplayName("invalid request")
+    @Test
+    public void approveReservation_invalidCase1(){
+        assertThrows(MLMException.class, () -> {
+            service.approveReservation(null, null);
+        });
+    }
+
+    @DisplayName("unauthorized user")
+    @Test
+    public void approveReservation_invalidCase2(){
+        when(authentication.getPrincipal()).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.approveReservation("nfcCode", "qrCode");
+        });
+    }
+
+    @DisplayName("reservation not found")
+    @Test
+    public void approveReservation_invalidCase3(){
+        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(new ArrayList<>());
+        assertThrows(MLMException.class, () -> {
+            service.approveReservation("nfcCode", "qrCode");
+        });
+    }
+
+    @DisplayName("valid case")
+    @Test
+    public void approveReservation_validCase(){
+        RoomReservation roomReservation = dosHelper.roomReservation1();
+        roomReservation.getRoomSlot().getRoom().setVerfCode("qrCode");
+        roomReservation.getRoomSlot().getRoom().setNFC_no("nfcCode");
+        LocalTime localTime = LocalTime.now();
+        roomReservation.getRoomSlot().setStartHour(localTime.withMinute(0).withNano(0).withSecond(0));
+        roomReservation.getRoomSlot().setEndHour(localTime.withMinute(59).withNano(0).withSecond(0));
+        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(List.of(roomReservation));
+        assertNotNull(service.approveReservation("nfcCode", "qrCode"));
+    }
 
 }
