@@ -18,7 +18,8 @@ public class CourseMaterial extends MLMBaseClass {
     private String name;
 
     @Lob
-    @Type(type = "org.hibernate.type.ImageType")
+    @Column(name = "data", columnDefinition = "BLOB")
+    @Type(type = "org.hibernate.type.BinaryType")
     private byte[] data;
 
     private String fileName;

@@ -2,8 +2,11 @@ package com.metuncc.mlm.datas;
 
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -437,5 +440,28 @@ public class DOSHelper {
         favorite.setDeleted(false);
         favorite.setDeletedDate(null);
         return favorite;
+    }
+    public Ebook ebook1() throws IOException {
+
+        ClassPathResource resource = new ClassPathResource("image.jpg");
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "image.jpg",
+                "image/jpeg",
+                resource.getInputStream()
+        );
+
+        Ebook ebook = new Ebook();
+        ebook.setId(1L);
+        ebook.setName("name");
+        ebook.setData(multipartFile.getBytes());
+        ebook.setFileName("file name");
+        ebook.setExtension("extension");
+        ebook.setBook(book1());
+        ebook.setCreatedDate(LocalDateTime.now());
+        ebook.setLastModifiedDate(LocalDateTime.now());
+        ebook.setDeleted(false);
+        ebook.setDeletedDate(null);
+        return ebook;
     }
 }

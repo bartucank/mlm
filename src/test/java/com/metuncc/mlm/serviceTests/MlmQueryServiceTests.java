@@ -101,6 +101,8 @@ public class MlmQueryServiceTests {
     private ReceiptHistoryRepository receiptHistoryRepository;
     @Mock
     private FavoriteRepository favoriteRepository;
+    @Mock
+    private EbookRepository ebookRepository;
 
     @Mock
     private HttpClient httpClient;
@@ -818,6 +820,13 @@ public class MlmQueryServiceTests {
         assertNotNull(service.getFavorites());
     }
 
+
+    @Test
+    public void getEbooks() throws IOException {
+
+        when(ebookRepository.getById(any())).thenReturn(dosHelper.ebook1());
+        assertNotNull(service.getEbook(1L));
+    }
 
 
 }

@@ -28,6 +28,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,6 +92,8 @@ public class MlmServiceTests {
     private EmailRepository emailRepository;
     @Mock
     private FavoriteRepository favoriteRepository;
+    @Mock
+    private EbookRepository ebookRepository;
     @InjectMocks
     private MlmServicesImpl service;
 
@@ -1057,6 +1060,60 @@ public class MlmServiceTests {
         when(userRepository.getById(any())).thenReturn(dosHelper.user1());
         when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
         assertNotNull(service.addToFavorite(1L));
+    }
+
+    @DisplayName("invalid request")
+    @Test
+    public void addEbook_invalidCase1(){
+        assertThrows(MLMException.class, () -> {
+            service.addEbook(null, null);
+        });
+    }
+
+    @DisplayName("unsupported file")
+    @Test
+    public void addEbook_invalidCase2() throws IOException {
+        byte[] content = "Mock file content".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "filename.txt",
+                "text/plain",
+                new ByteArrayInputStream(content)
+        );
+        assertThrows(MLMException.class, () -> {
+            service.addEbook(1L, multipartFile);
+        });
+    }
+
+    @DisplayName("book not found")
+    @Test
+    public void addEbook_invalidCase3() throws IOException {
+        byte[] content = "Mock file content".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "filename.pdf",
+                "application/pdf",
+                new ByteArrayInputStream(content)
+        );
+        when(bookRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.addEbook(1L, multipartFile);
+        });
+    }
+
+    @DisplayName("valid case")
+    @Test
+    public void addEbook_validCase() throws IOException {
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        when(ebookRepository.findByBookId(any())).thenReturn(null);
+        byte[] content = "Mock file content".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "filename.pdf",
+                "application/pdf",
+                new ByteArrayInputStream(content)
+        );
+        assertNotNull(service.addEbook(1L, multipartFile));
     }
 
 }

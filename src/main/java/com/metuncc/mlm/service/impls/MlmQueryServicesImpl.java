@@ -78,6 +78,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private CourseMaterialRepository courseMaterialRepository;
     private CourseStudentRepository courseStudentRepository;
     private FavoriteRepository favoriteRepository;
+    private EbookRepository ebookRepository;
 
 
     @Override
@@ -816,5 +817,21 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(favoriteList);
         return response;
+    }
+
+    @Override
+    public EbookDTO getEbook(Long ebookId){
+        Ebook dbEbook = ebookRepository.getById(ebookId);
+        if (Objects.nonNull(dbEbook)) {
+            EbookDTO dto = EbookDTO
+                    .builder()
+                    .name(dbEbook.getName())
+                    .data(ImageUtil.decompressImage(dbEbook.getData()))
+                    .build();
+            dto.setId(ebookId);
+            return dto;
+        } else {
+            return null;
+        }
     }
 }

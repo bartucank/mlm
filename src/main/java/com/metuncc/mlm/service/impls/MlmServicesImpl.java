@@ -77,13 +77,14 @@ public class MlmServicesImpl implements MlmServices {
     private CourseMaterialRepository courseMaterialRepository;
     private CourseStudentRepository courseStudentRepository;
     private FavoriteRepository favoriteRepository;
+    private EbookRepository ebookRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
     @Value("${webpage.link:https://metu.edu.tr}")
     private String webpageLink;
 
-    public MlmServicesImpl(BookReviewRepository bookReviewRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, ReceiptHistoryRepository receiptHistoryRepository, EmailRepository emailRepository, CourseRepository courseRepository, CourseMaterialRepository courseMaterialRepository, CourseStudentRepository courseStudentRepository, FavoriteRepository favoriteRepository) {
+    public MlmServicesImpl(BookReviewRepository bookReviewRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, ReceiptHistoryRepository receiptHistoryRepository, EmailRepository emailRepository, CourseRepository courseRepository, CourseMaterialRepository courseMaterialRepository, CourseStudentRepository courseStudentRepository, FavoriteRepository favoriteRepository, EbookRepository ebookRepository) {
         this.bookReviewRepository = bookReviewRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -107,6 +108,7 @@ public class MlmServicesImpl implements MlmServices {
         this.courseMaterialRepository = courseMaterialRepository;
         this.courseStudentRepository = courseStudentRepository;
         this.favoriteRepository = favoriteRepository;
+        this.ebookRepository = ebookRepository;
     }
 
     @Override
@@ -1467,6 +1469,32 @@ public class MlmServicesImpl implements MlmServices {
         favorite.setUserId(user);
         favorite.setBookId(book);
         favoriteRepository.save(favorite);
+        return success;
+    }
+
+    @Override
+    public StatusDTO addEbook(Long bookId, MultipartFile file) throws IOException {
+        if(Objects.isNull(bookId) || Objects.isNull(file)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        if(!(file.getOriginalFilename().endsWith(".pdf") || file.getOriginalFilename().endsWith(".epub"))){
+            throw new MLMException(ExceptionCode.UNSUPPORTED_FILE);
+        }
+        Book book = bookRepository.getById(bookId);
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+
+        Ebook ebook = ebookRepository.findByBookId(bookId);
+
+        if(Objects.isNull(ebook)){
+            ebook = new Ebook();
+            ebook.setBook(book);
+        }
+        ebook.setData(ImageUtil.compressImage(file.getBytes()));
+        ebook.setFileName(file.getOriginalFilename());
+        ebook.setExtension(file.getContentType());
+        ebookRepository.save(ebook);
         return success;
     }
 

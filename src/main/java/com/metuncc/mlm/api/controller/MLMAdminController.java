@@ -190,5 +190,10 @@ public class MLMAdminController {
         return ResponseEntity.ok().headers(headers).contentLength(bytes.length).contentType(MediaType.parseMediaType("application/ms-excel; charset=UTF-8")).body(byteArrayResource);
     }
 
+    @PostMapping("/ebook/addEbook")
+    public ResponseEntity<ApiResponse<StatusDTO>> addEbook(@RequestParam (name = "bookId") Long bookId,
+                                                           @RequestParam (name = "file") MultipartFile file) throws IOException {
+        return responseService.createResponse(mlmServices.addEbook(bookId,file));
+    }
 
 }

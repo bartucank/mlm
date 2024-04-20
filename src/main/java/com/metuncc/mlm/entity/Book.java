@@ -15,6 +15,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -40,6 +41,9 @@ public class Book extends MLMBaseClass {
     @Enumerated(value = EnumType.STRING)
     private BookStatus status;
 
+    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    private Ebook ebook;
+
 
 
 
@@ -61,6 +65,7 @@ public class Book extends MLMBaseClass {
         bookDTO.setCategoryStr(getCategory().toString());
         bookDTO.setStatus(getStatus());
         bookDTO.setStatusStr(getStatus().toString());
+        bookDTO.setEbookId(getEbook().getId());
         return bookDTO;
     }
     public BookDTO toDTOWithReview(BookReviewDTO dto) {
@@ -82,6 +87,7 @@ public class Book extends MLMBaseClass {
         bookDTO.setStatus(getStatus());
         bookDTO.setStatusStr(getStatus().toString());
         bookDTO.setReviewDTO(dto);
+        bookDTO.setEbookId(getEbook().getId());
         return bookDTO;
     }
 
