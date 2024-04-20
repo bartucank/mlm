@@ -16,6 +16,7 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
@@ -65,7 +66,9 @@ public class Book extends MLMBaseClass {
         bookDTO.setCategoryStr(getCategory().toString());
         bookDTO.setStatus(getStatus());
         bookDTO.setStatusStr(getStatus().toString());
-        bookDTO.setEbookId(getEbook().getId());
+        if(Objects.nonNull(getEbook())){
+            bookDTO.setEbookId(getEbook().getId());
+        }
         return bookDTO;
     }
     public BookDTO toDTOWithReview(BookReviewDTO dto) {
@@ -87,7 +90,9 @@ public class Book extends MLMBaseClass {
         bookDTO.setStatus(getStatus());
         bookDTO.setStatusStr(getStatus().toString());
         bookDTO.setReviewDTO(dto);
-        bookDTO.setEbookId(getEbook().getId());
+        if(Objects.nonNull(getEbook())){
+            bookDTO.setEbookId(getEbook().getId());
+        }
         return bookDTO;
     }
 
