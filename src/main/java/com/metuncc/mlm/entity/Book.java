@@ -67,8 +67,8 @@ public class Book extends MLMBaseClass {
         bookDTO.setStatus(getStatus());
         bookDTO.setStatusStr(getStatus().toString());
         if(Objects.nonNull(getEbook())){
-            bookDTO.setEbookId(getEbook().getId());
         }
+            bookDTO.setEbookId(getEbook().getId());
         return bookDTO;
     }
     public BookDTO toDTOWithReview(BookReviewDTO dto) {
