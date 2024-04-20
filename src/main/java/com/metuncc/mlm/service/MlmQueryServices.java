@@ -11,7 +11,9 @@ import com.metuncc.mlm.dto.ml.LightUser;
 import com.metuncc.mlm.entity.Room;
 import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.Role;
+import org.apache.commons.csv.CSVPrinter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -96,9 +98,15 @@ public interface MlmQueryServices {
 
     List<LightBook> getLightBooks();
 
+    void writeBooksToCSV(CSVPrinter csvPrinter) throws IOException;
+
     List<LightUser> getLightUsers();
 
+    void writeUsersToCSV(CSVPrinter csvPrinter) throws IOException;
+
     List<LightReview> getLightReviews();
+
+    void writeReviewsToCSV(CSVPrinter csvPrinter) throws IOException;
 
     BookDTOListResponse getFavorites();
 

@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
 import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.DAYS;
 
+import org.apache.commons.csv.CSVPrinter;
 @Service
 @AllArgsConstructor
 public class MlmQueryServicesImpl implements MlmQueryServices {
@@ -798,6 +800,15 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     public List<LightBook> getLightBooks(){
         return bookRepository.findAll().stream().map(Book::toLightDTO).collect(Collectors.toList());
     }
+    @Override
+    public void writeBooksToCSV(CSVPrinter csvPrinter) throws IOException {
+        List<Book > books = bookRepository.findAll();
+
+        for (Book book : books) {
+            csvPrinter.printRecord(book.getId(),book.getIsbn(),book.getCategory());
+        }
+    }
+
 
     @Override
     public List<LightUser> getLightUsers(){
@@ -805,8 +816,23 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    public void writeUsersToCSV(CSVPrinter csvPrinter) throws IOException {
+        List<User> users = userRepository.findAllByRoles(Role.USER);
+        for (User user : users) {
+            csvPrinter.printRecord(user.getId(),user.getDepartment());
+        }
+    }
+
+    @Override
     public List<LightReview> getLightReviews(){
         return bookReviewRepository.findAll().stream().map(BookReview::toLightDTO).collect(Collectors.toList());
+    }
+    @Override
+    public void writeReviewsToCSV(CSVPrinter csvPrinter) throws IOException {
+        List<BookReview> reviews = bookReviewRepository.findAll();
+        for (BookReview review : reviews) {
+            csvPrinter.printRecord(review.getUserId().getId().toString(), review.getBookId().getIsbn(),review.getStar());
+        }
     }
 
     @Override
