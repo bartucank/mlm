@@ -8,4 +8,5 @@ public class LightReview {
     private String comment;
     private Long rating;
     private Long userId;
+    private String isbn;
 }

@@ -36,6 +36,7 @@ public class BookReview extends MLMBaseClass {
         lightReview.setComment(getComment());
         lightReview.setRating(getStar());
         lightReview.setUserId(getUserId().getId());
+        lightReview.setIsbn(getBookId().getIsbn());
         return lightReview;
     }
 }
