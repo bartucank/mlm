@@ -37,6 +37,7 @@ import com.metuncc.mlm.utils.MailUtil;
 import com.metuncc.mlm.utils.excel.ExcelBookRow;
 import com.metuncc.mlm.utils.excel.ExcelReader;
 import net.glxn.qrgen.QRCode;
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -909,6 +910,9 @@ public class MlmServicesImpl implements MlmServices {
         try{
             List<ExcelBookRow> excelBooks = excelReader.parseBookExcel(file);
             for (ExcelBookRow excelBook : excelBooks) {
+                if(!CollectionUtils.isEmpty(bookRepository.getBookByIsbn(excelBook.getIsbn()))){
+                    continue;
+                }
                 try{
                     if(Objects.isNull(excelBook.getIsbn()) ||Objects.isNull(excelBook.getCategory()) || Objects.isNull(excelBook.getShelf())){
                         continue;
