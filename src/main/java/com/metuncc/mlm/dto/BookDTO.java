@@ -32,6 +32,7 @@ public class BookDTO extends MLMBaseClassDTO {
     private String categoryStr;
     private BookStatus status;
     private String statusStr;
+    private Long ebookId;
 
     private  BookReviewDTO reviewDTO;
     private List<BookReviewDTO> allReviews;

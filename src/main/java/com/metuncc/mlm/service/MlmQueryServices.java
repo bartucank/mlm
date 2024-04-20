@@ -101,4 +101,6 @@ public interface MlmQueryServices {
     List<LightReview> getLightReviews();
 
     BookDTOListResponse getFavorites();
+
+    EbookDTO getEbook(Long ebookId);
 }

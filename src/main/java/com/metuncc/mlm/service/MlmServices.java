@@ -94,4 +94,6 @@ public interface MlmServices {
     StatusDTO bulkRemoveStudentFromCourse(Long courseId, MultipartFile file);
 
     StatusDTO addToFavorite(Long bookId);
+
+    StatusDTO addEbook(Long bookId, MultipartFile file) throws IOException;
 }

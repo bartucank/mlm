@@ -152,13 +152,18 @@ public class MLMController {
         return responseService.createResponse(mlmQueryServices.getBookReviewsByBookId(id));
     }
 
-    @PostMapping("/user/addToFavorite")
+    @PostMapping("/favorite/addToFavorite")
     public ResponseEntity<ApiResponse<StatusDTO>> addToFavorite(@RequestParam("bookId") Long bookId){
         return responseService.createResponse(mlmServices.addToFavorite(bookId));
     }
 
-    @GetMapping("/user/getFavorites")
+    @GetMapping("/favorite/getFavorites")
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getFavorites(){
         return responseService.createResponse(mlmQueryServices.getFavorites());
+    }
+
+    @GetMapping("/ebook/getEbook")
+    public ResponseEntity<ApiResponse<EbookDTO>> getEbook(@RequestParam("id") Long id){
+        return responseService.createResponse(mlmQueryServices.getEbook(id));
     }
 }
