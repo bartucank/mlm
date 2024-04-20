@@ -76,13 +76,14 @@ public class MlmServicesImpl implements MlmServices {
     private CourseRepository courseRepository;
     private CourseMaterialRepository courseMaterialRepository;
     private CourseStudentRepository courseStudentRepository;
+    private FavoriteRepository favoriteRepository;
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
     @Value("${webpage.link:https://metu.edu.tr}")
     private String webpageLink;
 
-    public MlmServicesImpl(BookReviewRepository bookReviewRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, ReceiptHistoryRepository receiptHistoryRepository, EmailRepository emailRepository, CourseRepository courseRepository, CourseMaterialRepository courseMaterialRepository, CourseStudentRepository courseStudentRepository) {
+    public MlmServicesImpl(BookReviewRepository bookReviewRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, ReceiptHistoryRepository receiptHistoryRepository, EmailRepository emailRepository, CourseRepository courseRepository, CourseMaterialRepository courseMaterialRepository, CourseStudentRepository courseStudentRepository, FavoriteRepository favoriteRepository) {
         this.bookReviewRepository = bookReviewRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -105,6 +106,7 @@ public class MlmServicesImpl implements MlmServices {
         this.courseRepository = courseRepository;
         this.courseMaterialRepository = courseMaterialRepository;
         this.courseStudentRepository = courseStudentRepository;
+        this.favoriteRepository = favoriteRepository;
     }
 
     @Override
@@ -1448,5 +1450,25 @@ public class MlmServicesImpl implements MlmServices {
         courseRepository.save(course);
         return success;
     }
+
+    @Override
+    public StatusDTO addToFavorite(Long bookId){
+        if(Objects.isNull(bookId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(bookId);
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User user = userRepository.getById(jwtUser.getId());
+        Favorite favorite = new Favorite();
+        favorite.setUserId(user);
+        favorite.setBookId(book);
+        favoriteRepository.save(favorite);
+        return success;
+    }
+
 
 }

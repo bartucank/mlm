@@ -427,4 +427,15 @@ public class DOSHelper {
         email.setDeletedDate(null);
         return email;
     }
+    public Favorite favorite1() {
+        Favorite favorite = new Favorite();
+        favorite.setId(1L);
+        favorite.setUserId(user1());
+        favorite.setBookId(book1());
+        favorite.setCreatedDate(LocalDateTime.now());
+        favorite.setLastModifiedDate(LocalDateTime.now());
+        favorite.setDeleted(false);
+        favorite.setDeletedDate(null);
+        return favorite;
+    }
 }

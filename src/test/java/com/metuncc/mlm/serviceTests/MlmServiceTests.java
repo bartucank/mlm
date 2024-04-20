@@ -89,6 +89,8 @@ public class MlmServiceTests {
     private RoomReservationRepository roomReservationRepository;
     @Mock
     private EmailRepository emailRepository;
+    @Mock
+    private FavoriteRepository favoriteRepository;
     @InjectMocks
     private MlmServicesImpl service;
 
@@ -1030,6 +1032,31 @@ public class MlmServiceTests {
         roomReservation.getRoomSlot().setEndHour(localTime.withMinute(59).withNano(0).withSecond(0));
         when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(List.of(roomReservation));
         assertNotNull(service.approveReservation("nfcCode", "qrCode"));
+    }
+
+    @DisplayName("invalid request")
+    @Test
+    public void addToFavorite_invalidCase1(){
+        assertThrows(MLMException.class, () -> {
+            service.addToFavorite(null);
+        });
+    }
+
+    @DisplayName("book not found")
+    @Test
+    public void addToFavorite_invalidCase2(){
+        when(bookRepository.getById(any())).thenReturn(null);
+        assertThrows(MLMException.class, () -> {
+            service.addToFavorite(1L);
+        });
+    }
+
+    @DisplayName("valid case")
+    @Test
+    public void addToFavorite_validCase(){
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(bookRepository.getById(any())).thenReturn(dosHelper.book1());
+        assertNotNull(service.addToFavorite(1L));
     }
 
 }

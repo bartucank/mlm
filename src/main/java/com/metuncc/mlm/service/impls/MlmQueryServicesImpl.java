@@ -77,6 +77,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     private CourseRepository courseRepository;
     private CourseMaterialRepository courseMaterialRepository;
     private CourseStudentRepository courseStudentRepository;
+    private FavoriteRepository favoriteRepository;
 
 
     @Override
@@ -805,5 +806,15 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public List<LightReview> getLightReviews(){
         return bookReviewRepository.findAll().stream().map(BookReview::toLightDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public BookDTOListResponse getFavorites(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        List<BookDTO> favoriteList = favoriteRepository.findByUserId(jwtUser.getId()).stream().map(Favorite::toBookDTO).collect(Collectors.toList());
+        BookDTOListResponse response = new BookDTOListResponse();
+        response.setBookDTOList(favoriteList);
+        return response;
     }
 }

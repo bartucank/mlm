@@ -99,6 +99,8 @@ public class MlmQueryServiceTests {
     private BookBorrowHistoryRepository bookBorrowHistoryRepository;
     @Mock
     private ReceiptHistoryRepository receiptHistoryRepository;
+    @Mock
+    private FavoriteRepository favoriteRepository;
 
     @Mock
     private HttpClient httpClient;
@@ -808,6 +810,14 @@ public class MlmQueryServiceTests {
         when(bookReviewRepository.getByBookAndUserId(any(),any())).thenReturn(dosHelper.bookReview1());
         assertNotNull(service.getBookById(1L));
     }
+
+    @DisplayName("getBookById valid")
+    @Test
+    public void getFavorites(){
+        when(favoriteRepository.findByUserId(any())).thenReturn(List.of(dosHelper.favorite1()));
+        assertNotNull(service.getFavorites());
+    }
+
 
 
 }
