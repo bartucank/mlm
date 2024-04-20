@@ -99,4 +99,6 @@ public interface MlmQueryServices {
     List<LightUser> getLightUsers();
 
     List<LightReview> getLightReviews();
+
+    BookDTOListResponse getFavorites();
 }
