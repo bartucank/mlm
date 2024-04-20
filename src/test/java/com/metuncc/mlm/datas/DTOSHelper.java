@@ -27,6 +27,7 @@ public class DTOSHelper {
         user.setRole(Role.USER);
         user.setUsername("username");
         user.setFullName("full name");
+        user.setStudentNumber("1234567");
         user.setId(1L);
         user.setCreatedDate(LocalDateTime.now());
         user.setLastModifiedDate(LocalDateTime.now());

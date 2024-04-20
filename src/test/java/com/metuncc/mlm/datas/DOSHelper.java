@@ -20,6 +20,7 @@ public class DOSHelper {
         user.setUsername("username");
         user.setEmail("a@metu.edu.tr");
         user.setFullName("full name");
+        user.setStudentNumber("1234567");
         user.setDepartment(Department.CNG);
         user.setId(1L);
         user.setCreatedDate(LocalDateTime.now());
@@ -48,6 +49,8 @@ public class DOSHelper {
         user.setUsername("username2");
         user.setEmail("a2@metu.edu.tr");
         user.setFullName("full name2");
+        user.setStudentNumber("2234567");
+
         user.setDepartment(Department.CNG);
         user.setId(2L);
         user.setCreatedDate(LocalDateTime.now());
@@ -165,7 +168,7 @@ public class DOSHelper {
         roomSlot.setId(1L);
         roomSlot.setStartHour(LocalDateTime.now().toLocalTime());
         roomSlot.setEndHour(LocalDateTime.now().plusHours(1L).toLocalTime());
-        roomSlot.setDay(RoomSlotDays.MON);
+        roomSlot.setDay(RoomSlotDays.fromValue(LocalDate.now().getDayOfWeek().getValue()));
         roomSlot.setAvailable(true);
         roomSlot.setRoom(room1());
         roomSlot.setCreatedDate(LocalDateTime.now());
@@ -178,6 +181,19 @@ public class DOSHelper {
     public RoomReservation roomReservation1(){
         RoomReservation reservation = new RoomReservation();
         reservation.setId(1L);
+        reservation.setRoomSlot(roomSlot1());
+        reservation.setUserId(user1().getId());
+        reservation.setCreatedDate(LocalDateTime.now());
+        reservation.setLastModifiedDate(LocalDateTime.now());
+        reservation.setDate(LocalDate.now());
+        reservation.setDeleted(false);
+        reservation.setDeletedDate(null);
+        reservation.setApproved(false);
+        return reservation;
+    }
+    public RoomReservation roomReservation2(){
+        RoomReservation reservation = new RoomReservation();
+        reservation.setId(2L);
         reservation.setRoomSlot(roomSlot1());
         reservation.setUserId(user1().getId());
         reservation.setCreatedDate(LocalDateTime.now());
@@ -352,6 +368,19 @@ public class DOSHelper {
         return bookQueueHoldHistoryRecord;
     }
 
+    public BookQueueHoldHistoryRecord bookQueueHoldHistoryRecord2(){
+        BookQueueHoldHistoryRecord bookQueueHoldHistoryRecord = new BookQueueHoldHistoryRecord();
+        bookQueueHoldHistoryRecord.setId(2L);
+        bookQueueHoldHistoryRecord.setUserId(2L);
+        bookQueueHoldHistoryRecord.setEndDate(LocalDateTime.now().minusDays(1L));
+        bookQueueHoldHistoryRecord.setBookQueueRecord(bookQueueRecord1());
+        bookQueueHoldHistoryRecord.setCreatedDate(LocalDateTime.now());
+        bookQueueHoldHistoryRecord.setLastModifiedDate(LocalDateTime.now());
+        bookQueueHoldHistoryRecord.setDeleted(false);
+        bookQueueHoldHistoryRecord.setDeletedDate(null);
+        return bookQueueHoldHistoryRecord;
+    }
+
 
     public Image imageForIntegrationTest(){
         Image image = new Image();
@@ -386,5 +415,16 @@ public class DOSHelper {
         verificationCode.setDeleted(false);
         verificationCode.setDeletedDate(null);
         return verificationCode;
+    }
+    public Email email1() {
+        Email email = new Email();
+        email.setId(1L);
+        email.setSubject("subject");
+        email.setContent("content");
+        email.setCreatedDate(LocalDateTime.now());
+        email.setLastModifiedDate(LocalDateTime.now());
+        email.setDeleted(false);
+        email.setDeletedDate(null);
+        return email;
     }
 }
