@@ -446,7 +446,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             response.setTotalResult(0);
             return response;
         }
-        List<ReceiptHistoryDTO> receiptDTOs = receiptPage.getContent().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList());
+        List<ReceiptHistoryDTO> receiptDTOs = receiptPage.getContent().stream().map(ReceiptHistory::toForListDTO).collect(Collectors.toList());
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
         response.setReceiptHistoryDTOList(receiptDTOs);
         response.setTotalPage(receiptPage.getTotalPages());
