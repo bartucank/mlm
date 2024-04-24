@@ -6,9 +6,8 @@ import com.metuncc.mlm.entity.base.MLMBaseClass;
 import com.metuncc.mlm.entity.enums.ReceiptStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @EqualsAndHashCode(callSuper = true)
@@ -19,6 +18,7 @@ public class ReceiptHistory extends MLMBaseClass {
     private User user;
     @OneToOne
     private Image img;
+    @Enumerated(value = EnumType.STRING)
     private ReceiptStatus approved;
     private BigDecimal balance;
 

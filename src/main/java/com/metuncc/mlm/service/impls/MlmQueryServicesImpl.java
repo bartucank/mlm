@@ -428,13 +428,23 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             request.setPage(0);
             request.setSize(10);
         }
+        if(Objects.isNull(request.getIsApproved())){
+            request.setIsApproved(false);
+        }
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<ReceiptHistory> receiptPage = new PageImpl<>(new ArrayList<>());
+        Page<ReceiptHistory> receiptPage =null;
         if(request.getIsApproved().equals(true)){
             receiptPage = receiptHistoryRepository.getByStatus(ReceiptStatus.APPROVED, pageable);
         }
         else if (request.getIsApproved().equals(false)) {
             receiptPage = receiptHistoryRepository.getByStatus(ReceiptStatus.NOT_APPROVED, pageable);
+        }
+        if(Objects.isNull(receiptPage)){
+            ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
+            response.setReceiptHistoryDTOList(new ArrayList<>());
+            response.setTotalPage(0);
+            response.setTotalResult(0);
+            return response;
         }
         List<ReceiptHistoryDTO> receiptDTOs = receiptPage.getContent().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList());
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();

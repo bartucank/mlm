@@ -1,8 +1,6 @@
 package com.metuncc.mlm.dto;
 
 
-import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.ReceiptStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
