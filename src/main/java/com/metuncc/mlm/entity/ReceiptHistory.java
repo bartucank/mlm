@@ -3,6 +3,7 @@ package com.metuncc.mlm.entity;
 
 import com.metuncc.mlm.dto.ReceiptHistoryDTO;
 import com.metuncc.mlm.entity.base.MLMBaseClass;
+import com.metuncc.mlm.entity.enums.ReceiptStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import javax.persistence.Entity;
@@ -18,7 +19,7 @@ public class ReceiptHistory extends MLMBaseClass {
     private User user;
     @OneToOne
     private Image img;
-    private Boolean approved;
+    private ReceiptStatus approved;
     private BigDecimal balance;
 
     public ReceiptHistoryDTO toDTO(){

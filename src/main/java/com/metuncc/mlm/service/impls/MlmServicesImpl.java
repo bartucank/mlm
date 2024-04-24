@@ -37,7 +37,6 @@ import com.metuncc.mlm.utils.MailUtil;
 import com.metuncc.mlm.utils.excel.ExcelBookRow;
 import com.metuncc.mlm.utils.excel.ExcelReader;
 import net.glxn.qrgen.QRCode;
-import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -814,7 +813,7 @@ public class MlmServicesImpl implements MlmServices {
         ReceiptHistory receiptHistory = new ReceiptHistory();
         receiptHistory.setUser(user);
         receiptHistory.setImg(image);
-        receiptHistory.setApproved(false);
+        receiptHistory.setApproved(ReceiptStatus.NOT_APPROVED);
         receiptHistory.setBalance(new BigDecimal(0));
         receiptHistoryRepository.save(receiptHistory);
         return success;
@@ -829,7 +828,7 @@ public class MlmServicesImpl implements MlmServices {
             throw new MLMException(ExceptionCode.RECEIPT_NOT_FOUND);
         }
         receiptHistory.setBalance(balance);
-        receiptHistory.setApproved(true);
+        receiptHistory.setApproved(ReceiptStatus.APPROVED);
         User user = userRepository.getById(receiptHistory.getUser().getId());
         if(Objects.isNull(user)){
             throw new MLMException(ExceptionCode.USER_NOT_FOUND);
@@ -1502,5 +1501,18 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Override
+    public StatusDTO rejectReceipt(Long receiptId){
+        if(Objects.isNull(receiptId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        ReceiptHistory receiptHistory = receiptHistoryRepository.getById(receiptId);
+        if(Objects.isNull(receiptHistory)){
+            throw new MLMException(ExceptionCode.RECEIPT_NOT_FOUND);
+        }
+        receiptHistory.setApproved(ReceiptStatus.REJECTED);
+        receiptHistoryRepository.save(receiptHistory);
+        return success;
+    }
 
 }

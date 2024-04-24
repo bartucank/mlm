@@ -3,6 +3,7 @@ package com.metuncc.mlm.dto;
 
 import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.User;
+import com.metuncc.mlm.entity.enums.ReceiptStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +15,7 @@ public class ReceiptHistoryDTO extends MLMBaseClassDTO {
 
     private Long userId;
     private Long imgId;
-    private Boolean approved;
+    private ReceiptStatus approved;
     private BigDecimal balance;
 
 

@@ -30,6 +30,7 @@ import com.metuncc.mlm.utils.excel.BookExcelWriter;
 import com.metuncc.mlm.utils.excel.CourseStudentExcelWriter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -428,7 +429,13 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
             request.setSize(10);
         }
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<ReceiptHistory> receiptPage = receiptHistoryRepository.getByStatus(request.getIsApproved(), pageable);
+        Page<ReceiptHistory> receiptPage = new PageImpl<>(new ArrayList<>());
+        if(request.getIsApproved().equals(true)){
+            receiptPage = receiptHistoryRepository.getByStatus(ReceiptStatus.APPROVED, pageable);
+        }
+        else if (request.getIsApproved().equals(false)) {
+            receiptPage = receiptHistoryRepository.getByStatus(ReceiptStatus.NOT_APPROVED, pageable);
+        }
         List<ReceiptHistoryDTO> receiptDTOs = receiptPage.getContent().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList());
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
         response.setReceiptHistoryDTOList(receiptDTOs);
