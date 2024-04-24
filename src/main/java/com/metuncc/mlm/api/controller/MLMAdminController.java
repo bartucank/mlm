@@ -196,4 +196,9 @@ public class MLMAdminController {
         return responseService.createResponse(mlmServices.addEbook(bookId,file));
     }
 
+    @PutMapping("/rejectReceipt")
+    public ResponseEntity<ApiResponse<StatusDTO>> rejectReceipt(@RequestParam("receiptId") Long id){
+        return responseService.createResponse(mlmServices.rejectReceipt(id));
+    }
+
 }

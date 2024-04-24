@@ -96,4 +96,6 @@ public interface MlmServices {
     StatusDTO addToFavorite(Long bookId);
 
     StatusDTO addEbook(Long bookId, MultipartFile file) throws IOException;
+
+    StatusDTO rejectReceipt(Long receiptId);
 }

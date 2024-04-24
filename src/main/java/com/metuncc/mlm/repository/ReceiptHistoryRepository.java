@@ -1,6 +1,7 @@
 package com.metuncc.mlm.repository;
 
 import com.metuncc.mlm.entity.ReceiptHistory;
+import com.metuncc.mlm.entity.enums.ReceiptStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,5 +19,5 @@ public interface ReceiptHistoryRepository extends JpaRepository<ReceiptHistory,L
     List<ReceiptHistory> getByUserId(@Param("id") Long id);
 
     @Query("select r from ReceiptHistory r where r.approved = :approved")
-    Page<ReceiptHistory> getByStatus(@Param("approved") Boolean approved, Pageable pageable);
+    Page<ReceiptHistory> getByStatus(@Param("approved") ReceiptStatus approved, Pageable pageable);
 }
