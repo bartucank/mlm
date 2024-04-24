@@ -39,6 +39,7 @@ public class ReceiptHistory extends MLMBaseClass {
         receiptHistoryDTO.setUserId(getUser().getId());
         receiptHistoryDTO.setImgId(getImg().getId());
         receiptHistoryDTO.setApproved(getApproved().equals(ReceiptStatus.APPROVED)?true:getApproved().equals(ReceiptStatus.NOT_APPROVED)?false:null);
+        receiptHistoryDTO.setApprovedEnum(getApproved());
         receiptHistoryDTO.setBalance(getBalance());
         return receiptHistoryDTO;
     }
