@@ -13,7 +13,8 @@ public class ReceiptHistoryDTO extends MLMBaseClassDTO {
 
     private Long userId;
     private Long imgId;
-    private ReceiptStatus approved;
+    private ReceiptStatus approvedEnum;
+    private Boolean approved;
     private BigDecimal balance;
 
 

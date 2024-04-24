@@ -317,7 +317,7 @@ public class DOSHelper {
         receiptHistory.setId(1L);
         receiptHistory.setUser(user1());
         receiptHistory.setImg(image1());
-        receiptHistory.setApproved(false);
+        receiptHistory.setApproved(ReceiptStatus.NOT_APPROVED);
         receiptHistory.setBalance(BigDecimal.ONE);
         receiptHistory.setCreatedDate(LocalDateTime.now());
         receiptHistory.setLastModifiedDate(LocalDateTime.now());
