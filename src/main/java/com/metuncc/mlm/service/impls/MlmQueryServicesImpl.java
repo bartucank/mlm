@@ -410,13 +410,13 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
 
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
-        response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(jwtUser.getId()).stream().map(ReceiptHistory::toForListDTO).collect(Collectors.toList()));
+        response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(jwtUser.getId()).stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
         return response;
     }
     @Override
     public ReceiptHistoryDTOListResponse getReceipts(){
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
-        response.setReceiptHistoryDTOList(receiptHistoryRepository.findAll().stream().map(ReceiptHistory::toForListDTO).collect(Collectors.toList()));
+        response.setReceiptHistoryDTOList(receiptHistoryRepository.findAll().stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
         return response;
     }
     @Override
@@ -456,14 +456,14 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public ReceiptHistoryDTOListResponse getReceiptsByUser(Long id){
         ReceiptHistoryDTOListResponse response = new ReceiptHistoryDTOListResponse();
-        response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(id).stream().map(ReceiptHistory::toForListDTO).collect(Collectors.toList()));
+        response.setReceiptHistoryDTOList(receiptHistoryRepository.getByUserId(id).stream().map(ReceiptHistory::toDTO).collect(Collectors.toList()));
         return response;
     }
     @Override
     public ReceiptHistoryDTOHashMapResponse getReceiptsHashMap(){
         ReceiptHistoryDTOHashMapResponse response = new ReceiptHistoryDTOHashMapResponse();
         HashMap<Long, List<ReceiptHistoryDTO>> receiptHistoryHashMap = new HashMap<>();
-        List<ReceiptHistoryDTO> allReceipts = receiptHistoryRepository.findAll().stream().map(ReceiptHistory::toForListDTO).toList();
+        List<ReceiptHistoryDTO> allReceipts = receiptHistoryRepository.findAll().stream().map(ReceiptHistory::toDTO).toList();
         for (ReceiptHistoryDTO receipt : allReceipts) {
             Long userId = receipt.getUserId();
             receiptHistoryHashMap.computeIfAbsent(userId, k -> new ArrayList<>()).add(receipt);
