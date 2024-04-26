@@ -1467,6 +1467,9 @@ public class MlmServicesImpl implements MlmServices {
         }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        if(Objects.nonNull(favoriteRepository.findByUserIdAndBookId(jwtUser.getId(),bookId))){
+            throw new MLMException(ExceptionCode.ALREADY_FAVORITED);
+        }
         User user = userRepository.getById(jwtUser.getId());
         Favorite favorite = new Favorite();
         favorite.setUserId(user);

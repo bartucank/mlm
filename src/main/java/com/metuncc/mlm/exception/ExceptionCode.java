@@ -48,7 +48,8 @@ public enum ExceptionCode {
     COURSE_IMAGE_CANNOT_BE_NULL("Course image cannot be empty."),
     MATERIAL_NOT_FOUND("Material not found."),
     UNSUPPORTED_FILE("File type is not supported. Only PDF or EPUB"),
-    FAVORITE_NOT_FOUND("Favorite not found."),;
+    FAVORITE_NOT_FOUND("Favorite not found."),
+    ALREADY_FAVORITED("Already favorited."),;
 
 
 
