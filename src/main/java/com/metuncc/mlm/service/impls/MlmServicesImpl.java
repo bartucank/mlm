@@ -1515,4 +1515,24 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Override
+    public StatusDTO removeFavorite(Long bookId){
+        if(Objects.isNull(bookId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Book book = bookRepository.getById(bookId);
+        if(Objects.isNull(book)){
+            throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+
+        Favorite favorite = favoriteRepository.findByUserIdAndBookId(jwtUser.getId(),bookId);
+        if(Objects.isNull(favorite)){
+            throw new MLMException(ExceptionCode.FAVORITE_NOT_FOUND);
+        }
+        favoriteRepository.delete(favorite);
+        return success;
+    }
+
 }
