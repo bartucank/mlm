@@ -133,25 +133,22 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         if (Objects.isNull(book)) {
             throw new MLMException(ExceptionCode.BOOK_NOT_FOUND);
         }
-        BookReviewDTO reviewDTO = new BookReviewDTO();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+
         try{
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
             BookReview bookReview = bookReviewRepository.getByBookAndUserId(id,jwtUser.getId());
             if(Objects.nonNull(bookReview)){
-                return book.toDTOWithReview(bookReview.toDTO());
+                BookDTO bookDTO = book.toDTOWithReview(bookReview.toDTO());
+                bookDTO.setIsFavorited(Objects.nonNull(favoriteRepository.findByUserIdAndBookId(jwtUser.getId(), id)));
+                return bookDTO;
             }
         }catch (Exception e){
             //do nothing.
         }
         BookDTO bookDTO = book.toDTO();
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
-        if(Objects.nonNull(favoriteRepository.findByUserIdAndBookId(jwtUser.getId(),id))){
-            bookDTO.setIsFavorited(true);
-        }
-        else
-            bookDTO.setIsFavorited(false);
+        bookDTO.setIsFavorited(Objects.nonNull(favoriteRepository.findByUserIdAndBookId(jwtUser.getId(), id)));
         return bookDTO;
     }
 
