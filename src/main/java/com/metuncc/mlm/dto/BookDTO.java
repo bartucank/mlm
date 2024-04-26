@@ -37,5 +37,6 @@ public class BookDTO extends MLMBaseClassDTO {
     private  BookReviewDTO reviewDTO;
     private List<BookReviewDTO> allReviews;
     private BigDecimal averagePoint;
+    private Boolean isFavorited;
 
 }

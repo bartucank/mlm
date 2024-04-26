@@ -111,4 +111,6 @@ public interface MlmQueryServices {
     BookDTOListResponse getFavorites();
 
     EbookDTO getEbook(Long ebookId);
+
+    Boolean isFavorited(Long bookId);
 }

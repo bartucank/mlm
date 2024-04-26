@@ -14,4 +14,7 @@ public interface FavoriteRepository extends JpaRepository<Favorite,Long>, JpaSpe
     @Query("select f from Favorite f where f.userId.id = :userId")
     List<Favorite> findByUserId(@Param("userId") Long userId);
 
+    @Query("select f from Favorite f where f.userId.id = :userId and f.bookId.id = :bookId")
+    Favorite findByUserIdAndBookId(@Param("userId") Long userId, @Param("bookId") Long bookId);
+
 }

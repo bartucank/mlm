@@ -166,4 +166,14 @@ public class MLMController {
     public ResponseEntity<ApiResponse<EbookDTO>> getEbook(@RequestParam("id") Long id){
         return responseService.createResponse(mlmQueryServices.getEbook(id));
     }
+
+    @DeleteMapping("/favorite/removeFavorite")
+    public ResponseEntity<ApiResponse<StatusDTO>> removeFavorite(@RequestParam("bookId") Long bookId){
+        return responseService.createResponse(mlmServices.removeFavorite(bookId));
+    }
+
+    @GetMapping("/favorite/isFavorited")
+    public ResponseEntity<ApiResponse<Boolean>> isFavorited(@RequestParam("bookId") Long bookId){
+        return responseService.createResponse(mlmQueryServices.isFavorited(bookId));
+    }
 }

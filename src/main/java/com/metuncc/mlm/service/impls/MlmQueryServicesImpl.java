@@ -30,7 +30,6 @@ import com.metuncc.mlm.utils.excel.BookExcelWriter;
 import com.metuncc.mlm.utils.excel.CourseStudentExcelWriter;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -145,7 +144,15 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         }catch (Exception e){
             //do nothing.
         }
-        return book.toDTO();
+        BookDTO bookDTO = book.toDTO();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        if(Objects.nonNull(favoriteRepository.findByUserIdAndBookId(jwtUser.getId(),id))){
+            bookDTO.setIsFavorited(true);
+        }
+        else
+            bookDTO.setIsFavorited(false);
+        return bookDTO;
     }
 
     @Override
@@ -876,5 +883,15 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public Boolean isFavorited(Long bookId){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        if(Objects.nonNull(favoriteRepository.findByUserIdAndBookId(jwtUser.getId(),bookId))){
+            return true;
+        }
+        return false;
     }
 }
