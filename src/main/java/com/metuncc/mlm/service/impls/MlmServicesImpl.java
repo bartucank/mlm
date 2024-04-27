@@ -665,6 +665,21 @@ public class MlmServicesImpl implements MlmServices {
     }
 
     @Override
+    public Boolean checkNowReservationExists(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        if (Objects.isNull(jwtUser) || Objects.isNull(jwtUser.getId())) {
+            throw new MLMException(ExceptionCode.UNAUTHORIZED);
+        }
+        List<RoomReservation> roomReservationList = roomReservationRepository.getRoomReservationByUserId(jwtUser.getId());
+        LocalDateTime currentTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        List<RoomReservation> todaysReservations = roomReservationList.stream().filter(c -> (c.getRoomSlot().getDay().getValue() == currentTime.getDayOfWeek().getValue()) && (c.getRoomSlot().getStartHour().getHour() == currentTime.getHour())).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(todaysReservations)) {
+            return true;
+        }
+        return false;
+    }
+    @Override
     public StatusDTO makeReservation(Long roomSlotId) {
         if (Objects.isNull(roomSlotId)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
@@ -1419,7 +1434,7 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
     @Override
-    public StatusDTO finishCourseTerm(Long courseId ){
+    public StatusDTO finishCourseTerm(Long courseId){
         if(Objects.isNull(courseId)){
             throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
         }

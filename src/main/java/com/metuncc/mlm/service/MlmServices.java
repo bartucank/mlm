@@ -53,6 +53,8 @@ public interface MlmServices {
 
     StatusDTO givePhysicalCopyCardToUser(String nfcCode, Long userId);
 
+    Boolean checkNowReservationExists();
+
     StatusDTO makeReservation(Long roomSlotId);
 
     StatusDTO cancelReservation(Long roomReservationId);

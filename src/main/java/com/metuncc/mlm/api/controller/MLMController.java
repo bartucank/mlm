@@ -176,4 +176,8 @@ public class MLMController {
     public ResponseEntity<ApiResponse<Boolean>> isFavorited(@RequestParam("bookId") Long bookId){
         return responseService.createResponse(mlmQueryServices.isFavorited(bookId));
     }
+    @GetMapping("/checkNowReservationExists")
+    public ResponseEntity<ApiResponse<Boolean>> checkNowReservationExists(){
+        return responseService.createResponse(mlmServices.checkNowReservationExists());
+    }
 }
