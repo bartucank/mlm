@@ -1419,6 +1419,23 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
     @Override
+    public StatusDTO finishCourseTerm(Long courseId ){
+        if(Objects.isNull(courseId)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+
+        Course course = courseRepository.getById(courseId);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        course.setIsPublic(false);
+        courseStudentRepository.deleteAll(course.getCourseStudentList());
+        course.setCourseStudentList(new ArrayList<>());
+        courseRepository.save(course);
+
+        return success;
+    }
+    @Override
     public StatusDTO bulkRemoveStudentFromCourse(Long courseId, MultipartFile file){
         if(Objects.isNull(courseId)){
             throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);

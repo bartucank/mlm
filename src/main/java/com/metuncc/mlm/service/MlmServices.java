@@ -91,6 +91,8 @@ public interface MlmServices {
 
     StatusDTO removeStudentFromCourse(Long courseId, Long courseStudentId);
 
+    StatusDTO finishCourseTerm(Long courseId);
+
     StatusDTO bulkRemoveStudentFromCourse(Long courseId, MultipartFile file);
 
     StatusDTO addToFavorite(Long bookId);

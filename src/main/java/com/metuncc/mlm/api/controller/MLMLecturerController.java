@@ -74,4 +74,9 @@ public class MLMLecturerController {
     public ResponseEntity<ApiResponse<CourseDTOListResponse>> getCoursesForLecturer(){
         return responseService.createResponse(mlmQueryServices.getCoursesForLecturer());
     }
+
+    @PutMapping("/course/finishCourseTerm")
+    public ResponseEntity<ApiResponse<StatusDTO>> finishCourseTerm(@RequestParam("courseId") Long courseId){
+        return responseService.createResponse(mlmServices.finishCourseTerm(courseId));
+    }
 }
