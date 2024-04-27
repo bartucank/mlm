@@ -177,6 +177,11 @@ public class MLMController {
         return responseService.createResponse(mlmQueryServices.isFavorited(bookId));
     }
 
+    @GetMapping("/checkNowReservationExists")
+    public ResponseEntity<ApiResponse<Boolean>> checkNowReservationExists(){
+        return responseService.createResponse(mlmServices.checkNowReservationExists());
+    }
+  
     @PostMapping("/book/detailedFilter")
     public ResponseEntity<ApiResponse<DetailedFilter>> detailedFilter(@RequestBody DetailedFilter request){
         return responseService.createResponse(mlmQueryServices.detailedFilter(request));

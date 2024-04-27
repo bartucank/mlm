@@ -887,7 +887,7 @@ public class MlmServiceTests {
         roomReservations.add(dosHelper.roomReservation1());
         roomReservations.add(dosHelper.roomReservation2());
         when(roomSlotRepository.getById(any())).thenReturn(roomSlot);
-        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(roomReservations);
+        when(roomReservationRepository.getRoomReservationByUserId(any(),any())).thenReturn(roomReservations);
         assertThrows(MLMException.class, () -> {
             service.makeReservation(1L);
         });
@@ -901,7 +901,7 @@ public class MlmServiceTests {
         List<RoomReservation> roomReservations = new ArrayList<>();
         roomReservations.add(dosHelper.roomReservation1());
         when(roomSlotRepository.getById(any())).thenReturn(roomSlot);
-        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(roomReservations);
+        when(roomReservationRepository.getRoomReservationByUserId(any(),any())).thenReturn(roomReservations);
         when(roomReservationRepository.save(any())).thenReturn(dosHelper.roomReservation1());
         assertNotNull(service.makeReservation(1L));
     }
@@ -1018,7 +1018,7 @@ public class MlmServiceTests {
     @DisplayName("reservation not found")
     @Test
     public void approveReservation_invalidCase3(){
-        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(new ArrayList<>());
+        when(roomReservationRepository.getRoomReservationByUserId(any(),any())).thenReturn(new ArrayList<>());
         assertThrows(MLMException.class, () -> {
             service.approveReservation("nfcCode", "qrCode");
         });
@@ -1033,7 +1033,7 @@ public class MlmServiceTests {
         LocalTime localTime = LocalTime.now();
         roomReservation.getRoomSlot().setStartHour(localTime.withMinute(0).withNano(0).withSecond(0));
         roomReservation.getRoomSlot().setEndHour(localTime.withMinute(59).withNano(0).withSecond(0));
-        when(roomReservationRepository.getRoomReservationByUserId(any())).thenReturn(List.of(roomReservation));
+        when(roomReservationRepository.getRoomReservationByUserId(any(),any())).thenReturn(List.of(roomReservation));
         assertNotNull(service.approveReservation("nfcCode", "qrCode"));
     }
 

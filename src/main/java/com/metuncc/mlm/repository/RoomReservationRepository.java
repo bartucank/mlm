@@ -8,13 +8,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
 public interface RoomReservationRepository extends JpaRepository<RoomReservation,Long> {
 
-    @Query("select r from RoomReservation  r where r.userId=:id")
-    List<RoomReservation> getRoomReservationByUserId(@Param("id") Long id);
+    @Query("select r from RoomReservation  r where r.userId=:id and r.date=:date")
+    List<RoomReservation> getRoomReservationByUserId(@Param("id") Long id,
+                                                     @Param("date")LocalDate date);
+
+
+    @Query("select r from RoomReservation  r where r.userId=:id and r.roomSlot.startHour=:date")
+    List<RoomReservation> getRoomReservationByUserIdAndDate(@Param("id") Long id,@Param("date") LocalTime date);
 
 
     @Query("select r from RoomReservation r where r.roomSlot in :roomSlotList and r.approved=false")

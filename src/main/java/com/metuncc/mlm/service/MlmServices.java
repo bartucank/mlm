@@ -53,6 +53,8 @@ public interface MlmServices {
 
     StatusDTO givePhysicalCopyCardToUser(String nfcCode, Long userId);
 
+    Boolean checkNowReservationExists();
+
     StatusDTO makeReservation(Long roomSlotId);
 
     StatusDTO cancelReservation(Long roomReservationId);
@@ -90,6 +92,8 @@ public interface MlmServices {
     StatusDTO deleteCourseMaterial(Long materialId);
 
     StatusDTO removeStudentFromCourse(Long courseId, Long courseStudentId);
+
+    StatusDTO finishCourseTerm(Long courseId);
 
     StatusDTO bulkRemoveStudentFromCourse(Long courseId, MultipartFile file);
 
