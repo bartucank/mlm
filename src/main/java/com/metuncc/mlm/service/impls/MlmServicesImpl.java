@@ -671,7 +671,7 @@ public class MlmServicesImpl implements MlmServices {
         if (Objects.isNull(jwtUser) || Objects.isNull(jwtUser.getId())) {
             throw new MLMException(ExceptionCode.UNAUTHORIZED);
         }
-        List<RoomReservation> roomReservationList = roomReservationRepository.getRoomReservationByUserId(jwtUser.getId());
+        List<RoomReservation> roomReservationList = roomReservationRepository.getRoomReservationByUserId(jwtUser.getId(),LocalDate.now());
         LocalDateTime currentTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
         List<RoomReservation> todaysReservations = roomReservationList.stream().filter(c -> (c.getRoomSlot().getDay().getValue() == currentTime.getDayOfWeek().getValue()) && (c.getRoomSlot().getStartHour().getHour() == currentTime.getHour())).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(todaysReservations)) {
@@ -699,7 +699,7 @@ public class MlmServicesImpl implements MlmServices {
         }
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
-        if (roomReservationRepository.getRoomReservationByUserId(jwtUser.getId()).size() >= 2) {
+        if (roomReservationRepository.getRoomReservationByUserId(jwtUser.getId(),LocalDate.now()).size() >= 2) {
             throw new MLMException(ExceptionCode.MAX_RESERVATION_REACHED);
         }
 
@@ -796,7 +796,7 @@ public class MlmServicesImpl implements MlmServices {
         if (Objects.isNull(jwtUser) || Objects.isNull(jwtUser.getId())) {
             throw new MLMException(ExceptionCode.UNAUTHORIZED);
         }
-        List<RoomReservation> roomReservationList = roomReservationRepository.getRoomReservationByUserId(jwtUser.getId());
+        List<RoomReservation> roomReservationList = roomReservationRepository.getRoomReservationByUserId(jwtUser.getId(),LocalDate.now());
         LocalDateTime currentTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
         List<RoomReservation> todaysReservations = roomReservationList.stream().filter(c -> (c.getRoomSlot().getDay().getValue() == currentTime.getDayOfWeek().getValue()) && (c.getRoomSlot().getStartHour().getHour() == currentTime.getHour())).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(todaysReservations)) {
