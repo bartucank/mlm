@@ -675,7 +675,12 @@ public class MlmServicesImpl implements MlmServices {
         LocalDateTime currentTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
         List<RoomReservation> todaysReservations = roomReservationList.stream().filter(c -> (c.getRoomSlot().getDay().getValue() == currentTime.getDayOfWeek().getValue()) && (c.getRoomSlot().getStartHour().getHour() == currentTime.getHour())).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(todaysReservations)) {
-            return true;
+            for (RoomReservation todaysReservation : todaysReservations) {
+                if(!todaysReservation.getApproved()){
+                    return true;
+                }
+            }
+            return false;
         }
         return false;
     }
