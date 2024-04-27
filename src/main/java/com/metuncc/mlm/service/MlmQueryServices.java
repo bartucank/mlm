@@ -1,5 +1,6 @@
 package com.metuncc.mlm.service;
 
+import com.metuncc.mlm.api.request.DetailedFilter;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.api.response.*;
@@ -113,4 +114,8 @@ public interface MlmQueryServices {
     EbookDTO getEbook(Long ebookId);
 
     Boolean isFavorited(Long bookId);
+
+    DetailedFilter detailedFilter(DetailedFilter filter);
+
+    BookDTOListResponse getBooksByDetailedFilter(DetailedFilter filter);
 }

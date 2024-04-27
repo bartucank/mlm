@@ -176,4 +176,14 @@ public class MLMController {
     public ResponseEntity<ApiResponse<Boolean>> isFavorited(@RequestParam("bookId") Long bookId){
         return responseService.createResponse(mlmQueryServices.isFavorited(bookId));
     }
+
+    @PostMapping("/book/detailedFilter")
+    public ResponseEntity<ApiResponse<DetailedFilter>> detailedFilter(@RequestBody DetailedFilter request){
+        return responseService.createResponse(mlmQueryServices.detailedFilter(request));
+    }
+
+    @PostMapping("/book/getBooksByDetailedFilter")
+    public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksByDetailedFilter(@RequestBody DetailedFilter request){
+        return responseService.createResponse(mlmQueryServices.getBooksByDetailedFilter(request));
+    }
 }
