@@ -58,6 +58,9 @@ import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 import org.apache.commons.csv.CSVPrinter;
+
+import javax.transaction.Transactional;
+
 @Service
 @AllArgsConstructor
 public class MlmQueryServicesImpl implements MlmQueryServices {
@@ -125,6 +128,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public BookDTO getBookById(Long id) {
         if (Objects.isNull(id)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
@@ -867,6 +871,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public EbookDTO getEbook(Long ebookId){
         Ebook dbEbook = ebookRepository.getById(ebookId);
         if (Objects.nonNull(dbEbook)) {

@@ -17,7 +17,7 @@ public class Ebook extends MLMBaseClass {
 
     private String name;
 
-    @Lob
+    @Basic(fetch=FetchType.EAGER) @Lob
     private byte[] data;
 
     private String fileName;
