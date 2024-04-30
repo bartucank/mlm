@@ -899,4 +899,110 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         }
         return false;
     }
+
+    @Override
+    public DetailedFilter detailedFilter(DetailedFilter filter){
+
+        List<Long> shelfId = filter.getShelfId();
+        List<String> author = filter.getAuthor();
+        List<String> publisher = filter.getPublisher();
+        String name = filter.getName();
+        List<BookCategory> category = filter.getCategory();
+        List<BookStatus> status = filter.getStatus();
+        Boolean ebook = filter.getEbook();
+
+        String authorStr = null;
+        String publisherStr = null;
+        String nameStr = null;
+
+        if(Objects.nonNull(author) && Objects.nonNull(author.get(0))){
+            authorStr = '%'+author.get(0).toLowerCase()+'%';
+        }
+        if(Objects.nonNull(publisher) && Objects.nonNull(publisher.get(0))){
+            publisherStr = '%'+publisher.get(0).toLowerCase()+'%';
+        }
+        if(Objects.nonNull(name)){
+            nameStr = '%'+name.toLowerCase()+'%';
+        }
+
+        if(CollectionUtils.isEmpty(category)){
+            category = null;
+        }
+
+        List<String> authorList = bookRepository.getAuthors(status, shelfId, authorStr, publisherStr, nameStr, category, ebook);
+        List<String> finalAuthorList = new ArrayList<>();
+        for (String s : authorList) {
+            if(s.contains(",")){
+                List<String> names = List.of(s.split(","));
+                for (String n : names) {
+                    if(!StringUtils.isEmpty(n) && !n.equals("") && !n.equals(" ")){
+                        if(n.substring(0,1).equals(" ")){
+                            n = n.substring(1,n.length());
+                        }
+                        if(!n.equals("null")){
+                            finalAuthorList.add(n);
+                        }
+                    }
+                }
+            }else{
+                finalAuthorList.add(s);
+            }
+        }
+
+
+        List<String> finalPublishers = bookRepository.getPublishers(status, shelfId, authorStr, publisherStr, nameStr, category, ebook);
+        for(String finalPublisher : finalPublishers){
+            if(finalPublisher.charAt(0) == ' '){
+                finalPublisher = finalPublisher.substring(1);
+            }
+        }
+
+        List<Long> finalShelfIds = bookRepository.getShelfs(status, shelfId, authorStr, publisherStr, nameStr, category, ebook);
+        List<BookCategory> finalCategory = bookRepository.getCategories(status, shelfId, authorStr, publisherStr, nameStr, category, ebook);
+        List<BookStatus> finalStatus = bookRepository.getStatuses(status, shelfId, authorStr, publisherStr, nameStr, category, ebook);
+
+        DetailedFilter newFilter = new DetailedFilter();
+        newFilter.setShelfId(finalShelfIds);
+        newFilter.setAuthor(finalAuthorList);
+        newFilter.setPublisher(finalPublishers);
+        newFilter.setCategory(finalCategory);
+        newFilter.setStatus(finalStatus);
+        newFilter.setEbook(ebook);
+        newFilter.setName(name);
+        return newFilter;
+    }
+
+    @Override
+    public BookDTOListResponse getBooksByDetailedFilter(DetailedFilter filter){
+        List<Long> shelfId = filter.getShelfId();
+        List<String> author = filter.getAuthor();
+        List<String> publisher = filter.getPublisher();
+        String name = filter.getName();
+        List<BookCategory> category = filter.getCategory();
+        List<BookStatus> status = filter.getStatus();
+        Boolean ebook = filter.getEbook();
+
+        String authorStr = null;
+        String publisherStr = null;
+        String nameStr = null;
+
+        if(Objects.nonNull(author) && Objects.nonNull(author.get(0))){
+            authorStr = '%'+author.get(0).toLowerCase()+'%';
+        }
+        if(Objects.nonNull(publisher) && Objects.nonNull(publisher.get(0))){
+            publisherStr = '%'+publisher.get(0).toLowerCase()+'%';
+        }
+        if(Objects.nonNull(name)){
+            nameStr = '%'+name.toLowerCase()+'%';
+        }
+
+        if(CollectionUtils.isEmpty(category)){
+            category = null;
+        }
+        List<Book> books = bookRepository.getBooksByFilters(status, shelfId, authorStr, publisherStr, nameStr, category, ebook);
+        List<BookDTO> bookDTOList = books.stream().map(Book::toDTO).collect(Collectors.toList());
+        BookDTOListResponse response = new BookDTOListResponse();
+        response.setBookDTOList(bookDTOList);
+        return response;
+    }
 }

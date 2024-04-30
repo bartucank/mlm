@@ -191,4 +191,5 @@ public class MLMController {
     public ResponseEntity<ApiResponse<BookDTOListResponse>> getBooksByDetailedFilter(@RequestBody DetailedFilter request){
         return responseService.createResponse(mlmQueryServices.getBooksByDetailedFilter(request));
     }
+
 }
