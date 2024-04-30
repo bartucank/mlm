@@ -2,6 +2,7 @@ package com.metuncc.mlm.service.impls;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metuncc.mlm.api.request.DetailedFilter;
 import com.metuncc.mlm.api.request.FindBookRequest;
 import com.metuncc.mlm.api.request.GetReceiptRequest;
 import com.metuncc.mlm.api.response.*;
@@ -58,6 +59,8 @@ import static java.lang.Math.abs;
 import static java.time.temporal.ChronoUnit.DAYS;
 
 import org.apache.commons.csv.CSVPrinter;
+import org.springframework.util.StringUtils;
+
 
 import javax.transaction.Transactional;
 

@@ -32,4 +32,102 @@ public interface BookRepository extends JpaRepository<Book,Long>, JpaSpecificati
 
     @Query("select b from Book b where b.isbn=:isbn")
     List<Book> getBookByIsbn(@Param("isbn") String isbn);
+
+    @Query("select b from Book b " +
+            "where (:status is null or b.status in :status) and " +
+            "(:shelfId is null or b.shelfId.id in :shelfId) and " +
+            "(:author is null or lower(b.author) like :author) and " +
+            "(:name is null or lower(b.name) like :name) and " +
+            "(:publisher is null or lower(b.publisher) like :publisher) and " +
+            "(:category is null or b.category = :category) and " +
+            "(:ebook is null or ((:ebook = true and b.ebook is not null) or (:ebook = false and b.ebook is null)))")
+    List<Book> getBooksByFilters(@Param("status") List<BookStatus> status,
+                                 @Param("shelfId") List<Long> shelfId,
+                                 @Param("author") String author,
+                                 @Param("publisher") String publisher,
+                                 @Param("name") String name,
+                                 @Param("category") List<BookCategory> category,
+                                 @Param("ebook") Boolean ebook);
+
+    @Query("select distinct b.author from Book b " +
+            "where (:status is null or b.status in :status) and " +
+            "(:shelfId is null or b.shelfId.id in :shelfId) and " +
+            "(:author is null or lower(b.author) like :author) and " +
+            "(:name is null or lower(b.name) like :name) and " +
+            "(:publisher is null or lower(b.publisher) like :publisher) and " +
+            "(:category is null or b.category = :category) and " +
+            "(:ebook is null or ((:ebook = true and b.ebook is not null) or (:ebook = false and b.ebook is null)))")
+    List<String> getAuthors(@Param("status") List<BookStatus> status,
+                            @Param("shelfId") List<Long> shelfId,
+                            @Param("author") String author,
+                            @Param("publisher") String publisher,
+                            @Param("name") String name,
+                            @Param("category") List<BookCategory> category,
+                            @Param("ebook") Boolean ebook);
+
+    @Query("select distinct b.shelfId.id from Book  b " +
+            "where (:status is null or b.status in :status) and " +
+            "(:shelfId is null or b.shelfId.id in :shelfId) and " +
+            "(:author is null or lower(b.author) like :author) and " +
+            "(:name is null or lower(b.name) like :name) and " +
+            "(:publisher is null or lower(b.publisher) like :publisher) and " +
+            "(:category is null or b.category = :category) and " +
+            "(:ebook is null or ((:ebook = true and b.ebook is not null) or (:ebook = false and b.ebook is null)))")
+    List<Long> getShelfs(@Param("status") List<BookStatus> status,
+                         @Param("shelfId") List<Long> shelfId,
+                         @Param("author") String author,
+                         @Param("publisher") String publisher,
+                         @Param("name") String name,
+                         @Param("category") List<BookCategory> category,
+                         @Param("ebook") Boolean ebook);
+
+    @Query("select distinct b.publisher from Book b " +
+            "where (:status is null or b.status in :status) and " +
+            "(:shelfId is null or b.shelfId.id in :shelfId) and " +
+            "(:author is null or lower(b.author) like :author) and " +
+            "(:name is null or lower(b.name) like :name) and " +
+            "(:publisher is null or lower(b.publisher) like :publisher) and " +
+            "(:category is null or b.category = :category) and " +
+            "(:ebook is null or ((:ebook = true and b.ebook is not null) or (:ebook = false and b.ebook is null)))")
+    List<String> getPublishers(@Param("status") List<BookStatus> status,
+                               @Param("shelfId") List<Long> shelfId,
+                               @Param("author") String author,
+                               @Param("publisher") String publisher,
+                               @Param("name") String name,
+                               @Param("category") List<BookCategory> category,
+                               @Param("ebook") Boolean ebook);
+
+    @Query("select distinct b.category from Book b " +
+            "where (:status is null or b.status in :status) and " +
+            "(:shelfId is null or b.shelfId.id in :shelfId) and " +
+            "(:author is null or lower(b.author) like :author) and " +
+            "(:name is null or lower(b.name) like :name) and " +
+            "(:publisher is null or lower(b.publisher) like :publisher) and " +
+            "(:category is null or b.category = :category) and " +
+            "(:ebook is null or ((:ebook = true and b.ebook is not null) or (:ebook = false and b.ebook is null)))")
+    List<BookCategory> getCategories(@Param("status") List<BookStatus> status,
+                                     @Param("shelfId") List<Long> shelfId,
+                                     @Param("author") String author,
+                                     @Param("publisher") String publisher,
+                                     @Param("name") String name,
+                                     @Param("category") List<BookCategory> category,
+                                     @Param("ebook") Boolean ebook);
+
+    @Query("select distinct b.status from Book  b " +
+            "where (:status is null or b.status in :status) and " +
+            "(:shelfId is null or b.shelfId.id in :shelfId) and " +
+            "(:author is null or lower(b.author) like :author) and " +
+            "(:name is null or lower(b.name) like :name) and " +
+            "(:publisher is null or lower(b.publisher) like :publisher) and " +
+            "(:category is null or b.category = :category) and " +
+            "(:ebook is null or ((:ebook = true and b.ebook is not null) or (:ebook = false and b.ebook is null)))")
+    List<BookStatus> getStatuses(@Param("status") List<BookStatus> status,
+                                 @Param("shelfId") List<Long> shelfId,
+                                 @Param("author") String author,
+                                 @Param("publisher") String publisher,
+                                 @Param("name") String name,
+                                 @Param("category") List<BookCategory> category,
+                                 @Param("ebook") Boolean ebook);
+
+
 }
