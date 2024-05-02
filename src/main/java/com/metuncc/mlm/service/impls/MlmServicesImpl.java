@@ -1256,7 +1256,14 @@ public class MlmServicesImpl implements MlmServices {
         if(Objects.isNull(image)){
             throw new MLMException(ExceptionCode.IMAGE_NOT_FOUND);
         }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        User currentUser = userRepository.getById(jwtUser.getId());
+        if(Objects.isNull(currentUser) || !currentUser.getRole().equals(Role.LEC)){
+            throw new MLMException(ExceptionCode.UNAUTHORIZED);
+        }
         Course course = new Course();
+        course.setLecturer(currentUser);
         course.setName(createCourseRequest.getName());
         course.setIsPublic(createCourseRequest.getIsPublic());
         course.setImageId(image);
