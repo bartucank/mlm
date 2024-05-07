@@ -13,6 +13,7 @@ import com.metuncc.mlm.dto.google.Item;
 import com.metuncc.mlm.dto.ml.LightBook;
 import com.metuncc.mlm.dto.ml.LightReview;
 import com.metuncc.mlm.dto.ml.LightUser;
+import com.metuncc.mlm.dto.ml.MLRecommends;
 import com.metuncc.mlm.entity.*;
 import com.metuncc.mlm.entity.enums.*;
 import com.metuncc.mlm.exception.ExceptionCode;
@@ -1003,6 +1004,82 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         List<BookDTO> bookDTOList = books.stream().map(Book::toDTO).collect(Collectors.toList());
         BookDTOListResponse response = new BookDTOListResponse();
         response.setBookDTOList(bookDTOList);
+        return response;
+    }
+
+    @Override
+    public BookDTOListResponse getBookRecommendation(Long userId, Long bookId){
+        List<BookDTO> bookDTOS = new ArrayList<>();
+        if(Objects.nonNull(userId)){
+            //UserBased
+            String endPoint = "https://eew.com.tr/recom/getRecommend?mod=user&userId="+userId.toString();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endPoint))
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> resp = null;
+            try {
+                resp = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String bodyResp = resp.body();
+            MLRecommends mlmResp;
+            if(Objects.nonNull(bodyResp)){
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    mlmResp = objectMapper.readValue(bodyResp, MLRecommends.class);
+                    try{
+                        for (Long recommendation : mlmResp.getRecommendations()) {
+                            bookDTOS.add(bookRepository.getById(recommendation).toDTO());
+                            if(bookDTOS.size()==6){
+                                break;
+                            }
+                        }
+                    }catch (Exception e){
+                        //Ignore.
+                    }
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+        if(Objects.nonNull(bookId)){
+            //BookBased
+            String endPoint = "https://eew.com.tr/recom/getRecommend?mod=book&bookId="+bookId.toString();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(endPoint))
+                    .method("GET", HttpRequest.BodyPublishers.noBody())
+                    .build();
+            HttpResponse<String> resp = null;
+            try {
+                resp = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            String bodyResp = resp.body();
+            MLRecommends mlmResp;
+            if(Objects.nonNull(bodyResp)){
+                ObjectMapper objectMapper = new ObjectMapper();
+                try {
+                    mlmResp = objectMapper.readValue(bodyResp, MLRecommends.class);
+                    try{
+                        for (Long recommendation : mlmResp.getRecommendations()) {
+                            bookDTOS.add(bookRepository.getById(recommendation).toDTO());
+                            if(bookDTOS.size()==6){
+                                break;
+                            }
+                        }
+                    }catch (Exception e){
+                        //Ignore.
+                    }
+                } catch (Exception e) {
+                    return null;
+                }
+            }
+        }
+        BookDTOListResponse response = new BookDTOListResponse();
+        response.setBookDTOList(bookDTOS);
         return response;
     }
 }

@@ -192,4 +192,10 @@ public class MLMController {
         return responseService.createResponse(mlmQueryServices.getBooksByDetailedFilter(request));
     }
 
+    @PostMapping("/book/getBookRecommendation")
+    public ResponseEntity<ApiResponse<BookDTOListResponse>> getBookRecommendation(@RequestParam("bookId") Long bookId,
+                                                                                  @RequestParam("userId") Long userId){
+        return responseService.createResponse(mlmQueryServices.getBookRecommendation(userId, bookId));
+    }
+
 }

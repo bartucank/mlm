@@ -118,4 +118,6 @@ public interface MlmQueryServices {
     DetailedFilter detailedFilter(DetailedFilter filter);
 
     BookDTOListResponse getBooksByDetailedFilter(DetailedFilter filter);
+
+    BookDTOListResponse getBookRecommendation(Long userId, Long bookId);
 }
