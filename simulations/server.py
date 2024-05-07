@@ -1,6 +1,6 @@
 import subprocess
 
-libraries_to_install = ["requests", "flask", "flask_cors"]
+libraries_to_install = ["pandas", "numpy", "matplotlib","seaborn","scikit-learn"]
 for library in libraries_to_install:
     try:
         subprocess.run(["pip3", "install", library], check=False)
