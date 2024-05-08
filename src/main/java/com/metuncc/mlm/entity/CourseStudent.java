@@ -28,8 +28,12 @@ public class CourseStudent extends MLMBaseClass {
         CourseStudentDTO courseStudentDTO = new CourseStudentDTO();
         courseStudentDTO.setId(getId());
         courseStudentDTO.setStudentNumber(getStudentNumber());
-        courseStudentDTO.setStudentId(getStudent().getId());
-        courseStudentDTO.setStudentName(getStudent().getFullName());
+        try{
+            courseStudentDTO.setStudentId(getStudent().getId());
+            courseStudentDTO.setStudentName(getStudent().getFullName());
+        }catch (Exception e){
+
+        }
         return courseStudentDTO;
     }
 }
