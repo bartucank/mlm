@@ -1310,7 +1310,7 @@ public class MlmServicesImpl implements MlmServices {
             }else{
                 content.append("You can download MLM app from the app store and register to the system. <br>");
             }
-            emailRepository.save(new Email().set("e"+studentNumber.substring(0,5)+"@metu.edu.tr",title ,content.toString(),null));
+            emailRepository.save(new Email().set("e"+studentNumber.substring(0,6)+"@metu.edu.tr",title ,content.toString(),null));
         }else{
             courseStudent.setStudent(user);
         }
