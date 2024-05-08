@@ -902,6 +902,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public DetailedFilter detailedFilter(DetailedFilter filter){
 
         List<Long> shelfId = filter.getShelfId();
@@ -974,6 +975,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public BookDTOListResponse getBooksByDetailedFilter(DetailedFilter filter){
         List<Long> shelfId = filter.getShelfId();
         List<String> author = filter.getAuthor();
