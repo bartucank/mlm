@@ -81,7 +81,7 @@ public class MlmServicesImpl implements MlmServices {
     private final StatusDTO success = StatusDTO.builder().statusCode("S").msg("Success!").build();
     private final StatusDTO error = StatusDTO.builder().statusCode("E").msg("Error!").build();
 
-    @Value("${webpage.link:https://metu.edu.tr}")
+    @Value("${webpage.link:https://eew.com.tr/#/register}")
     private String webpageLink;
 
     public MlmServicesImpl(BookReviewRepository bookReviewRepository, UserRepository userRepository, PasswordEncoder passwordEncoder, ShelfRepository shelfRepository, RoomRepository roomRepository, ImageRepository imageRepository, BookRepository bookRepository, AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider, MailUtil mailUtil, VerificationCodeRepository verificationCodeRepository, BookBorrowHistoryRepository bookBorrowHistoryRepository, BookQueueRecordRepository bookQueueRecordRepository, CopyCardRepository copyCardRepository, RoomSlotRepository roomSlotRepository, RoomReservationRepository roomReservationRepository, BookQueueHoldHistoryRecordRepository bookQueueHoldHistoryRecordRepository, ReceiptHistoryRepository receiptHistoryRepository, EmailRepository emailRepository, CourseRepository courseRepository, CourseMaterialRepository courseMaterialRepository, CourseStudentRepository courseStudentRepository, FavoriteRepository favoriteRepository, EbookRepository ebookRepository) {
