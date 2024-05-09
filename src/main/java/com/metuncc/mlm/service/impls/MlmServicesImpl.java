@@ -1553,8 +1553,8 @@ public class MlmServicesImpl implements MlmServices {
         if(Objects.isNull(bookId)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
-        Ebook ebook = ebookRepository.findByBookId(bookId);
-        ebookRepository.delete(ebook);
+         ebookRepository.deleteByBookId(bookId);
+
         return success;
     }
 

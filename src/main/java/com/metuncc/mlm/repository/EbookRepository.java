@@ -11,5 +11,7 @@ public interface EbookRepository extends JpaRepository<Ebook,Long> {
     @Query("SELECT e FROM Ebook e WHERE e.book.id = :bookId")
     Ebook findByBookId(@Param("bookId") Long bookId);
 
+    @Query("DELETE FROM Ebook e WHERE e.book.id = :bookId")
+    void deleteByBookId(@Param("bookId") Long bookId);
 
 }
