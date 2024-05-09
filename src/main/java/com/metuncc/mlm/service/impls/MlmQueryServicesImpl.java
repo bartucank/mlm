@@ -664,6 +664,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return sortedStatistics;
     }
     @Override
+    @Transactional
     public List<BookReviewDTO> getBookReviewsByBookId(Long id){
         if(Objects.isNull(id)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
