@@ -29,11 +29,16 @@ public class BookSpecification implements Specification<Book> {
 
     private BookCategory category;
     private BookStatus status;
-
+    private Boolean ebookAvailable;
 
     @Override
     public Predicate toPredicate(Root<Book> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicateList = new ArrayList<>();
+        if(Objects.nonNull(ebookAvailable)){
+            predicateList.add(
+                    criteriaBuilder.isNotNull(root.get("ebook"))
+            );
+        }
         if(Objects.nonNull(name)){
             predicateList.add(
                     criteriaBuilder.like(

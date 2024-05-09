@@ -22,5 +22,6 @@ public class FindBookRequest {
 
     private int page;
     private int size;
+    private Boolean ebookAvailable;
 
 }

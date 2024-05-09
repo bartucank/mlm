@@ -230,7 +230,8 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 request.getPublicationDate(),
                 request.getBarcode(),
                 request.getCategory(),
-                request.getStatus()
+                request.getStatus(),
+                request.getEbookAvailable()
         );
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<Book> bookPage = bookRepository.findAll(bookSpecification, pageable);
