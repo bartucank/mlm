@@ -4,7 +4,6 @@ import com.metuncc.mlm.api.request.*;
 import com.metuncc.mlm.api.response.LoginResponse;
 import com.metuncc.mlm.dto.StatusDTO;
 import com.metuncc.mlm.entity.Image;
-import com.metuncc.mlm.entity.User;
 import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -100,6 +99,8 @@ public interface MlmServices {
     StatusDTO addToFavorite(Long bookId);
 
     StatusDTO addEbook(Long bookId, MultipartFile file) throws IOException;
+
+    StatusDTO deleteEBook(Long bookId);
 
     StatusDTO rejectReceipt(Long receiptId);
 

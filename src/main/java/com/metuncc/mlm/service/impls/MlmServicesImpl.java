@@ -1549,6 +1549,16 @@ public class MlmServicesImpl implements MlmServices {
     }
 
     @Override
+    public StatusDTO deleteEBook(Long bookId){
+        if(Objects.isNull(bookId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Ebook ebook = ebookRepository.findByBookId(bookId);
+        ebookRepository.delete(ebook);
+        return success;
+    }
+
+    @Override
     public StatusDTO rejectReceipt(Long receiptId){
         if(Objects.isNull(receiptId)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);

@@ -195,6 +195,10 @@ public class MLMAdminController {
                                                            @RequestParam (name = "file") MultipartFile file) throws IOException {
         return responseService.createResponse(mlmServices.addEbook(bookId,file));
     }
+    @DeleteMapping("/ebook/deleteEbook")
+    public ResponseEntity<ApiResponse<StatusDTO>> addEbook(@RequestParam (name = "bookId") Long bookId)  {
+        return responseService.createResponse(mlmServices.deleteEBook(bookId));
+    }
 
     @PutMapping("/rejectReceipt")
     public ResponseEntity<ApiResponse<StatusDTO>> rejectReceipt(@RequestParam("receiptId") Long id){
