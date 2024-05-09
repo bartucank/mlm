@@ -2,15 +2,13 @@ package com.metuncc.mlm.repository.specifications;
 
 import antlr.collections.impl.BitSet;
 import com.metuncc.mlm.entity.Book;
+import com.metuncc.mlm.entity.Ebook;
 import com.metuncc.mlm.entity.enums.BookCategory;
 import com.metuncc.mlm.entity.enums.BookStatus;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import javax.persistence.criteria.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +33,8 @@ public class BookSpecification implements Specification<Book> {
     public Predicate toPredicate(Root<Book> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicateList = new ArrayList<>();
         if(Objects.nonNull(ebookAvailable) && ebookAvailable){
-            predicateList.add(
-                    criteriaBuilder.isNotNull(root.get("ebook"))
-            );
+            Join<Book, Ebook> ebookJoin = root.join("ebook", JoinType.LEFT);
+            predicateList.add(criteriaBuilder.isNotNull(ebookJoin.get("id")));
         }
         if(Objects.nonNull(name)){
             predicateList.add(
