@@ -766,6 +766,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public CourseDTO getCourseById(Long id){
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -784,6 +785,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return course.toDTOForUsers();
     }
     @Override
+    @Transactional
     public CourseDTO getCourseByIdForLecturer(Long id){
         if(Objects.isNull(id)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
@@ -796,6 +798,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public CourseDTOListResponse getCoursesForUser(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
@@ -806,6 +809,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public CourseDTOListResponse getCoursesForLecturer(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
@@ -816,6 +820,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public CourseMaterialDTO getCourseMaterialById(Long id){
         if(Objects.isNull(id)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
