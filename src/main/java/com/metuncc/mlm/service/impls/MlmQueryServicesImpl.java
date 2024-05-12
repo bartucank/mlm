@@ -899,6 +899,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public Boolean isFavorited(Long bookId){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
