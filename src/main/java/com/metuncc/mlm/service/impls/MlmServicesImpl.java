@@ -1576,6 +1576,7 @@ public class MlmServicesImpl implements MlmServices {
     }
 
     @Override
+    @Transactional
     public StatusDTO removeFavorite(Long bookId){
         if(Objects.isNull(bookId)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);

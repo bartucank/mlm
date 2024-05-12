@@ -872,6 +872,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     }
 
     @Override
+    @Transactional
     public BookDTOListResponse getFavorites(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
