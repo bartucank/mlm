@@ -1420,7 +1420,14 @@ public class MlmServicesImpl implements MlmServices {
             throw new MLMException(ExceptionCode.MATERIAL_NOT_FOUND);
         }
         Course course = courseMaterial.getCourse();
-        course.getCourseMaterialList().remove(courseMaterial);
+        courseMaterial.setCourse(null);
+        List<CourseMaterial> courseMaterials = new ArrayList<>();
+        for (CourseMaterial material : course.getCourseMaterialList()) {
+            if(!material.getId().equals(materialId)){
+                courseMaterials.add(material);
+            }
+        }
+        course.setCourseMaterialList(courseMaterials);
         courseRepository.save(course);
         courseMaterialRepository.delete(courseMaterial);
         return success;
