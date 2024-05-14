@@ -1596,4 +1596,48 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Override
+    public StatusDTO moveShelf(Long oldShelfId, Long newShelfId){
+        if(Objects.isNull(oldShelfId) || Objects.isNull(newShelfId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Shelf oldShelf = shelfRepository.getById(oldShelfId);
+        if(Objects.isNull(oldShelf)){
+            throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+        }
+        Shelf newShelf = shelfRepository.getById(newShelfId);
+        if(Objects.isNull(newShelf)){
+            throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+        }
+        List<Book> books = bookRepository.getBooksByShelfId(oldShelfId);
+        books.forEach(b->{
+            b.setShelfId(newShelf);
+            bookRepository.save(b);
+        });
+        return success;
+    }
+
+    @Override
+    public StatusDTO deleteShelf(Long oldShelfId, Long newShelfId) {
+        if (Objects.isNull(oldShelfId)) {
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Shelf oldShelf = shelfRepository.getById(oldShelfId);
+        if (Objects.isNull(oldShelf)) {
+            throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);
+        }
+        List<Book> books = bookRepository.getBooksByShelfId(oldShelfId);
+        if (!books.isEmpty()) { //shelf to be deleted is not empty
+            if(Objects.isNull(newShelfId) || Objects.isNull(shelfRepository.getById(newShelfId))){
+                throw new MLMException(ExceptionCode.SHELF_NOT_EMPTY);
+            }
+            moveShelf(oldShelfId, newShelfId);
+            shelfRepository.delete(oldShelf);
+        }
+        else { //shelf to be deleted is empty
+            shelfRepository.delete(oldShelf);
+        }
+        return success;
+    }
+
 }

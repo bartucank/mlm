@@ -205,4 +205,16 @@ public class MLMAdminController {
         return responseService.createResponse(mlmServices.rejectReceipt(id));
     }
 
+    @PutMapping("/moveShelf")
+    public ResponseEntity<ApiResponse<StatusDTO>> moveShelf(@RequestParam("oldShelfId") Long odlShelfId,
+                                                            @RequestParam("newShelfId") Long newShelfId){
+        return responseService.createResponse(mlmServices.moveShelf(odlShelfId,newShelfId));
+    }
+
+    @DeleteMapping("/deleteShelf")
+    public ResponseEntity<ApiResponse<StatusDTO>> deleteShelf(@RequestParam("oldShelfId") Long odlShelfId,
+                                                              @RequestParam("newShelfId") Long newShelfId){
+        return responseService.createResponse(mlmServices.deleteShelf(odlShelfId,newShelfId));
+    }
+
 }

@@ -105,4 +105,8 @@ public interface MlmServices {
     StatusDTO rejectReceipt(Long receiptId);
 
     StatusDTO removeFavorite(Long bookId);
+
+    StatusDTO moveShelf(Long oldShelfId, Long newShelfId);
+
+    StatusDTO deleteShelf(Long oldShelfId, Long newShelfId);
 }

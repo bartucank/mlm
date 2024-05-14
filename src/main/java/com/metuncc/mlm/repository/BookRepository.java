@@ -130,4 +130,6 @@ public interface BookRepository extends JpaRepository<Book,Long>, JpaSpecificati
                                  @Param("ebook") Boolean ebook);
 
 
+    @Query("select count(b) from Book b where b.shelfId.id=:shelfId")
+    Long getCountByShelfId(@Param("shelfId") Long shelfId);
 }
