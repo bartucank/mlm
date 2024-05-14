@@ -112,6 +112,9 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     public ShelfDTOListResponse getAllShelfs() {
         ShelfDTOListResponse response = new ShelfDTOListResponse();
         response.setShelfDTOList(shelfRepository.findAll().stream().map(Shelf::toDTO).collect(Collectors.toList()));
+        for (ShelfDTO shelfDTO : response.getShelfDTOList()) {
+            shelfDTO.setBookCount(bookRepository.getCountByShelfId(shelfDTO.getId()));
+        }
         return response;
     }
 

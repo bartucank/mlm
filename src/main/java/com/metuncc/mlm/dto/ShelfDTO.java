@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 public class ShelfDTO extends MLMBaseClassDTO {
 
     private String floor;
+    private Long bookCount;
 
 
 }
