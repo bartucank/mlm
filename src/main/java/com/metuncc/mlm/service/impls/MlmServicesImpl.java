@@ -1410,6 +1410,7 @@ public class MlmServicesImpl implements MlmServices {
     }
 
     @Override
+    @Transactional
     public StatusDTO deleteCourseMaterial(Long materialId){
         if(Objects.isNull(materialId)){
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
