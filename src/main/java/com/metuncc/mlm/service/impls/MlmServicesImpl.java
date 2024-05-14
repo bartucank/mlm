@@ -1442,9 +1442,15 @@ public class MlmServicesImpl implements MlmServices {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
         courseStudent.setCourse(null);
-        course.getCourseStudentList().remove(courseStudent);
-        courseStudentRepository.delete(courseStudent);
+        List<CourseStudent> students = new ArrayList<>();
+        for (CourseStudent student : course.getCourseStudentList()) {
+            if(!student.getId().equals(courseStudentId)){
+                students.add(student);
+            }
+        }
+        course.setCourseStudentList(students);
         courseRepository.save(course);
+        courseStudentRepository.delete(courseStudent);
         return success;
     }
     @Override
