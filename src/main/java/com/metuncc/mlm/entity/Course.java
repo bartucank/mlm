@@ -26,10 +26,10 @@ public class Course extends MLMBaseClass {
     @OneToOne
     private Image imageId;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<CourseMaterial> courseMaterialList;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     private List<CourseStudent> courseStudentList;
 
 
