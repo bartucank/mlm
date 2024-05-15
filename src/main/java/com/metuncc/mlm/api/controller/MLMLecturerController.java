@@ -79,4 +79,9 @@ public class MLMLecturerController {
     public ResponseEntity<ApiResponse<StatusDTO>> finishCourseTerm(@RequestParam("courseId") Long courseId){
         return responseService.createResponse(mlmServices.finishCourseTerm(courseId));
     }
+
+    @DeleteMapping("/course/deleteCourse")
+    public ResponseEntity<ApiResponse<StatusDTO>> deleteCourse(@RequestParam("courseId") Long courseId){
+        return responseService.createResponse(mlmServices.deleteCourse(courseId));
+    }
 }

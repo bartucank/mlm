@@ -1432,6 +1432,34 @@ public class MlmServicesImpl implements MlmServices {
         courseMaterialRepository.delete(courseMaterial);
         return success;
     }
+
+    @Override
+    @Transactional
+    public StatusDTO deleteCourse(Long courseId){
+        if(Objects.isNull(courseId)){
+            throw new MLMException(ExceptionCode.INVALID_REQUEST);
+        }
+        Course course = courseRepository.getById(courseId);
+        if(Objects.isNull(course)){
+            throw new MLMException(ExceptionCode.COURSE_NOT_FOUND);
+        }
+        List<CourseMaterial> materialToBeDeleted = new ArrayList<>();
+        List<CourseStudent> studentsToBeDeleted = new ArrayList<>();
+        for (CourseMaterial courseMaterial : course.getCourseMaterialList()) {
+            courseMaterial.setCourse(null);
+            materialToBeDeleted.add(courseMaterial);
+        }
+        for (CourseStudent courseStudent : course.getCourseStudentList()) {
+            courseStudent.setCourse(null);
+            studentsToBeDeleted.add(courseStudent);
+        }
+        course.setCourseMaterialList(new ArrayList<>());
+        course.setCourseStudentList(new ArrayList<>());
+        courseMaterialRepository.deleteAll(materialToBeDeleted);
+        courseStudentRepository.deleteAll(studentsToBeDeleted);
+        courseRepository.delete(course);
+        return success;
+    }
     @Override
     public StatusDTO removeStudentFromCourse(Long courseId, Long courseStudentId){
         if(Objects.isNull(courseId)){

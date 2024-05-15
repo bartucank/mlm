@@ -7,6 +7,7 @@ import com.metuncc.mlm.entity.Image;
 import com.metuncc.mlm.entity.enums.RoomSlotDays;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.math.BigDecimal;
 
@@ -89,6 +90,9 @@ public interface MlmServices {
     StatusDTO uploadCourseMaterial(MultipartFile file, Long courseId, String name) throws IOException;
 
     StatusDTO deleteCourseMaterial(Long materialId);
+
+    @Transactional
+    StatusDTO deleteCourse(Long courseId);
 
     StatusDTO removeStudentFromCourse(Long courseId, Long courseStudentId);
 
