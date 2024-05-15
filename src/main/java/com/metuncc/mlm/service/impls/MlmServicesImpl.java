@@ -685,6 +685,26 @@ public class MlmServicesImpl implements MlmServices {
         return false;
     }
     @Override
+    public Boolean approveReservation(String secret){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+        if (Objects.isNull(jwtUser) || Objects.isNull(jwtUser.getId())) {
+            throw new MLMException(ExceptionCode.UNAUTHORIZED);
+        }
+        List<RoomReservation> roomReservationList = roomReservationRepository.getRoomReservationByUserId(jwtUser.getId(),LocalDate.now());
+        LocalDateTime currentTime = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+        List<RoomReservation> todaysReservations = roomReservationList.stream().filter(c -> (c.getRoomSlot().getDay().getValue() == currentTime.getDayOfWeek().getValue()) && (c.getRoomSlot().getStartHour().getHour() == currentTime.getHour())).collect(Collectors.toList());
+        if (!CollectionUtils.isEmpty(todaysReservations)) {
+            for (RoomReservation todaysReservation : todaysReservations) {
+                if(!todaysReservation.getApproved() && todaysReservation.getRoomSlot().getRoom().getVerfCode().equals(secret)){
+                    return true;
+                }
+            }
+            return false;
+        }
+        return false;
+    }
+    @Override
     public StatusDTO makeReservation(Long roomSlotId) {
         if (Objects.isNull(roomSlotId)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);

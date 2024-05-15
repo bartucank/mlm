@@ -55,6 +55,9 @@ public interface MlmServices {
 
     Boolean checkNowReservationExists();
 
+
+    Boolean approveReservation(String secret);
+
     StatusDTO makeReservation(Long roomSlotId);
 
     StatusDTO cancelReservation(Long roomReservationId);
