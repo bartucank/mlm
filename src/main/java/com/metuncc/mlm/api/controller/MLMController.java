@@ -198,4 +198,10 @@ public class MLMController {
         return responseService.createResponse(mlmQueryServices.getBookRecommendation(userId, bookId));
     }
 
+    //approveReservation
+    @PostMapping("/approveReservation")
+    public ResponseEntity<ApiResponse<Boolean>> approveReservation(@RequestParam("key") String qrCode){
+        return responseService.createResponse(mlmServices.approveReservation(qrCode));
+    }
+
 }
