@@ -490,13 +490,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public StatisticsDTO getStatistics(){
         StatisticsDTO statisticsDTO = new StatisticsDTO();
-        statisticsDTO.setTotalUserCount(userRepository.totalUserCount());
-        statisticsDTO.setTotalBookCount(bookRepository.totalBookCount());
-        statisticsDTO.setAvailableBookCount(bookRepository.bookCountByAvailability(BookStatus.AVAILABLE));
-        statisticsDTO.setUnavailableBookCount(bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE));
-        statisticsDTO.setSumOfBalance(copyCardRepository.totalBalance());
-        statisticsDTO.setSumOfDebt(userRepository.totalDebt());
-        statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
+        properStatisticDTO(statisticsDTO);
 
         LocalDateTime today = LocalDateTime.now();
         statisticsDTO.setDay(today.getDayOfWeek());
@@ -645,13 +639,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public List<StatisticsDTO> getStatisticsForChart(){
         StatisticsDTO statisticsDTO = new StatisticsDTO();
-        statisticsDTO.setTotalUserCount(userRepository.totalUserCount());
-        statisticsDTO.setTotalBookCount(bookRepository.totalBookCount());
-        statisticsDTO.setAvailableBookCount(bookRepository.bookCountByAvailability(BookStatus.AVAILABLE));
-        statisticsDTO.setUnavailableBookCount(bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE));
-        statisticsDTO.setSumOfBalance(copyCardRepository.totalBalance());
-        statisticsDTO.setSumOfDebt(userRepository.totalDebt());
-        statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
+        properStatisticDTO(statisticsDTO);
         statisticsDTO.setId(9999L);
         LocalDateTime today = LocalDateTime.now();
         statisticsDTO.setDay(today.getDayOfWeek());
@@ -667,6 +655,17 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
                 .collect(Collectors.toList());
         return sortedStatistics;
     }
+
+    private void properStatisticDTO(StatisticsDTO statisticsDTO) {
+        statisticsDTO.setTotalUserCount(userRepository.totalUserCount());
+        statisticsDTO.setTotalBookCount(bookRepository.totalBookCount());
+        statisticsDTO.setAvailableBookCount(bookRepository.bookCountByAvailability(BookStatus.AVAILABLE));
+        statisticsDTO.setUnavailableBookCount(bookRepository.bookCountByAvailability(BookStatus.NOT_AVAILABLE));
+        statisticsDTO.setSumOfBalance(copyCardRepository.totalBalance());
+        statisticsDTO.setSumOfDebt(userRepository.totalDebt());
+        statisticsDTO.setQueueCount(bookQueueRecordRepository.getBookQueueRecordByStatus(QueueStatus.ACTIVE));
+    }
+
     @Override
     @Transactional
     public List<BookReviewDTO> getBookReviewsByBookId(Long id){
