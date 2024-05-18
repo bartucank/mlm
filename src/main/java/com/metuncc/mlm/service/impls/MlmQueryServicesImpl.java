@@ -985,7 +985,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return newFilter;
     }
 
-    @OverrideF
+    @Override
     @Transactional
     public BookDTOListResponse getBooksByDetailedFilter(DetailedFilter filter){
         List<Long> shelfId = filter.getShelfId();
