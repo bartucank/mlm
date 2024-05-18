@@ -985,7 +985,7 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
         return newFilter;
     }
 
-    @Override
+    @OverrideF
     @Transactional
     public BookDTOListResponse getBooksByDetailedFilter(DetailedFilter filter){
         List<Long> shelfId = filter.getShelfId();
@@ -1023,6 +1023,11 @@ public class MlmQueryServicesImpl implements MlmQueryServices {
     @Override
     public BookDTOListResponse getBookRecommendation(Long userId, Long bookId){
         List<BookDTO> bookDTOS = new ArrayList<>();
+        if(Objects.isNull(userId) && Objects.isNull(bookId)){
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            JwtUserDetails jwtUser = (JwtUserDetails) auth.getPrincipal();
+            userId = jwtUser.getId();
+        }
         if(Objects.nonNull(userId)){
             //UserBased
             String endPoint = "https://eew.com.tr/recom/getRecommend?mod=user&userId="+userId.toString();
