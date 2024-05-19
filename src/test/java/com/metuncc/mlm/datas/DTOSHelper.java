@@ -1,6 +1,7 @@
 package com.metuncc.mlm.datas;
 
 import com.metuncc.mlm.api.request.BookRequest;
+import com.metuncc.mlm.api.request.CreateCourseRequest;
 import com.metuncc.mlm.api.request.CreateRoomRequest;
 import com.metuncc.mlm.api.request.UserRequest;
 import com.metuncc.mlm.dto.BookDTO;
@@ -114,4 +115,13 @@ public class DTOSHelper {
         createRoomRequest.setImageId(1L);
         return createRoomRequest;
     }
+
+    public CreateCourseRequest getCreateCourseRequest1() {
+        CreateCourseRequest createCourseRequest = new CreateCourseRequest();
+        createCourseRequest.setName("name");
+        createCourseRequest.setImageId(1L);
+        createCourseRequest.setIsPublic(true);
+        return createCourseRequest;
+    }
+
 }
