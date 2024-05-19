@@ -1232,10 +1232,13 @@ public class MlmServicesImpl implements MlmServices {
         if(Objects.isNull(user)){
             throw new MLMException(ExceptionCode.USER_NOT_FOUND);
         }
+        List<VerificationCode> oldCodes = verificationCodeRepository.oldUnapprovedCodes( VerificationType.RESET_PASSWORD,user.getId());
+        verificationCodeRepository.deleteAll(oldCodes);
         VerificationCode verificationCode = new VerificationCode();
         verificationCode.setUser(user);
         verificationCode.setCode(generateRandomCode(4));
         verificationCode.setVerificationType(VerificationType.RESET_PASSWORD);
+        verificationCode.setIsCompleted(false);
         verificationCodeRepository.save(verificationCode);
         mailUtil.sendResetPasswordEmail(user.getEmail(), verificationCode.getCode());
         return  success;

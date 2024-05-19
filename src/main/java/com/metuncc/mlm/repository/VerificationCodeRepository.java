@@ -26,4 +26,8 @@ public interface VerificationCodeRepository extends JpaRepository<VerificationCo
     @Query("select v from VerificationCode v where v.createdDate<:localDateTime and v.verificationType=:ttype ")
     List<VerificationCode> getVerificationCodesByCreatedDateBefore(@Param("localDateTime") LocalDateTime localDateTime,
                                                                    @Param("ttype") VerificationType ttype);
+
+    @Query("select v from VerificationCode v where v.verificationType=:ttype and v.user.id=:id and v.isCompleted=false")
+    List<VerificationCode> oldUnapprovedCodes(@Param("ttype") VerificationType verificationType,
+                                              @Param("id") Long id);
 }
