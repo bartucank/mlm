@@ -82,7 +82,7 @@ public interface MlmServices {
 
     Boolean checkCodeForResetPassword(String code);
 
-    LoginResponse completeCodeForResetPassword(VerifyChangePasswordRequest request);
+    Boolean completeCodeForResetPassword(VerifyChangePasswordRequest request);
 
     StatusDTO createCourse(CreateCourseRequest createCourseRequest);
 

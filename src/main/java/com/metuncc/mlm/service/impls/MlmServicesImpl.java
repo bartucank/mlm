@@ -1251,7 +1251,7 @@ public class MlmServicesImpl implements MlmServices {
     }
 
     @Override
-    public LoginResponse completeCodeForResetPassword(VerifyChangePasswordRequest request){
+    public Boolean completeCodeForResetPassword(VerifyChangePasswordRequest request){
         VerificationCode verificationCode = verificationCodeRepository.getByCode(request.getCode());
         if(Objects.isNull(verificationCode)){
             throw new MLMException(ExceptionCode.UNAUTHORIZED);
@@ -1259,10 +1259,8 @@ public class MlmServicesImpl implements MlmServices {
         User user =verificationCode.getUser();
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
-        UserRequest userRequest = new UserRequest();
-        userRequest.setUsername(user.getUsername());
-        userRequest.setPass(user.getPassword());
-        return login(userRequest);
+        verificationCode.setIsCompleted(true);
+        return true;
     }
 
     @Override

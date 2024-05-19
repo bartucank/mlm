@@ -261,6 +261,13 @@ public class MlmScheduledServicesImpl implements MlmScheduledServices {
             }
         }
     }
+
+    @Scheduled(fixedRate = 900000)
+    public void deleteVerificationCodes(){
+        LocalDateTime localDateTime = LocalDateTime.now().minusMinutes(15L);
+        List<VerificationCode> verificationCodes = verificationCodeRepository.getVerificationCodesByCreatedDateBefore(localDateTime,VerificationType.RESET_PASSWORD);
+        verificationCodeRepository.deleteAll(verificationCodes);
+    }
 }
 
 

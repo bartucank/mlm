@@ -61,7 +61,7 @@ public class AuthController {
         return responseService.createResponse(mlmServices.checkCodeForResetPassword(code));
     }
     @PostMapping("/completeCodeForResetPassword")
-    public ResponseEntity<ApiResponse<LoginResponse>> completeCodeForResetPassword(@RequestBody VerifyChangePasswordRequest request){
+    public ResponseEntity<ApiResponse<Boolean>> completeCodeForResetPassword(@RequestBody VerifyChangePasswordRequest request){
         return responseService.createResponse(mlmServices.completeCodeForResetPassword(request));
     }
 
