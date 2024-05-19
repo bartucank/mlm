@@ -1622,6 +1622,9 @@ public class MlmServicesImpl implements MlmServices {
         if (Objects.isNull(oldShelfId)) {
             throw new MLMException(ExceptionCode.INVALID_REQUEST);
         }
+        if(Objects.nonNull(oldShelfId) && Objects.nonNull(newShelfId) && oldShelfId.equals(newShelfId) ){
+            throw new MLMException(ExceptionCode.SHELFS_SAME);
+        }
         Shelf oldShelf = shelfRepository.getById(oldShelfId);
         if (Objects.isNull(oldShelf)) {
             throw new MLMException(ExceptionCode.SHELF_NOT_FOUND);

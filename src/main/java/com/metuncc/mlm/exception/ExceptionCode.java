@@ -50,7 +50,8 @@ public enum ExceptionCode {
     UNSUPPORTED_FILE("File type is not supported. Only PDF or EPUB"),
     FAVORITE_NOT_FOUND("Favorite not found."),
     ALREADY_FAVORITED("Already favorited."),
-    SHELF_NOT_EMPTY("Shelf is not empty. Please enter new shelf ID to move the books."),;
+    SHELF_NOT_EMPTY("Shelf is not empty. Please enter new shelf ID to move the books."),
+    SHELFS_SAME("Shelf is same. Please enter new shelf ID to move the books.");
 
 
 
