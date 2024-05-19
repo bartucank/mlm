@@ -103,6 +103,7 @@ public class SecurityConfig {
 
 
                 .antMatchers("/api/auth/**").permitAll()
+                .antMatchers("/api/auth/completeCodeForResetPassword").permitAll()
                 .antMatchers("/api/user/**").permitAll()
                 .antMatchers("/api/admin/**").permitAll()
                 .antMatchers("/api/lecturer/**").permitAll()

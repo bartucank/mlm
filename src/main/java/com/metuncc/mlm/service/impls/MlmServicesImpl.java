@@ -1659,6 +1659,7 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Transactional
     @Override
     public StatusDTO moveShelf(Long oldShelfId, Long newShelfId){
         if(Objects.isNull(oldShelfId) || Objects.isNull(newShelfId)){
@@ -1680,6 +1681,7 @@ public class MlmServicesImpl implements MlmServices {
         return success;
     }
 
+    @Transactional
     @Override
     public StatusDTO deleteShelf(Long oldShelfId, Long newShelfId) {
         if (Objects.isNull(oldShelfId)) {
