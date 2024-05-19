@@ -204,6 +204,7 @@ public class MlmServicesImpl implements MlmServices {
         return StatusDTO.builder().statusCode("S").msg(shelf.getId().toString()).build();
     }
 
+    @Transactional
     @Override
     public StatusDTO updateShelf(ShelfCreateRequest request) {
         if (Objects.isNull(request) || Objects.isNull(request.getId()) || Objects.isNull(request.getFloor())) {
