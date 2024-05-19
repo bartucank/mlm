@@ -698,6 +698,8 @@ public class MlmServicesImpl implements MlmServices {
         if (!CollectionUtils.isEmpty(todaysReservations)) {
             for (RoomReservation todaysReservation : todaysReservations) {
                 if(!todaysReservation.getApproved() && todaysReservation.getRoomSlot().getRoom().getVerfCode().equals(secret)){
+                    todaysReservation.setApproved(true);
+                    roomReservationRepository.save(todaysReservation);
                     return true;
                 }
             }
