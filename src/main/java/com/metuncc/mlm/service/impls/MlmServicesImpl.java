@@ -1221,7 +1221,13 @@ public class MlmServicesImpl implements MlmServices {
         if(Objects.isNull(request.getEmail()) && Objects.isNull(request.getUsername())){
             throw new MLMException(ExceptionCode.EMAIL_OR_USERNAME_SHOULD_BE_NOT_EMPTY);
         }
-        User user = userRepository.getByEmailOrUsername(request.getEmail(),request.getUsername());
+        User user = null;
+        if(Objects.nonNull(request.getEmail())){
+            user = userRepository.getByEmailForgot(request.getEmail());
+        } else if(Objects.nonNull(request.getUsername())){
+            user = userRepository.getByUsernameForgot(request.getUsername());
+        }
+
         if(Objects.isNull(user)){
             throw new MLMException(ExceptionCode.USER_NOT_FOUND);
         }
