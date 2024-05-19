@@ -32,6 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -94,6 +95,10 @@ public class MlmServiceTests {
     private FavoriteRepository favoriteRepository;
     @Mock
     private EbookRepository ebookRepository;
+    @Mock
+    private ReceiptHistoryRepository receiptHistoryRepository;
+    @Mock
+    private CopyCardRepository copyCardRepository;
     @InjectMocks
     private MlmServicesImpl service;
 
@@ -1116,4 +1121,76 @@ public class MlmServiceTests {
         assertNotNull(service.addEbook(1L, multipartFile));
     }
 
+    @Test
+    public void createCourse_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.createCourse(null);
+        });
+    }
+
+    @Test
+    public void createCourse_validCase(){
+        initSecurityForLecturer();
+        when(courseRepository.save(any())).thenReturn(dosHelper.course1());
+        when(imageRepository.getById(any())).thenReturn(dosHelper.image1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.lecturer1());
+        assertNotNull(service.createCourse(dtosHelper.getCreateCourseRequest1()));
+    }
+
+    @Test
+    public void uploadCourseMaterial_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.uploadCourseMaterial(null, null, null);
+        });
+    }
+
+    @Test
+    public void uploadCourseMaterial_validCase() throws IOException {
+        when(courseRepository.getById(any())).thenReturn(dosHelper.course1());
+        byte[] content = "Mock file content".getBytes();
+        MockMultipartFile multipartFile = new MockMultipartFile(
+                "file",
+                "filename.pdf",
+                "application/pdf",
+                new ByteArrayInputStream(content)
+        );
+        assertNotNull(service.uploadCourseMaterial(multipartFile, 1L, "asd" ));
+    }
+
+    @Test
+    public void bulkAddStudentToCourse_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.bulkAddStudentToCourse(null, null);
+        });
+    }
+
+    @Test
+    public void createReceiptHistory_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.createReceiptHistory(null);
+        });
+    }
+
+    @Test
+    public void createReceiptHistory_validCase(){
+        when(receiptHistoryRepository.save(any())).thenReturn(dosHelper.receiptHistory1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(imageRepository.getImageById(any())).thenReturn(dosHelper.image1());
+        assertNotNull(service.createReceiptHistory(1L));
+    }
+
+    @Test
+    public void approveReceipt_invalidCase(){
+        assertThrows(MLMException.class, () -> {
+            service.approveReceipt(null, null);
+        });
+    }
+
+    @Test
+    public void approveReceipt_validCase(){
+        when(receiptHistoryRepository.getById(any())).thenReturn(dosHelper.receiptHistory1());
+        when(userRepository.getById(any())).thenReturn(dosHelper.user1());
+        when(copyCardRepository.getByUser(any())).thenReturn(dosHelper.copyCard1());
+        assertNotNull(service.approveReceipt(1L, BigDecimal.ONE));
+    }
 }
