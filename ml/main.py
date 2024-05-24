@@ -27,6 +27,28 @@ from sklearn.neighbors import NearestNeighbors
 app = Flask(__name__)
 CORS(app)
 
+def mean_average_precision(recommended_items, relevant_items):
+    relevant_set = set(relevant_items)
+    score = 0.0
+    num_hits = 0.0
+    for i, item in enumerate(recommended_items):
+        if item in relevant_set:
+            num_hits += 1.0
+            score += num_hits / (i + 1.0)
+    return score / max(1.0, len(relevant_set))
+
+def precision_at_k(recommended_items, relevant_items, k):
+    recommended_k = recommended_items[:k]
+    relevant_set = set(relevant_items)
+    recommended_set = set(recommended_k)
+    return len(recommended_set & relevant_set) / k
+
+def recall_at_k(recommended_items, relevant_items, k):
+    recommended_k = recommended_items[:k]
+    relevant_set = set(relevant_items)
+    recommended_set = set(recommended_k)
+    return len(recommended_set & relevant_set) / len(relevant_set)
+
 def download_csv(url, filename):
     response = requests.get(url)
     if response.status_code == 200:
