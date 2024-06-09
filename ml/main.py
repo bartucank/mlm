@@ -1,12 +1,13 @@
 import subprocess
 
-libraries_to_install = ["requests", "flask", "scipy", "scikit-learn", "flask_cors","json","pandas","numpy","matplotlib.pyplot","seaborn"]
-for library in libraries_to_install:
-    try:
-        subprocess.run(["pip3", "install", library], check=False)
-        print(f"{library} installed")
-    except subprocess.CalledProcessError as e:
-        print(f"Error !!! library: {library}  error: {e}")
+# libraries_to_install = ["requests", "flask", "scipy", "scikit-learn", "flask_cors","json","pandas","numpy","matplotlib.pyplot","seaborn"]
+# for library in libraries_to_install:
+#     try:
+#         subprocess.run(["pip3", "install", library], check=False)
+#         print(f"{library} installed")
+#     except subprocess.CalledProcessError as e:
+#         print(f"Error !!! library: {library}  error: {e}")
+
 from datetime import datetime, timedelta
 import joblib
 import os
@@ -112,6 +113,7 @@ def preprocess_data(reviews, books):
 def create_book_pivot(merged_data):
     book_pivot = merged_data.pivot_table(columns='userid', index='bookid', values='rate')
     book_pivot.fillna(0, inplace=True)
+    book_pivot.to_csv('book_pivot.csv')
     return book_pivot
 
 def train_model(book_pivot):
