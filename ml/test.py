@@ -10,6 +10,7 @@ class TestRecommendationSystem(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         print("Starting tests...")
+
 #         cls.download_csv('https://eew.com.tr/srv/api/external/csv/reviews', 'test_reviews.csv')
 #         cls.download_csv('https://eew.com.tr/srv/api/external/csv/books', 'test_books.csv')
 
