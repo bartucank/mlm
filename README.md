@@ -3,7 +3,7 @@
   <a href="https://github.com/bartucank/mlm">
     <img src="https://www.metu.edu.tr/system/files/logo_orj/3/3.8.png" alt="Logo" >
   </a>
-  <h3 align="center">METU NCC Library Management</h3>
+  <h3 align="center">METU NCC Library Management - Backend Repository</h3>
 
   <p align="center">
     Graduate project, Library Management System for METU NCC
